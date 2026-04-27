@@ -5,7 +5,7 @@
   "description": "Backend API for an AI Virtual Patient Simulator hackathon project.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start:server": "node server.js",
     "dev": "node server.js",
     "vercel-build": "cd frontend && npm install && npm run build"
   },
