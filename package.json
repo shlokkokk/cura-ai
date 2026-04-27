@@ -1,0 +1,15 @@
+{
+  "name": "ai-virtual-patient-simulator-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend API for an AI Virtual Patient Simulator hackathon project.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "vercel-build": "cd frontend && npm install && npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

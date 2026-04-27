@@ -1,0 +1,49 @@
+@baseUrl = http://localhost:3000
+@adminKey = your_optional_admin_key_here
+
+### Health
+GET {{baseUrl}}/health
+
+### List cases
+GET {{baseUrl}}/api/cases
+
+### Get one case
+GET {{baseUrl}}/api/cases/case-1
+
+### Create session
+POST {{baseUrl}}/api/sessions
+Content-Type: application/json
+
+{
+  "caseId": "case-1",
+  "learnerName": "Frontend Demo User"
+}
+
+### Send learner message
+POST {{baseUrl}}/api/sessions/REPLACE_SESSION_ID/messages
+Content-Type: application/json
+
+{
+  "message": "How long have you had the fever and cough?"
+}
+
+### The response includes a provider field
+### "gemini" when GEMINI_API_KEY is set
+### "local-scripted" otherwise
+
+### Evaluate learner submission
+POST {{baseUrl}}/api/sessions/REPLACE_SESSION_ID/evaluate
+Content-Type: application/json
+
+{
+  "diagnosis": "Community acquired pneumonia",
+  "reasoning": "Fever, productive cough, pleuritic chest pain, and worsening shortness of breath make pneumonia likely."
+}
+
+### Admin analytics
+GET {{baseUrl}}/api/admin/analytics
+x-admin-key: {{adminKey}}
+
+### Admin sessions
+GET {{baseUrl}}/api/admin/sessions?limit=20
+x-admin-key: {{adminKey}}
