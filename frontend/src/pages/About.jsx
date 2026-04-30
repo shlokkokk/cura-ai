@@ -76,22 +76,26 @@ export default function About() {
               </div>
               
               <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--surface)', border: '2px dashed var(--border)', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>?</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Team Member</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Role</p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Description</p>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #10B981, #34D399)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>T</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Toqa Abdul-Hafez</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Team Leader & Designer</p>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Leading the vision and crafting the user experience.</p>
               </div>
               
               <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--surface)', border: '2px dashed var(--border)', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>?</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Team Member</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Role</p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Description</p>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #F59E0B, #FCD34D)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>M</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Maham Taqi</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Presentation & Editing</p>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Communicating our impact and refining our story.</p>
+              </div>
+
+              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #3B82F6, #93C5FD)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>A</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Abubakar Mughal</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Quality Assurance</p>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Ensuring flawless execution and platform stability.</p>
               </div>
             </div>
-            <p style={{ color: 'var(--muted)', marginTop: '40px', fontStyle: 'italic' }}>
-              Let me know the rest of the team members and their roles to update this section!
-            </p>
           </div>
         </section>
       </main>
