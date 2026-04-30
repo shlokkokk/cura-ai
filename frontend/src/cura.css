@@ -28,16 +28,16 @@
   position: relative;
 }
 .curaai-web-app-ui-design2 {
-  width: 1458px;
+  width: 100%;
+  max-width: 1458px;
   height: auto;
   background-color: #fafcff;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding: 0 0 1114px;
+  align-items: center;
+  padding: 0 0 100px;
   box-sizing: border-box;
-  max-width: 114%;
 }
 .app3,
 .body2 {
@@ -45,10 +45,11 @@
   max-width: 100%;
 }
 .body2 {
-  width: 1458px;
+  width: 100%;
   height: auto;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   z-index: 1;
   text-align: center;
   font-size: 48px;
@@ -56,6 +57,7 @@
   font-family: "DM Sans";
 }
 .app3 {
+  width: 100%;
   height: auto;
   background: linear-gradient(
     135deg,
@@ -70,8 +72,9 @@
     #e9f5ff 92.86%,
     #e6f4ff
   );
-  padding: 72.8px 88px 0;
+  padding: 40px 20px 0;
   gap: 39px;
+  align-items: center;
 }
 .app3,
 .container9,
@@ -82,20 +85,24 @@
   flex-shrink: 0;
 }
 .container9 {
-  width: 1269px;
+  width: 100%;
+  max-width: 1269px;
   height: auto;
   flex-direction: column;
-  padding: 45px 13px 45px 24px;
+  padding: 20px 10px;
   position: relative;
   isolation: isolate;
-  gap: 74px;
-  max-width: 100%;
+  gap: 40px;
 }
 .section2 {
-  width: 1232px;
+  width: 100%;
+  max-width: 1232px;
   height: auto;
-  padding: 0 0 38.8px;
-  gap: 84.2px;
+  padding: 0;
+  gap: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .container10 {
   height: auto;
@@ -2076,15 +2083,62 @@
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+/* Responsive Overrides for Mobile */
+@media (max-width: 900px) {
+  .section2 {
+    flex-direction: column !important;
+    text-align: center;
+  }
+  .container10 {
+    width: 100% !important;
+    padding: 20px 0 !important;
+    align-items: center !important;
+  }
+  .heading-1-group {
+    align-items: center !important;
+  }
+  .heading-13, .master-clinical-decision-makin2 {
+    width: 100% !important;
+    text-align: center;
+  }
+  .practice-medicine-with3, .realistic-ai-patients2 {
+    width: 100% !important;
+    font-size: 36px !important;
+    line-height: 1.2 !important;
+  }
+  .container11 {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .button11, .button12 {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .container-wrapper2 img {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .how-it-works-group {
+    width: 100% !important;
+    padding: 20px !important;
+  }
+  .bxsoffer-parent, .container12, .background, .features {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+  .heading-2 {
+    font-size: 32px !important;
+    line-height: 1.2 !important;
+  }
+  .heading {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .desktop2 {
+    overflow-x: hidden;
+  }
+}
