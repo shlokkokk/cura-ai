@@ -229,7 +229,9 @@ export default function Landing() {
             </div>
             <div className="app-child">
               <div className="dark-gray-wingback-c-parent">
-                <section className="dark-gray-wingback-c">
+                {[1, 2].map((key) => (
+                  <React.Fragment key={key}>
+                    <section className="dark-gray-wingback-c">
                   <div className="wrapper8">
                     <h2 className="h27">“</h2>
                   </div>
@@ -319,6 +321,8 @@ export default function Landing() {
                     </h3>
                   </div>
                 </section>
+                  </React.Fragment>
+                ))}
               </div>
             </div>
             <div className="km3">
