@@ -10,6 +10,7 @@ export default function Dashboard() {
   const location = useLocation();
   const [stats, setStats] = useState(null);
   const [cases, setCases] = useState({});
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
