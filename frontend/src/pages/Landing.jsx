@@ -61,7 +61,7 @@ export default function Landing() {
                     </div>
                   </div>
                 </section>
-                <div className="container-wrapper2">
+                <div className="container-wrapper2" style={{ overflow: 'hidden', borderRadius: '24px' }}>
                   <video
                     className="container-icon2"
                     src="/222.mp4"
@@ -69,7 +69,7 @@ export default function Landing() {
                     loop
                     muted
                     playsInline
-                    style={{ objectFit: 'cover', borderRadius: '24px', transform: 'scale(1.02)', clipPath: 'inset(0px 0px 30px 0px)' }}
+                    style={{ objectFit: 'cover', width: '100%', height: '100%', borderRadius: '24px', transform: 'scale(1.2) translateX(4%) translateY(3%)' }}
                   />
                 </div>
               </div>
