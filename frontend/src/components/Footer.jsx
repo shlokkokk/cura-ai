@@ -15,7 +15,6 @@ export default function Footer() {
           <div className="footer-col">
             <h4 style={{ color: 'white', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px', marginBottom: '16px' }}>Product</h4>
             <Link to="/features" style={{ display: 'block', color: '#a78bfa', textDecoration: 'none', marginBottom: '12px' }}>Features</Link>
-            <Link to="/pricing" style={{ display: 'block', color: '#a78bfa', textDecoration: 'none', marginBottom: '12px' }}>Pricing</Link>
           </div>
           <div className="footer-col">
             <h4 style={{ color: 'white', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px', marginBottom: '16px' }}>Company</h4>

@@ -26,7 +26,6 @@ export default function Navbar({ simple = false }) {
               {!user && (
                 <>
                   <Link to="/features" className={`nav-link ${location.pathname === '/features' ? 'active' : ''}`}>Features</Link>
-                  <Link to="/pricing" className={`nav-link ${location.pathname === '/pricing' ? 'active' : ''}`}>Pricing</Link>
                 </>
               )}
               

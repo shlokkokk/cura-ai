@@ -7,7 +7,6 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Simulator from './pages/Simulator';
 import Features from './pages/Features';
-import Pricing from './pages/Pricing';
 import About from './pages/About';
 import Profile from './pages/Profile';
 import PatientHistory from './pages/PatientHistory';
@@ -25,7 +24,6 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/features" element={<Features />} />
-      <Route path="/pricing" element={<Pricing />} />
       <Route path="/about" element={<About />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
