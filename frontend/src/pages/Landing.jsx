@@ -69,7 +69,7 @@ export default function Landing() {
                     loop
                     muted
                     playsInline
-                    style={{ objectFit: 'cover', borderRadius: '24px' }}
+                    style={{ objectFit: 'cover', borderRadius: '24px', transform: 'scale(1.02)', clipPath: 'inset(0px 0px 30px 0px)' }}
                   />
                 </div>
               </div>
@@ -243,7 +243,7 @@ export default function Landing() {
                     </div>
                     <div className="profile-infos">
                       <div className="name-name-frame">
-                        <h2 className="name-name4">Name Name</h2>
+                        <h2 className="name-name4">Sarah Jenkins</h2>
                       </div>
                       <div className="medical-student-at-harvard-uni-container">
                         <div className="medical-student-at2">
@@ -273,7 +273,7 @@ export default function Landing() {
                     </div>
                     <div className="frame-parent14">
                       <div className="name-name-frame">
-                        <h2 className="name-name4">Name Name</h2>
+                        <h2 className="name-name4">Dr. Mark Thorne</h2>
                       </div>
                       <div className="medical-student-at-harvard-uni-container">
                         <div className="medical-student-at2">
@@ -303,7 +303,7 @@ export default function Landing() {
                     </div>
                     <div className="chair-parent">
                       <div className="name-name-frame">
-                        <h2 className="name-name4">Name Name</h2>
+                        <h2 className="name-name4">Dr. Elena Rodriguez</h2>
                       </div>
                       <div className="medical-student-at-harvard-uni-container">
                         <div className="medical-student-at2">
