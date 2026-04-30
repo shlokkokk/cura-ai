@@ -119,7 +119,7 @@ export default function Landing() {
                   <h2 className="features3">Features</h2>
                 </div>
                 <div className="chair">
-                  <div className="vector-parent">
+                  <div className="vector-parent" style={{ border: '1px solid var(--border)' }}>
                     <img
                       className="vector-icon10"
                       alt=""
@@ -133,7 +133,7 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
-                  <div className="km">
+                  <div className="km" style={{ border: '1px solid var(--border)' }}>
                     <img
                       className="vector-icon11"
                       alt=""
@@ -148,7 +148,7 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
-                  <div className="frame-parent8">
+                  <div className="frame-parent8" style={{ border: '1px solid var(--border)' }}>
                     <img
                       className="group-icon"
                       loading="lazy"
@@ -163,7 +163,7 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
-                  <div className="frame-parent9">
+                  <div className="frame-parent9" style={{ border: '1px solid var(--border)' }}>
                     <img
                       className="frame-child2"
                       loading="lazy"
