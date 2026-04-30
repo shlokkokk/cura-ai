@@ -76,7 +76,7 @@ export default function About() {
               </div>
               
               <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #10B981, #34D399)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>T</div>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #EC4899, #F472B6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>T</div>
                 <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Toqa Abdul-Hafez</h3>
                 <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Team Leader & Designer</p>
                 <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Leading the vision and crafting the user experience.</p>
