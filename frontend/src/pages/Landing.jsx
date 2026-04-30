@@ -360,25 +360,7 @@ export default function Landing() {
                         Practice medicine with realistic AI patients
                       </div>
                     </div>
-                    <div className="social-links2">
-                      <img
-                        className="social-link-12"
-                        alt=""
-                        src="/Social-link-1.svg"
-                      />
 
-                      <img
-                        className="social-link-22"
-                        alt=""
-                        src="/Social-link-2.svg"
-                      />
-
-                      <img
-                        className="social-link-22"
-                        alt=""
-                        src="/Social-link-3.svg"
-                      />
-                    </div>
                   </div>
                   <div className="nav2">
                     <div className="column-12">
