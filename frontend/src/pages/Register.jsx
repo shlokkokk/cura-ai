@@ -143,6 +143,7 @@ export default function Register() {
                 <select id="role" value={formData.role} onChange={handleChange}>
                   <option value="student">🎓 Medical Student</option>
                   <option value="faculty">👨‍⚕️ Faculty / Doctor</option>
+                  <option value="researcher">🔬 Medical Researcher</option>
                 </select>
               </div>
               
@@ -175,6 +176,7 @@ export default function Register() {
                   <option value="Emergency Medicine">Emergency Medicine</option>
                   <option value="Oncology">Oncology</option>
                   <option value="Radiology">Radiology</option>
+                  <option value="Genetics">Genetics</option>
                 </select>
               </div>
             </div>

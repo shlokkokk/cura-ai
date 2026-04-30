@@ -1,12 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0d1b31"/>
-  <rect x="2" y="2" width="60" height="60" rx="12" fill="none" stroke="#43d9ad" stroke-width="1.5" opacity="0.3"/>
-  <path d="M28 16h8v12h12v8H36v12h-8V36H16v-8h12z" fill="#43d9ad"/>
-  <path d="M28 16h8v12h12v8H36v12h-8V36H16v-8h12z" fill="url(#glow)" opacity="0.4"/>
-  <defs>
-    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#43d9ad"/>
-      <stop offset="100%" stop-color="#ffb36b"/>
-    </linearGradient>
-  </defs>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circuit board pins - top -->
+  <line x1="20" y1="2" x2="20" y2="10" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="32" y1="2" x2="32" y2="10" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="44" y1="2" x2="44" y2="10" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Circuit board pins - bottom -->
+  <line x1="20" y1="54" x2="20" y2="62" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="32" y1="54" x2="32" y2="62" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="44" y1="54" x2="44" y2="62" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Circuit board pins - left -->
+  <line x1="2" y1="20" x2="10" y2="20" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="2" y1="32" x2="10" y2="32" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="2" y1="44" x2="10" y2="44" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Circuit board pins - right -->
+  <line x1="54" y1="20" x2="62" y2="20" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="54" y1="32" x2="62" y2="32" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="54" y1="44" x2="62" y2="44" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Corner diagonal pins -->
+  <line x1="4" y1="4" x2="12" y2="12" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="4" x2="52" y2="12" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="4" y1="60" x2="12" y2="52" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="60" y1="60" x2="52" y2="52" stroke="#7C3AED" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Main chip body - rounded rect -->
+  <rect x="10" y="10" width="44" height="44" rx="8" stroke="#5B21B6" stroke-width="3" fill="none"/>
+  <!-- Heart shape -->
+  <path d="M32 44C32 44 20 36 20 28C20 24 23 22 26 22C28.5 22 30.5 23.5 32 25.5C33.5 23.5 35.5 22 38 22C41 22 44 24 44 28C44 36 32 44 32 44Z" stroke="#5B21B6" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Cross inside heart -->
+  <line x1="32" y1="29" x2="32" y2="37" stroke="#5B21B6" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="28" y1="33" x2="36" y2="33" stroke="#5B21B6" stroke-width="2.5" stroke-linecap="round"/>
 </svg>

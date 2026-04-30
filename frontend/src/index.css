@@ -953,6 +953,9 @@ body.is-loading .btn-primary{opacity:.5;pointer-events:none}
 }
 
 .figma-diagnosis-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   border-radius: 25px;
   background: linear-gradient(135deg, rgba(138, 124, 255, 0.2), rgba(166, 154, 255, 0.1));
   padding: 20px;
@@ -960,6 +963,7 @@ body.is-loading .btn-primary{opacity:.5;pointer-events:none}
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  backdrop-filter: blur(10px);
 }
 .figma-diagnosis-btn {
   cursor: pointer;

@@ -29,8 +29,16 @@ export default function Simulator() {
   const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
   const [reportLoading, setReportLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [isEmergencyMode, setIsEmergencyMode] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(180);
   
   const chatLogRef = useRef(null);
+
+  // Format AI text to remove markdown stars
+  const cleanMarkdown = (text) => {
+    if (!text) return '';
+    return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+  };
 
   const downloadReport = async () => {
     if (!sessionId) return;
@@ -45,7 +53,8 @@ export default function Simulator() {
       const reportDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       
       // Parse sections from report text
-      const sections = reportText.split('\n').map(line => {
+      const cleanedReportText = cleanMarkdown(reportText);
+      const sections = cleanedReportText.split('\n').map(line => {
         // Bold headers (lines in ALL CAPS or starting with number + dot)
         if (/^[A-Z\s\d.—\-:]{5,}$/.test(line.trim()) || /^\d+\./.test(line.trim())) {
           return `<h3 style="color:#5046a3;margin:18px 0 8px;font-size:14px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;">${line}</h3>`;
@@ -133,6 +142,23 @@ export default function Simulator() {
   };
 
   useEffect(() => {
+    let timer;
+    if (isEmergencyMode && timeLeft > 0 && sessionId && !evaluation) {
+      timer = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setIsAssessmentModalOpen(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isEmergencyMode, timeLeft, sessionId, evaluation]);
+
+  useEffect(() => {
     if (!user) {
       navigate('/login');
       return;
@@ -187,6 +213,7 @@ export default function Simulator() {
     setReasoning('');
     setQuestion('');
     setIsAssessmentModalOpen(false);
+    setTimeLeft(180);
     
     const patient = caseData || caseList.find(c => c.id === caseId);
     if (!patient) return;
@@ -348,7 +375,6 @@ export default function Simulator() {
           )}
 
 
-          {/* Action Buttons */}
           <div className="figma-tests-actions">
             <button className="figma-test-action-btn" onClick={async () => {
               const specialtyParam = user.specialization ? `?specialty=${encodeURIComponent(user.specialization)}` : '';
@@ -356,6 +382,16 @@ export default function Simulator() {
               setCases(data.cases);
               if (data.cases.length > 0) loadCase(data.cases[0].id, data.cases, data.cases[0]);
             }}>🔄 New Patient</button>
+            <button 
+              className="figma-test-action-btn" 
+              onClick={() => {
+                setIsEmergencyMode(!isEmergencyMode);
+                setTimeLeft(180);
+              }}
+              style={{ background: isEmergencyMode ? '#fef2f2' : '', borderColor: isEmergencyMode ? '#ef4444' : '', color: isEmergencyMode ? '#dc2626' : '' }}
+            >
+              🚨 {isEmergencyMode ? 'Emergency: ON' : 'Emergency: OFF'}
+            </button>
           </div>
         </section>
 
@@ -383,7 +419,7 @@ export default function Simulator() {
               )}
             </div>
             <div className="figma-chat-specialty-badge">
-              {activeCase?.specialty || user.specialization || 'General'}
+              {isEmergencyMode ? 'EMERGENCY' : (activeCase?.specialty || user.specialization || 'General')}
             </div>
           </div>
 
@@ -430,10 +466,12 @@ export default function Simulator() {
                 {activeCase?.urgency || 'Stable State'}
               </span>
             </div>
-            <div className="figma-patient-traits">
-              {activeCase?.personality || 'Loading...'}
-            </div>
-            {activeCase?.complexity && (
+            {!isEmergencyMode && (
+              <div className="figma-patient-traits">
+                {activeCase?.personality || 'Loading...'}
+              </div>
+            )}
+            {!isEmergencyMode && activeCase?.complexity && (
               <div style={{ marginTop: '8px', fontSize: '0.8rem', color: 'var(--muted)' }}>
                 Complexity: <strong>{activeCase.complexity}</strong>
               </div>
@@ -442,6 +480,11 @@ export default function Simulator() {
               <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(138,124,255,0.06)', borderRadius: '8px', fontSize: '0.75rem', color: 'var(--muted)', lineHeight: '1.5' }}>
                 <strong style={{ color: 'var(--text)', fontSize: '0.8rem' }}>Vitals:</strong><br/>
                 {activeCase.vitals}
+              </div>
+            )}
+            {isEmergencyMode && (
+              <div style={{ marginTop: '10px', padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#dc2626', fontWeight: 'bold', textAlign: 'center', fontSize: '1.2rem', width: '100%' }}>
+                ⏳ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
               </div>
             )}
           </div>
@@ -532,7 +575,7 @@ export default function Simulator() {
                 <div className="score-ring-container" style={{ textAlign: 'center', padding: '20px', background: 'var(--bg)', borderRadius: '16px', marginBottom: '20px' }}>
                   <p style={{ fontSize: '0.8rem', color: 'var(--muted)', fontWeight: 'bold' }}>SESSION SCORE</p>
                   <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)', margin: '10px 0' }}>{evaluation.score}%</div>
-                  <p style={{ fontSize: '0.9rem' }}>{evaluation.feedbackSummary || (evaluation.score >= 70 ? "Strong clinical performance." : "Good effort — keep practicing.")}</p>
+                  <p style={{ fontSize: '0.9rem' }}>{cleanMarkdown(evaluation.feedbackSummary) || (evaluation.score >= 70 ? "Strong clinical performance." : "Good effort — keep practicing.")}</p>
                 </div>
                 
                 <div style={{ display: 'grid', gap: '12px' }}>
@@ -540,36 +583,37 @@ export default function Simulator() {
                     <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {evaluation.diagnosisCorrect ? '✅ Diagnosis Correct' : '❌ Diagnosis Incorrect'}
                     </h4>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>Likely diagnosis: <strong>{evaluation.likelyDiagnosis || "Check rubric for standard"}</strong>.</p>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>Likely diagnosis: <strong>{cleanMarkdown(evaluation.likelyDiagnosis) || "Check rubric for standard"}</strong>.</p>
                   </article>
                   
                   {evaluation.strengths?.length > 0 && (
                     <article style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '16px', borderRadius: '16px' }}>
                       <h4 style={{ margin: '0 0 8px 0', color: 'var(--primary)' }}>💪 Strengths</h4>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.strengths.map((s,i) => <li key={i}>{s}</li>)}</ul>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.strengths.map((s,i) => <li key={i}>{cleanMarkdown(s)}</li>)}</ul>
                     </article>
                   )}
                   
                   {evaluation.improvements?.length > 0 && (
                     <article style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '16px', borderRadius: '16px' }}>
                       <h4 style={{ margin: '0 0 8px 0', color: '#d97706' }}>⚠️ Improve</h4>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.improvements.map((s,i) => <li key={i}>{s}</li>)}</ul>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.improvements.map((s,i) => <li key={i}>{cleanMarkdown(s)}</li>)}</ul>
                     </article>
                   )}
                   
                   {evaluation.expectedQuestionsMissed?.length > 0 && (
                     <article style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '16px', borderRadius: '16px' }}>
                       <h4 style={{ margin: '0 0 8px 0', color: '#dc2626' }}>❓ Should Ask</h4>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.expectedQuestionsMissed.map((s,i) => <li key={i}>{s}</li>)}</ul>
+                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.expectedQuestionsMissed.map((s,i) => <li key={i}>{cleanMarkdown(s)}</li>)}</ul>
                     </article>
                   )}
                 </div>
                 
-                <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-                  <button onClick={downloadReport} disabled={reportLoading} className="figma-diagnosis-btn" style={{ flex: 1 }}>
-                    {reportLoading ? 'Generating Report...' : '📄 Download Report'}
+                <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
+                  <button onClick={downloadReport} disabled={reportLoading} className="figma-diagnosis-btn" style={{ flex: 1, fontSize: '16px' }}>
+                    {reportLoading ? 'Generating...' : '📄 Download'}
                   </button>
-                  <button onClick={() => { setIsAssessmentModalOpen(false); activeCase && loadCase(activeCase.id); }} className="figma-test-action-btn" style={{ flex: 1 }}>Retry Case</button>
+                  <button onClick={() => { setIsAssessmentModalOpen(false); activeCase && loadCase(activeCase.id); }} className="figma-test-action-btn" style={{ flex: 1, fontSize: '16px' }}>Retry Case</button>
+                  <button onClick={() => navigate('/dashboard')} className="figma-test-action-btn" style={{ flex: 1, fontSize: '16px' }}>Dashboard</button>
                 </div>
               </div>
             )}

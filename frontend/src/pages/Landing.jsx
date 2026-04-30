@@ -102,7 +102,7 @@ export default function Landing() {
                       className="frame-inner"
                       loading="lazy"
                       alt=""
-                      src="/Group-12.svg"
+                      src="/Group-1.svg"
                     />
 
                     <div className="choose-a-patient3">
@@ -150,7 +150,7 @@ export default function Landing() {
                       className="group-icon"
                       loading="lazy"
                       alt=""
-                      src="/Group-31.svg"
+                      src="/Group-3.svg"
                     />
 
                     <div className="multi-specialties-group">
@@ -165,7 +165,7 @@ export default function Landing() {
                       className="frame-child2"
                       loading="lazy"
                       alt=""
-                      src="/Group-21.svg"
+                      src="/Group-2.svg"
                     />
 
                     <div className="progress-tracking-group">
@@ -209,7 +209,7 @@ export default function Landing() {
                   <img
                     className="frame-child3"
                     alt=""
-                    src="/Group-13.svg"
+                    src="/Group-11.svg"
                   />
                 </div>
                 <div className="choose-a-patient4">
@@ -398,7 +398,7 @@ export default function Landing() {
                 </div>
               </div>
               <div className="auramed2026-container">
-                <div className="medical-student-at2">©AuraMed2026</div>
+                <div className="medical-student-at2">© Synapse Team 2026</div>
               </div>
             </footer>
           </div>

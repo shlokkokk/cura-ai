@@ -9,7 +9,7 @@ const SPECIALTIES = [
   'Endocrinology', 'General Surgery', 'Orthopedics', 'Pediatrics',
   'Dermatology', 'Psychiatry', 'Ophthalmology', 'ENT',
   'Gastroenterology', 'Nephrology', 'Urology', 'Obstetrics & Gynecology',
-  'Dentistry', 'Emergency Medicine', 'Oncology', 'Radiology'
+  'Dentistry', 'Emergency Medicine', 'Oncology', 'Radiology', 'Genetics'
 ];
 
 export default function Profile() {
@@ -133,6 +133,7 @@ export default function Profile() {
                   <select name="role" value={formData.role} onChange={handleChange}>
                     <option value="student">🎓 Medical Student</option>
                     <option value="faculty">👨‍⚕️ Doctor / Faculty</option>
+                    <option value="researcher">🔬 Medical Researcher</option>
                   </select>
                 </div>
                 <div className="sim-field">

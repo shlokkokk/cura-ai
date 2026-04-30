@@ -45,7 +45,7 @@ export default function About() {
         </section>
 
         <section style={{ padding: '100px 20px', background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', marginBottom: '80px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '60px' }}>Our Core Values</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
               {[
@@ -60,6 +60,38 @@ export default function About() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '20px' }}>Meet the Synapse Team</h2>
+            <p style={{ fontSize: '1.1rem', color: 'var(--muted)', lineHeight: '1.8', marginBottom: '40px', maxWidth: '700px', margin: '0 auto 40px auto' }}>
+              We are a passionate team of developers, medical professionals, and AI enthusiasts dedicated to revolutionizing medical education.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px' }}>
+              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #6D28D9, #8a7cff)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>M</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Muddasir</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Lead Developer</p>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Architect behind the AI integration and simulator logic.</p>
+              </div>
+              
+              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--surface)', border: '2px dashed var(--border)', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>?</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Team Member</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Role</p>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Description</p>
+              </div>
+              
+              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--surface)', border: '2px dashed var(--border)', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>?</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Team Member</h3>
+                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Role</p>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Description</p>
+              </div>
+            </div>
+            <p style={{ color: 'var(--muted)', marginTop: '40px', fontStyle: 'italic' }}>
+              Let me know the rest of the team members and their roles to update this section!
+            </p>
           </div>
         </section>
       </main>
