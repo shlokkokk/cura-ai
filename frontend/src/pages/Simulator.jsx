@@ -30,7 +30,7 @@ export default function Simulator() {
   const [reportLoading, setReportLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(180);
+  const [timeLeft, setTimeLeft] = useState(600);
   
   const chatLogRef = useRef(null);
 
@@ -386,7 +386,7 @@ export default function Simulator() {
               className="figma-test-action-btn" 
               onClick={() => {
                 setIsEmergencyMode(!isEmergencyMode);
-                setTimeLeft(180);
+                setTimeLeft(600);
               }}
               style={{ background: isEmergencyMode ? '#fef2f2' : '', borderColor: isEmergencyMode ? '#ef4444' : '', color: isEmergencyMode ? '#dc2626' : '' }}
             >
@@ -411,7 +411,7 @@ export default function Simulator() {
                   }}
                 >
                   {cases.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} — {c.specialty}</option>
+                    <option key={c.id} value={c.id}>{c.name} — {isEmergencyMode ? 'EMERGENCY' : c.specialty}</option>
                   ))}
                 </select>
               ) : (
