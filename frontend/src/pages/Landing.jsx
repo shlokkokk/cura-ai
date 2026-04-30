@@ -62,11 +62,14 @@ export default function Landing() {
                   </div>
                 </section>
                 <div className="container-wrapper2">
-                  <img
+                  <video
                     className="container-icon2"
-                    loading="lazy"
-                    alt=""
-                    src="/Container.svg"
+                    src="/222.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{ objectFit: 'cover', borderRadius: '24px' }}
                   />
                 </div>
               </div>
