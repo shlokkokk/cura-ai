@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
@@ -12,6 +12,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const { saveUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +24,9 @@ export default function Login() {
         body: JSON.stringify({ email, password })
       });
       saveUser(data.user);
-      navigate('/dashboard');
+      const searchParams = new URLSearchParams(location.search);
+      const redirect = searchParams.get('redirect') || '/dashboard';
+      navigate(redirect);
     } catch (err) {
       setError(err.message);
     } finally {

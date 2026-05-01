@@ -13,26 +13,99 @@
     "vitals": "Temp 36.5 C, HR 110, RR 20, BP 145/85, SpO2 96%",
     "history": "Osteoporosis, mild hypertension",
     "keyFacts": [
-      { "label": "Onset", "value": "2 hours ago" },
-      { "label": "Associated symptoms", "value": "Inability to bear weight" },
-      { "label": "Risk factors", "value": "Age, Osteoporosis" },
-      { "label": "Hidden clue", "value": "Right leg is shortened and externally rotated" }
+      {
+        "label": "Onset",
+        "value": "2 hours ago"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Inability to bear weight"
+      },
+      {
+        "label": "Risk factors",
+        "value": "Age, Osteoporosis"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Right leg is shortened and externally rotated"
+      }
     ],
-    "expectedDiagnosis": ["neck of femur fracture", "hip fracture", "femur fracture"],
-    "differentialDiagnoses": ["Pelvic fracture", "Hip dislocation", "Severe contusion"],
-    "redFlags": ["Inability to bear weight", "Shortened externally rotated leg"],
-    "expectedQuestions": ["How did you fall?", "Can you put any weight on your leg?", "Have you had falls before?", "Do you have osteoporosis?"],
-    "recommendedTests": ["X-ray pelvis and right hip", "ECG", "Basic metabolic panel"],
-    "communicationGoals": ["Manage pain promptly", "Explain need for surgical assessment"],
-    "keywords": ["fall", "hip", "pain", "weight", "leg", "osteoporosis"],
-    "hints": ["Can you describe the position of your leg right now?", "Are you able to stand or put weight on it?"],
+    "expectedDiagnosis": [
+      "neck of femur fracture",
+      "hip fracture",
+      "femur fracture"
+    ],
+    "differentialDiagnoses": [
+      "Pelvic fracture",
+      "Hip dislocation",
+      "Severe contusion"
+    ],
+    "redFlags": [
+      "Inability to bear weight",
+      "Shortened externally rotated leg"
+    ],
+    "expectedQuestions": [
+      "How did you fall?",
+      "Can you put any weight on your leg?",
+      "Have you had falls before?",
+      "Do you have osteoporosis?"
+    ],
+    "recommendedTests": [
+      "X-ray pelvis and right hip",
+      "ECG",
+      "Basic metabolic panel"
+    ],
+    "communicationGoals": [
+      "Manage pain promptly",
+      "Explain need for surgical assessment"
+    ],
+    "keywords": [
+      "fall",
+      "hip",
+      "pain",
+      "weight",
+      "leg",
+      "osteoporosis"
+    ],
+    "hints": [
+      "Can you describe the position of your leg right now?",
+      "Are you able to stand or put weight on it?"
+    ],
     "scriptedAnswers": [
-      { "match": ["fall", "happen", "how"], "answer": "I tripped over a rug in the hallway and landed hard on my right side." },
-      { "match": ["weight", "stand", "walk"], "answer": "No, I can't put any weight on it at all, the pain is unbearable." },
-      { "match": ["leg", "look", "position"], "answer": "My right leg looks a bit shorter than the left, and my foot is pointing outwards." }
+      {
+        "match": [
+          "fall",
+          "happen",
+          "how"
+        ],
+        "answer": "I tripped over a rug in the hallway and landed hard on my right side."
+      },
+      {
+        "match": [
+          "weight",
+          "stand",
+          "walk"
+        ],
+        "answer": "No, I can't put any weight on it at all, the pain is unbearable."
+      },
+      {
+        "match": [
+          "leg",
+          "look",
+          "position"
+        ],
+        "answer": "My right leg looks a bit shorter than the left, and my foot is pointing outwards."
+      }
     ],
-    "fallbackResponses": ["It hurts too much to move.", "I just need some pain relief.", "Please be careful with my leg."],
-    "evaluationFocus": ["Identify signs of hip fracture", "Assess fall circumstances"]
+    "fallbackResponses": [
+      "It hurts too much to move.",
+      "I just need some pain relief.",
+      "Please be careful with my leg."
+    ],
+    "evaluationFocus": [
+      "Identify signs of hip fracture",
+      "Assess fall circumstances"
+    ]
   },
   {
     "id": "case-7",
@@ -48,26 +121,99 @@
     "vitals": "Temp 37.8 C, HR 130, RR 32, BP 100/65, SpO2 92% on room air",
     "history": "Diagnosed with mild intermittent asthma, eczema",
     "keyFacts": [
-      { "label": "Onset", "value": "Gradually worsening over 24 hours" },
-      { "label": "Associated symptoms", "value": "Runny nose, dry cough" },
-      { "label": "Risk factors", "value": "History of asthma, recent cold" },
-      { "label": "Hidden clue", "value": "Using accessory muscles to breathe" }
+      {
+        "label": "Onset",
+        "value": "Gradually worsening over 24 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Runny nose, dry cough"
+      },
+      {
+        "label": "Risk factors",
+        "value": "History of asthma, recent cold"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Using accessory muscles to breathe"
+      }
     ],
-    "expectedDiagnosis": ["asthma exacerbation", "acute asthma", "asthma attack"],
-    "differentialDiagnoses": ["Viral bronchiolitis", "Pneumonia", "Foreign body aspiration"],
-    "redFlags": ["High respiratory rate", "Low SpO2", "Accessory muscle use"],
-    "expectedQuestions": ["How long has he been wheezing?", "Has he used his inhaler?", "Is he sucking in his chest when breathing?"],
-    "recommendedTests": ["Pulse oximetry", "Peak flow (if able)", "Chest X-ray if pneumonia suspected"],
-    "communicationGoals": ["Calm the child and parent", "Administer bronchodilators quickly"],
-    "keywords": ["wheeze", "breath", "inhaler", "cough", "chest", "asthma"],
-    "hints": ["Ask the parent if the child has used their rescue inhaler.", "Ask about chest retractions."],
+    "expectedDiagnosis": [
+      "asthma exacerbation",
+      "acute asthma",
+      "asthma attack"
+    ],
+    "differentialDiagnoses": [
+      "Viral bronchiolitis",
+      "Pneumonia",
+      "Foreign body aspiration"
+    ],
+    "redFlags": [
+      "High respiratory rate",
+      "Low SpO2",
+      "Accessory muscle use"
+    ],
+    "expectedQuestions": [
+      "How long has he been wheezing?",
+      "Has he used his inhaler?",
+      "Is he sucking in his chest when breathing?"
+    ],
+    "recommendedTests": [
+      "Pulse oximetry",
+      "Peak flow (if able)",
+      "Chest X-ray if pneumonia suspected"
+    ],
+    "communicationGoals": [
+      "Calm the child and parent",
+      "Administer bronchodilators quickly"
+    ],
+    "keywords": [
+      "wheeze",
+      "breath",
+      "inhaler",
+      "cough",
+      "chest",
+      "asthma"
+    ],
+    "hints": [
+      "Ask the parent if the child has used their rescue inhaler.",
+      "Ask about chest retractions."
+    ],
     "scriptedAnswers": [
-      { "match": ["inhaler", "pump", "medicine"], "answer": "(Parent) I gave him two puffs of salbutamol an hour ago but it didn't help much." },
-      { "match": ["chest", "sucking", "ribs"], "answer": "(Parent) Yes, his tummy and ribs seem to suck in deep every time he takes a breath." },
-      { "match": ["cough", "fever", "cold"], "answer": "(Parent) He started with a runny nose and dry cough yesterday." }
+      {
+        "match": [
+          "inhaler",
+          "pump",
+          "medicine"
+        ],
+        "answer": "(Parent) I gave him two puffs of salbutamol an hour ago but it didn't help much."
+      },
+      {
+        "match": [
+          "chest",
+          "sucking",
+          "ribs"
+        ],
+        "answer": "(Parent) Yes, his tummy and ribs seem to suck in deep every time he takes a breath."
+      },
+      {
+        "match": [
+          "cough",
+          "fever",
+          "cold"
+        ],
+        "answer": "(Parent) He started with a runny nose and dry cough yesterday."
+      }
     ],
-    "fallbackResponses": ["(Parent) He's really struggling to breathe.", "(Parent) Should he be breathing this fast?", "(Child) My chest feels tight."],
-    "evaluationFocus": ["Assess severity of pediatric respiratory distress", "Determine inhaler usage"]
+    "fallbackResponses": [
+      "(Parent) He's really struggling to breathe.",
+      "(Parent) Should he be breathing this fast?",
+      "(Child) My chest feels tight."
+    ],
+    "evaluationFocus": [
+      "Assess severity of pediatric respiratory distress",
+      "Determine inhaler usage"
+    ]
   },
   {
     "id": "case-8",
@@ -83,26 +229,100 @@
     "vitals": "Temp 36.6 C, HR 72, RR 14, BP 115/75, SpO2 100%",
     "history": "Frequent sunburns in childhood, fair skin",
     "keyFacts": [
-      { "label": "Onset", "value": "Noticed changes over the last 3 months" },
-      { "label": "Associated symptoms", "value": "Mild itching, no bleeding" },
-      { "label": "Risk factors", "value": "Fair skin, history of sunburns" },
-      { "label": "Hidden clue", "value": "Lesion has irregular borders and multiple colors" }
+      {
+        "label": "Onset",
+        "value": "Noticed changes over the last 3 months"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Mild itching, no bleeding"
+      },
+      {
+        "label": "Risk factors",
+        "value": "Fair skin, history of sunburns"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Lesion has irregular borders and multiple colors"
+      }
     ],
-    "expectedDiagnosis": ["malignant melanoma", "melanoma", "dysplastic nevus"],
-    "differentialDiagnoses": ["Seborrheic keratosis", "Basal cell carcinoma", "Atypical nevus"],
-    "redFlags": ["Asymmetry", "Irregular borders", "Color variation", "Evolution over time"],
-    "expectedQuestions": ["How long has it been changing?", "Has it bled or itched?", "Do you have a family history of skin cancer?"],
-    "recommendedTests": ["Excisional biopsy", "Dermatoscopy"],
-    "communicationGoals": ["Explain the ABCDE criteria", "Reassure while emphasizing need for biopsy"],
-    "keywords": ["mole", "change", "color", "sun", "itch", "bleed", "shape"],
-    "hints": ["Ask about the ABCDE criteria of the mole.", "Ask about childhood sun exposure."],
+    "expectedDiagnosis": [
+      "malignant melanoma",
+      "melanoma",
+      "dysplastic nevus"
+    ],
+    "differentialDiagnoses": [
+      "Seborrheic keratosis",
+      "Basal cell carcinoma",
+      "Atypical nevus"
+    ],
+    "redFlags": [
+      "Asymmetry",
+      "Irregular borders",
+      "Color variation",
+      "Evolution over time"
+    ],
+    "expectedQuestions": [
+      "How long has it been changing?",
+      "Has it bled or itched?",
+      "Do you have a family history of skin cancer?"
+    ],
+    "recommendedTests": [
+      "Excisional biopsy",
+      "Dermatoscopy"
+    ],
+    "communicationGoals": [
+      "Explain the ABCDE criteria",
+      "Reassure while emphasizing need for biopsy"
+    ],
+    "keywords": [
+      "mole",
+      "change",
+      "color",
+      "sun",
+      "itch",
+      "bleed",
+      "shape"
+    ],
+    "hints": [
+      "Ask about the ABCDE criteria of the mole.",
+      "Ask about childhood sun exposure."
+    ],
     "scriptedAnswers": [
-      { "match": ["change", "how long", "when"], "answer": "My partner noticed it looked darker and bigger about 3 months ago." },
-      { "match": ["color", "shape", "look"], "answer": "It used to be light brown, now it has black and dark brown spots, and the edges look jagged." },
-      { "match": ["itch", "bleed", "hurt"], "answer": "It doesn't hurt or bleed, but it does itch occasionally." }
+      {
+        "match": [
+          "change",
+          "how long",
+          "when"
+        ],
+        "answer": "My partner noticed it looked darker and bigger about 3 months ago."
+      },
+      {
+        "match": [
+          "color",
+          "shape",
+          "look"
+        ],
+        "answer": "It used to be light brown, now it has black and dark brown spots, and the edges look jagged."
+      },
+      {
+        "match": [
+          "itch",
+          "bleed",
+          "hurt"
+        ],
+        "answer": "It doesn't hurt or bleed, but it does itch occasionally."
+      }
     ],
-    "fallbackResponses": ["I just want to make sure it's nothing dangerous.", "Does it look like cancer to you?", "I can tell you about how it changed."],
-    "evaluationFocus": ["Apply ABCDE melanoma criteria", "Identify risk factors for skin cancer"]
+    "fallbackResponses": [
+      "I just want to make sure it's nothing dangerous.",
+      "Does it look like cancer to you?",
+      "I can tell you about how it changed."
+    ],
+    "evaluationFocus": [
+      "Apply ABCDE melanoma criteria",
+      "Identify risk factors for skin cancer"
+    ]
   },
   {
     "id": "case-9",
@@ -118,26 +338,101 @@
     "vitals": "Temp 36.5 C, HR 68, RR 14, BP 110/70, SpO2 99%",
     "history": "No prior psychiatric history, stressful job",
     "keyFacts": [
-      { "label": "Onset", "value": "Gradual over the last 6 months" },
-      { "label": "Associated symptoms", "value": "Insomnia, weight loss, anhedonia" },
-      { "label": "Risk factors", "value": "High stress, isolation" },
-      { "label": "Hidden clue", "value": "Has thought about 'not waking up' but denies active plan" }
+      {
+        "label": "Onset",
+        "value": "Gradual over the last 6 months"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Insomnia, weight loss, anhedonia"
+      },
+      {
+        "label": "Risk factors",
+        "value": "High stress, isolation"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Has thought about 'not waking up' but denies active plan"
+      }
     ],
-    "expectedDiagnosis": ["major depressive disorder", "clinical depression", "depression"],
-    "differentialDiagnoses": ["Hypothyroidism", "Adjustment disorder", "Bipolar disorder (depressed phase)"],
-    "redFlags": ["Passive suicidal ideation", "Significant weight loss", "Severe insomnia"],
-    "expectedQuestions": ["How is your sleep and appetite?", "Do you still enjoy your hobbies?", "Have you had any thoughts of harming yourself?"],
-    "recommendedTests": ["PHQ-9 questionnaire", "TSH and basic bloods to rule out organic causes"],
-    "communicationGoals": ["Build rapport and trust", "Assess suicide risk gently but directly"],
-    "keywords": ["sad", "sleep", "eat", "weight", "hobby", "suicide", "harm", "energy"],
-    "hints": ["Be sure to ask directly about thoughts of self-harm or suicide.", "Ask about sleep and appetite changes (SIGECAPS)."],
+    "expectedDiagnosis": [
+      "major depressive disorder",
+      "clinical depression",
+      "depression"
+    ],
+    "differentialDiagnoses": [
+      "Hypothyroidism",
+      "Adjustment disorder",
+      "Bipolar disorder (depressed phase)"
+    ],
+    "redFlags": [
+      "Passive suicidal ideation",
+      "Significant weight loss",
+      "Severe insomnia"
+    ],
+    "expectedQuestions": [
+      "How is your sleep and appetite?",
+      "Do you still enjoy your hobbies?",
+      "Have you had any thoughts of harming yourself?"
+    ],
+    "recommendedTests": [
+      "PHQ-9 questionnaire",
+      "TSH and basic bloods to rule out organic causes"
+    ],
+    "communicationGoals": [
+      "Build rapport and trust",
+      "Assess suicide risk gently but directly"
+    ],
+    "keywords": [
+      "sad",
+      "sleep",
+      "eat",
+      "weight",
+      "hobby",
+      "suicide",
+      "harm",
+      "energy"
+    ],
+    "hints": [
+      "Be sure to ask directly about thoughts of self-harm or suicide.",
+      "Ask about sleep and appetite changes (SIGECAPS)."
+    ],
     "scriptedAnswers": [
-      { "match": ["sleep", "insomnia", "wake"], "answer": "I fall asleep okay but wake up at 3 AM every day and can't go back to sleep." },
-      { "match": ["enjoy", "hobby", "fun"], "answer": "I used to love playing guitar and gaming, but I haven't touched either in months. Nothing feels fun anymore." },
-      { "match": ["harm", "suicide", "kill", "die"], "answer": "I don't have a plan to kill myself, but sometimes I wish I just wouldn't wake up in the morning." }
+      {
+        "match": [
+          "sleep",
+          "insomnia",
+          "wake"
+        ],
+        "answer": "I fall asleep okay but wake up at 3 AM every day and can't go back to sleep."
+      },
+      {
+        "match": [
+          "enjoy",
+          "hobby",
+          "fun"
+        ],
+        "answer": "I used to love playing guitar and gaming, but I haven't touched either in months. Nothing feels fun anymore."
+      },
+      {
+        "match": [
+          "harm",
+          "suicide",
+          "kill",
+          "die"
+        ],
+        "answer": "I don't have a plan to kill myself, but sometimes I wish I just wouldn't wake up in the morning."
+      }
     ],
-    "fallbackResponses": ["Everything just feels exhausting.", "I don't know why I feel this way.", "I can answer questions about my sleep or mood."],
-    "evaluationFocus": ["Screen for depression using SIGECAPS", "Conduct a suicide risk assessment"]
+    "fallbackResponses": [
+      "Everything just feels exhausting.",
+      "I don't know why I feel this way.",
+      "I can answer questions about my sleep or mood."
+    ],
+    "evaluationFocus": [
+      "Screen for depression using SIGECAPS",
+      "Conduct a suicide risk assessment"
+    ]
   },
   {
     "id": "case-10",
@@ -153,26 +448,103 @@
     "vitals": "Temp 36.8 C, HR 95, RR 18, BP 160/90, SpO2 98%",
     "history": "Hyperopia (farsightedness), early cataracts",
     "keyFacts": [
-      { "label": "Onset", "value": "Started 3 hours ago while in a dark cinema" },
-      { "label": "Associated symptoms", "value": "Nausea, seeing halos around lights" },
-      { "label": "Risk factors", "value": "Age, hyperopia, dark environment trigger" },
-      { "label": "Hidden clue", "value": "Right pupil is mid-dilated and fixed" }
+      {
+        "label": "Onset",
+        "value": "Started 3 hours ago while in a dark cinema"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Nausea, seeing halos around lights"
+      },
+      {
+        "label": "Risk factors",
+        "value": "Age, hyperopia, dark environment trigger"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Right pupil is mid-dilated and fixed"
+      }
     ],
-    "expectedDiagnosis": ["acute angle closure glaucoma", "acute glaucoma", "angle closure glaucoma"],
-    "differentialDiagnoses": ["Corneal ulcer", "Acute anterior uveitis", "Migraine"],
-    "redFlags": ["Severe eye pain with nausea", "Halos around lights", "Fixed mid-dilated pupil"],
-    "expectedQuestions": ["What were you doing when it started?", "Are you seeing halos around lights?", "Do you feel nauseous?"],
-    "recommendedTests": ["Tonometry (measure intraocular pressure)", "Slit-lamp examination", "Gonioscopy"],
-    "communicationGoals": ["Act quickly to save vision", "Explain the need for urgent pressure-lowering treatment"],
-    "keywords": ["eye", "pain", "vision", "halo", "nausea", "dark", "pupil", "blur"],
-    "hints": ["Ask about visual disturbances like halos around lights.", "Ask what environment she was in when it started."],
+    "expectedDiagnosis": [
+      "acute angle closure glaucoma",
+      "acute glaucoma",
+      "angle closure glaucoma"
+    ],
+    "differentialDiagnoses": [
+      "Corneal ulcer",
+      "Acute anterior uveitis",
+      "Migraine"
+    ],
+    "redFlags": [
+      "Severe eye pain with nausea",
+      "Halos around lights",
+      "Fixed mid-dilated pupil"
+    ],
+    "expectedQuestions": [
+      "What were you doing when it started?",
+      "Are you seeing halos around lights?",
+      "Do you feel nauseous?"
+    ],
+    "recommendedTests": [
+      "Tonometry (measure intraocular pressure)",
+      "Slit-lamp examination",
+      "Gonioscopy"
+    ],
+    "communicationGoals": [
+      "Act quickly to save vision",
+      "Explain the need for urgent pressure-lowering treatment"
+    ],
+    "keywords": [
+      "eye",
+      "pain",
+      "vision",
+      "halo",
+      "nausea",
+      "dark",
+      "pupil",
+      "blur"
+    ],
+    "hints": [
+      "Ask about visual disturbances like halos around lights.",
+      "Ask what environment she was in when it started."
+    ],
     "scriptedAnswers": [
-      { "match": ["start", "when", "doing", "dark"], "answer": "I was at the movie theater. It was dark, and suddenly my right eye started throbbing." },
-      { "match": ["vision", "blur", "halo", "light"], "answer": "My vision is very blurry in that eye, and when I look at lights I see rainbow halos around them." },
-      { "match": ["nausea", "vomit", "sick"], "answer": "Yes, the pain is so bad it's making me feel very sick to my stomach." }
+      {
+        "match": [
+          "start",
+          "when",
+          "doing",
+          "dark"
+        ],
+        "answer": "I was at the movie theater. It was dark, and suddenly my right eye started throbbing."
+      },
+      {
+        "match": [
+          "vision",
+          "blur",
+          "halo",
+          "light"
+        ],
+        "answer": "My vision is very blurry in that eye, and when I look at lights I see rainbow halos around them."
+      },
+      {
+        "match": [
+          "nausea",
+          "vomit",
+          "sick"
+        ],
+        "answer": "Yes, the pain is so bad it's making me feel very sick to my stomach."
+      }
     ],
-    "fallbackResponses": ["My eye feels like it's going to pop.", "Please do something for the pain.", "I can't see properly out of my right eye."],
-    "evaluationFocus": ["Recognize signs of acute glaucoma", "Identify the trigger (pupillary dilation in the dark)"]
+    "fallbackResponses": [
+      "My eye feels like it's going to pop.",
+      "Please do something for the pain.",
+      "I can't see properly out of my right eye."
+    ],
+    "evaluationFocus": [
+      "Recognize signs of acute glaucoma",
+      "Identify the trigger (pupillary dilation in the dark)"
+    ]
   },
   {
     "id": "case-11",
@@ -188,27 +560,118 @@
     "vitals": "Temp 36.9 C, HR 105, RR 18, BP 105/65 (lying down), SpO2 98%",
     "history": "Frequent NSAID use for back pain, drinks 3-4 beers daily",
     "keyFacts": [
-      { "label": "Onset", "value": "Stomach pain for weeks, dark stools started yesterday" },
-      { "label": "Associated symptoms", "value": "Dizziness when standing, fatigue" },
-      { "label": "Risk factors", "value": "NSAID use, alcohol, stress" },
-      { "label": "Hidden clue", "value": "Pain improves slightly right after eating but returns later" }
+      {
+        "label": "Onset",
+        "value": "Stomach pain for weeks, dark stools started yesterday"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Dizziness when standing, fatigue"
+      },
+      {
+        "label": "Risk factors",
+        "value": "NSAID use, alcohol, stress"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Pain improves slightly right after eating but returns later"
+      }
     ],
-    "expectedDiagnosis": ["peptic ulcer disease", "bleeding peptic ulcer", "gastric ulcer", "duodenal ulcer"],
-    "differentialDiagnoses": ["Gastritis", "Gastric cancer", "Esophageal varices"],
-    "redFlags": ["Melena (tarry stools)", "Postural dizziness (signs of hypovolemia)", "Tachycardia"],
-    "expectedQuestions": ["What color are your bowel movements?", "Do you take ibuprofen or aspirin?", "Does eating make the pain better or worse?"],
-    "recommendedTests": ["Complete blood count", "Upper endoscopy (EGD)", "H. pylori testing"],
-    "communicationGoals": ["Assess for hemodynamic stability", "Prepare patient for endoscopy"],
-    "keywords": ["stomach", "pain", "stool", "poop", "black", "tarry", "dizzy", "nsaid", "ibuprofen", "eat"],
-    "hints": ["Ask about the use of pain medications like NSAIDs.", "Ask if the pain relates to meals."],
+    "expectedDiagnosis": [
+      "peptic ulcer disease",
+      "bleeding peptic ulcer",
+      "gastric ulcer",
+      "duodenal ulcer"
+    ],
+    "differentialDiagnoses": [
+      "Gastritis",
+      "Gastric cancer",
+      "Esophageal varices"
+    ],
+    "redFlags": [
+      "Melena (tarry stools)",
+      "Postural dizziness (signs of hypovolemia)",
+      "Tachycardia"
+    ],
+    "expectedQuestions": [
+      "What color are your bowel movements?",
+      "Do you take ibuprofen or aspirin?",
+      "Does eating make the pain better or worse?"
+    ],
+    "recommendedTests": [
+      "Complete blood count",
+      "Upper endoscopy (EGD)",
+      "H. pylori testing"
+    ],
+    "communicationGoals": [
+      "Assess for hemodynamic stability",
+      "Prepare patient for endoscopy"
+    ],
+    "keywords": [
+      "stomach",
+      "pain",
+      "stool",
+      "poop",
+      "black",
+      "tarry",
+      "dizzy",
+      "nsaid",
+      "ibuprofen",
+      "eat"
+    ],
+    "hints": [
+      "Ask about the use of pain medications like NSAIDs.",
+      "Ask if the pain relates to meals."
+    ],
     "scriptedAnswers": [
-      { "match": ["stool", "poop", "bowel", "color", "black"], "answer": "Since yesterday, my bowel movements have been completely black and sticky, like tar." },
-      { "match": ["medication", "ibuprofen", "nsaid", "painkiller", "aspirin"], "answer": "I take about 800mg of ibuprofen a few times a day for my chronic back pain." },
-      { "match": ["eat", "food", "meal", "worse", "better"], "answer": "Strangely, the burning pain gets a bit better right after I eat, but then comes back a couple of hours later." },
-      { "match": ["dizzy", "stand", "faint"], "answer": "I felt really lightheaded and dizzy when I got out of bed this morning." }
+      {
+        "match": [
+          "stool",
+          "poop",
+          "bowel",
+          "color",
+          "black"
+        ],
+        "answer": "Since yesterday, my bowel movements have been completely black and sticky, like tar."
+      },
+      {
+        "match": [
+          "medication",
+          "ibuprofen",
+          "nsaid",
+          "painkiller",
+          "aspirin"
+        ],
+        "answer": "I take about 800mg of ibuprofen a few times a day for my chronic back pain."
+      },
+      {
+        "match": [
+          "eat",
+          "food",
+          "meal",
+          "worse",
+          "better"
+        ],
+        "answer": "Strangely, the burning pain gets a bit better right after I eat, but then comes back a couple of hours later."
+      },
+      {
+        "match": [
+          "dizzy",
+          "stand",
+          "faint"
+        ],
+        "answer": "I felt really lightheaded and dizzy when I got out of bed this morning."
+      }
     ],
-    "fallbackResponses": ["I feel very weak and tired today.", "My stomach has been burning for weeks.", "You can ask about my digestion or medications."],
-    "evaluationFocus": ["Recognize upper GI bleed symptoms (melena)", "Identify NSAID risk factor"]
+    "fallbackResponses": [
+      "I feel very weak and tired today.",
+      "My stomach has been burning for weeks.",
+      "You can ask about my digestion or medications."
+    ],
+    "evaluationFocus": [
+      "Recognize upper GI bleed symptoms (melena)",
+      "Identify NSAID risk factor"
+    ]
   },
   {
     "id": "case-12",
@@ -224,26 +687,104 @@
     "vitals": "Temp 37.1 C, HR 112, RR 22, BP 150/90, SpO2 99%",
     "history": "No significant past medical history, poor hydration on job site",
     "keyFacts": [
-      { "label": "Onset", "value": "Sudden onset 4 hours ago" },
-      { "label": "Associated symptoms", "value": "Nausea, visible blood in urine" },
-      { "label": "Risk factors", "value": "Dehydration, high sodium diet" },
-      { "label": "Hidden clue", "value": "Patient cannot find a comfortable position" }
+      {
+        "label": "Onset",
+        "value": "Sudden onset 4 hours ago"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Nausea, visible blood in urine"
+      },
+      {
+        "label": "Risk factors",
+        "value": "Dehydration, high sodium diet"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Patient cannot find a comfortable position"
+      }
     ],
-    "expectedDiagnosis": ["kidney stone", "nephrolithiasis", "renal colic", "ureteral calculus"],
-    "differentialDiagnoses": ["Pyelonephritis", "Abdominal aortic aneurysm", "Musculoskeletal pain"],
-    "redFlags": ["Hematuria", "Severe uncontrollable pain"],
-    "expectedQuestions": ["Does the pain move anywhere?", "Have you noticed blood in your urine?", "Are you able to find a comfortable position?"],
-    "recommendedTests": ["Urinalysis", "CT KUB (non-contrast)", "Renal panel"],
-    "communicationGoals": ["Provide rapid analgesia", "Explain the nature of renal colic"],
-    "keywords": ["pain", "flank", "groin", "urine", "blood", "pee", "comfortable", "restless"],
-    "hints": ["Ask about changes in his urine color.", "Note his behavior (pacing/restless) compared to peritonitis (still)."],
+    "expectedDiagnosis": [
+      "kidney stone",
+      "nephrolithiasis",
+      "renal colic",
+      "ureteral calculus"
+    ],
+    "differentialDiagnoses": [
+      "Pyelonephritis",
+      "Abdominal aortic aneurysm",
+      "Musculoskeletal pain"
+    ],
+    "redFlags": [
+      "Hematuria",
+      "Severe uncontrollable pain"
+    ],
+    "expectedQuestions": [
+      "Does the pain move anywhere?",
+      "Have you noticed blood in your urine?",
+      "Are you able to find a comfortable position?"
+    ],
+    "recommendedTests": [
+      "Urinalysis",
+      "CT KUB (non-contrast)",
+      "Renal panel"
+    ],
+    "communicationGoals": [
+      "Provide rapid analgesia",
+      "Explain the nature of renal colic"
+    ],
+    "keywords": [
+      "pain",
+      "flank",
+      "groin",
+      "urine",
+      "blood",
+      "pee",
+      "comfortable",
+      "restless"
+    ],
+    "hints": [
+      "Ask about changes in his urine color.",
+      "Note his behavior (pacing/restless) compared to peritonitis (still)."
+    ],
     "scriptedAnswers": [
-      { "match": ["radiate", "move", "groin", "where"], "answer": "It starts in my left lower back and shoots straight down into my groin." },
-      { "match": ["urine", "pee", "blood", "color"], "answer": "Yes, when I peed an hour ago it looked pinkish, like there was blood in it." },
-      { "match": ["comfortable", "sit", "still", "position"], "answer": "No! I can't sit still, I keep walking around but nothing makes the pain better." }
+      {
+        "match": [
+          "radiate",
+          "move",
+          "groin",
+          "where"
+        ],
+        "answer": "It starts in my left lower back and shoots straight down into my groin."
+      },
+      {
+        "match": [
+          "urine",
+          "pee",
+          "blood",
+          "color"
+        ],
+        "answer": "Yes, when I peed an hour ago it looked pinkish, like there was blood in it."
+      },
+      {
+        "match": [
+          "comfortable",
+          "sit",
+          "still",
+          "position"
+        ],
+        "answer": "No! I can't sit still, I keep walking around but nothing makes the pain better."
+      }
     ],
-    "fallbackResponses": ["Please give me something for the pain, it's a 10 out of 10.", "I've never felt anything like this.", "I just want the pain to stop."],
-    "evaluationFocus": ["Diagnose renal colic based on radiation and restlessness", "Ask about hematuria"]
+    "fallbackResponses": [
+      "Please give me something for the pain, it's a 10 out of 10.",
+      "I've never felt anything like this.",
+      "I just want the pain to stop."
+    ],
+    "evaluationFocus": [
+      "Diagnose renal colic based on radiation and restlessness",
+      "Ask about hematuria"
+    ]
   },
   {
     "id": "case-13",
@@ -259,27 +800,118 @@
     "vitals": "Temp 36.8 C, HR 90, RR 16, BP 165/110, SpO2 98%",
     "history": "First pregnancy, previously uncomplicated",
     "keyFacts": [
-      { "label": "Onset", "value": "Swelling for 3 days, headache started today" },
-      { "label": "Associated symptoms", "value": "Visual spots, right upper quadrant abdominal pain" },
-      { "label": "Risk factors", "value": "First pregnancy (primigravida)" },
-      { "label": "Hidden clue", "value": "Pain under the right ribs (liver capsule stretching)" }
+      {
+        "label": "Onset",
+        "value": "Swelling for 3 days, headache started today"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Visual spots, right upper quadrant abdominal pain"
+      },
+      {
+        "label": "Risk factors",
+        "value": "First pregnancy (primigravida)"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Pain under the right ribs (liver capsule stretching)"
+      }
     ],
-    "expectedDiagnosis": ["preeclampsia", "severe preeclampsia", "hellp syndrome"],
-    "differentialDiagnoses": ["Gestational hypertension", "Migraine", "Normal pregnancy changes"],
-    "redFlags": ["High blood pressure in pregnancy", "Visual changes", "RUQ pain", "Severe unremitting headache"],
-    "expectedQuestions": ["Are you having any changes in your vision?", "Do you have any pain under your right ribs?", "Is the baby moving normally?"],
-    "recommendedTests": ["Urinalysis for protein", "Complete blood count", "Liver and kidney function tests", "Fetal monitoring (CTG)"],
-    "communicationGoals": ["Monitor maternal and fetal wellbeing", "Explain the serious nature of the condition without causing panic"],
-    "keywords": ["headache", "swell", "face", "hands", "pregnant", "vision", "spots", "ribs", "pain", "baby", "move"],
-    "hints": ["Ask about right upper quadrant or rib pain.", "Ask about visual disturbances."],
+    "expectedDiagnosis": [
+      "preeclampsia",
+      "severe preeclampsia",
+      "hellp syndrome"
+    ],
+    "differentialDiagnoses": [
+      "Gestational hypertension",
+      "Migraine",
+      "Normal pregnancy changes"
+    ],
+    "redFlags": [
+      "High blood pressure in pregnancy",
+      "Visual changes",
+      "RUQ pain",
+      "Severe unremitting headache"
+    ],
+    "expectedQuestions": [
+      "Are you having any changes in your vision?",
+      "Do you have any pain under your right ribs?",
+      "Is the baby moving normally?"
+    ],
+    "recommendedTests": [
+      "Urinalysis for protein",
+      "Complete blood count",
+      "Liver and kidney function tests",
+      "Fetal monitoring (CTG)"
+    ],
+    "communicationGoals": [
+      "Monitor maternal and fetal wellbeing",
+      "Explain the serious nature of the condition without causing panic"
+    ],
+    "keywords": [
+      "headache",
+      "swell",
+      "face",
+      "hands",
+      "pregnant",
+      "vision",
+      "spots",
+      "ribs",
+      "pain",
+      "baby",
+      "move"
+    ],
+    "hints": [
+      "Ask about right upper quadrant or rib pain.",
+      "Ask about visual disturbances."
+    ],
     "scriptedAnswers": [
-      { "match": ["vision", "see", "spots", "blur"], "answer": "Yes, I keep seeing little flashing spots in my eyes today." },
-      { "match": ["pain", "stomach", "ribs", "abdomen"], "answer": "I have this dull ache right under my ribs on the right side. I thought it was just the baby kicking." },
-      { "match": ["baby", "move", "kick", "active"], "answer": "The baby is still moving, but maybe a little less than yesterday." },
-      { "match": ["swell", "hands", "face", "feet"], "answer": "My feet have been swollen for a while, but today my face is puffy and I couldn't get my rings off." }
+      {
+        "match": [
+          "vision",
+          "see",
+          "spots",
+          "blur"
+        ],
+        "answer": "Yes, I keep seeing little flashing spots in my eyes today."
+      },
+      {
+        "match": [
+          "pain",
+          "stomach",
+          "ribs",
+          "abdomen"
+        ],
+        "answer": "I have this dull ache right under my ribs on the right side. I thought it was just the baby kicking."
+      },
+      {
+        "match": [
+          "baby",
+          "move",
+          "kick",
+          "active"
+        ],
+        "answer": "The baby is still moving, but maybe a little less than yesterday."
+      },
+      {
+        "match": [
+          "swell",
+          "hands",
+          "face",
+          "feet"
+        ],
+        "answer": "My feet have been swollen for a while, but today my face is puffy and I couldn't get my rings off."
+      }
     ],
-    "fallbackResponses": ["Is my baby going to be okay?", "My head is really pounding.", "You can ask about my pregnancy or my symptoms."],
-    "evaluationFocus": ["Recognize preeclampsia with severe features", "Identify RUQ pain as a sign of liver involvement"]
+    "fallbackResponses": [
+      "Is my baby going to be okay?",
+      "My head is really pounding.",
+      "You can ask about my pregnancy or my symptoms."
+    ],
+    "evaluationFocus": [
+      "Recognize preeclampsia with severe features",
+      "Identify RUQ pain as a sign of liver involvement"
+    ]
   },
   {
     "id": "case-14",
@@ -295,26 +927,101 @@
     "vitals": "Temp 38.5 C, HR 110, RR 24, BP 95/60, SpO2 99%",
     "history": "Recent cold, attends daycare",
     "keyFacts": [
-      { "label": "Onset", "value": "Started pulling at his right ear last night" },
-      { "label": "Associated symptoms", "value": "Irritability, fever, nasal congestion" },
-      { "label": "Risk factors", "value": "Age, daycare attendance, recent URI" },
-      { "label": "Hidden clue", "value": "Not eating well because swallowing hurts his ear" }
+      {
+        "label": "Onset",
+        "value": "Started pulling at his right ear last night"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Irritability, fever, nasal congestion"
+      },
+      {
+        "label": "Risk factors",
+        "value": "Age, daycare attendance, recent URI"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Not eating well because swallowing hurts his ear"
+      }
     ],
-    "expectedDiagnosis": ["acute otitis media", "otitis media", "ear infection"],
-    "differentialDiagnoses": ["Otitis externa", "Viral upper respiratory infection", "Teething"],
-    "redFlags": ["High fever", "Mastoid tenderness", "Lethargy"],
-    "expectedQuestions": ["Has he had a cold recently?", "Is there any discharge from the ear?", "Is he eating and drinking normally?"],
-    "recommendedTests": ["Otoscopy"],
-    "communicationGoals": ["Advise on pain management", "Discuss appropriate antibiotic stewardship"],
-    "keywords": ["ear", "pain", "pull", "fever", "cold", "discharge", "eat", "drink", "daycare"],
-    "hints": ["Ask about recent colds or runny nose.", "Ask if there's any fluid coming out of the ear."],
+    "expectedDiagnosis": [
+      "acute otitis media",
+      "otitis media",
+      "ear infection"
+    ],
+    "differentialDiagnoses": [
+      "Otitis externa",
+      "Viral upper respiratory infection",
+      "Teething"
+    ],
+    "redFlags": [
+      "High fever",
+      "Mastoid tenderness",
+      "Lethargy"
+    ],
+    "expectedQuestions": [
+      "Has he had a cold recently?",
+      "Is there any discharge from the ear?",
+      "Is he eating and drinking normally?"
+    ],
+    "recommendedTests": [
+      "Otoscopy"
+    ],
+    "communicationGoals": [
+      "Advise on pain management",
+      "Discuss appropriate antibiotic stewardship"
+    ],
+    "keywords": [
+      "ear",
+      "pain",
+      "pull",
+      "fever",
+      "cold",
+      "discharge",
+      "eat",
+      "drink",
+      "daycare"
+    ],
+    "hints": [
+      "Ask about recent colds or runny nose.",
+      "Ask if there's any fluid coming out of the ear."
+    ],
     "scriptedAnswers": [
-      { "match": ["cold", "runny nose", "sick"], "answer": "(Parent) Yes, he's had a runny nose and a mild cough for the last four days." },
-      { "match": ["discharge", "fluid", "leak", "blood"], "answer": "(Parent) No, I haven't seen any fluid or blood coming out of the ear." },
-      { "match": ["eat", "drink", "swallow"], "answer": "(Parent) He is drinking milk, but he refuses to eat solid food. I think chewing hurts." }
+      {
+        "match": [
+          "cold",
+          "runny nose",
+          "sick"
+        ],
+        "answer": "(Parent) Yes, he's had a runny nose and a mild cough for the last four days."
+      },
+      {
+        "match": [
+          "discharge",
+          "fluid",
+          "leak",
+          "blood"
+        ],
+        "answer": "(Parent) No, I haven't seen any fluid or blood coming out of the ear."
+      },
+      {
+        "match": [
+          "eat",
+          "drink",
+          "swallow"
+        ],
+        "answer": "(Parent) He is drinking milk, but he refuses to eat solid food. I think chewing hurts."
+      }
     ],
-    "fallbackResponses": ["(Parent) He was up all night crying and holding his ear.", "(Parent) Should I give him antibiotics?", "(Child) My ear hurts!"],
-    "evaluationFocus": ["Diagnose acute otitis media clinically", "Assess for complications like mastoiditis"]
+    "fallbackResponses": [
+      "(Parent) He was up all night crying and holding his ear.",
+      "(Parent) Should I give him antibiotics?",
+      "(Child) My ear hurts!"
+    ],
+    "evaluationFocus": [
+      "Diagnose acute otitis media clinically",
+      "Assess for complications like mastoiditis"
+    ]
   },
   {
     "id": "case-15",
@@ -330,26 +1037,966 @@
     "vitals": "Temp 36.9 C, HR 125, RR 28, BP 85/50, SpO2 90% on room air",
     "history": "Known peanut allergy, carries an EpiPen but forgot it today",
     "keyFacts": [
-      { "label": "Onset", "value": "15 minutes ago after eating a cookie at a bakery" },
-      { "label": "Associated symptoms", "value": "Hives on chest, lip swelling, wheezing, dizziness" },
-      { "label": "Risk factors", "value": "Known food allergy" },
-      { "label": "Hidden clue", "value": "Hypotension (BP 85/50) indicates systemic shock, not just an allergic reaction" }
+      {
+        "label": "Onset",
+        "value": "15 minutes ago after eating a cookie at a bakery"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Hives on chest, lip swelling, wheezing, dizziness"
+      },
+      {
+        "label": "Risk factors",
+        "value": "Known food allergy"
+      },
+      {
+        "label": "Hidden clue",
+        "value": "Hypotension (BP 85/50) indicates systemic shock, not just an allergic reaction"
+      }
     ],
-    "expectedDiagnosis": ["anaphylaxis", "anaphylactic shock", "severe allergic reaction"],
-    "differentialDiagnoses": ["Asthma attack", "Panic attack", "Angioedema"],
-    "redFlags": ["Airway compromise (lip swelling, wheeze)", "Hypotension", "Rapid onset after allergen exposure"],
-    "expectedQuestions": ["What did you eat?", "Do you have any allergies?", "Have you used an EpiPen?"],
-    "recommendedTests": ["Continuous vital monitoring", "Clinical diagnosis (no tests should delay treatment)"],
-    "communicationGoals": ["Administer IM epinephrine immediately", "Communicate urgency to the medical team"],
-    "keywords": ["eat", "food", "allergy", "peanut", "breathe", "lip", "swell", "epipen", "dizzy"],
-    "hints": ["Ask about known allergies and what she ate.", "Check if she has self-administered any medication."],
+    "expectedDiagnosis": [
+      "anaphylaxis",
+      "anaphylactic shock",
+      "severe allergic reaction"
+    ],
+    "differentialDiagnoses": [
+      "Asthma attack",
+      "Panic attack",
+      "Angioedema"
+    ],
+    "redFlags": [
+      "Airway compromise (lip swelling, wheeze)",
+      "Hypotension",
+      "Rapid onset after allergen exposure"
+    ],
+    "expectedQuestions": [
+      "What did you eat?",
+      "Do you have any allergies?",
+      "Have you used an EpiPen?"
+    ],
+    "recommendedTests": [
+      "Continuous vital monitoring",
+      "Clinical diagnosis (no tests should delay treatment)"
+    ],
+    "communicationGoals": [
+      "Administer IM epinephrine immediately",
+      "Communicate urgency to the medical team"
+    ],
+    "keywords": [
+      "eat",
+      "food",
+      "allergy",
+      "peanut",
+      "breathe",
+      "lip",
+      "swell",
+      "epipen",
+      "dizzy"
+    ],
+    "hints": [
+      "Ask about known allergies and what she ate.",
+      "Check if she has self-administered any medication."
+    ],
     "scriptedAnswers": [
-      { "match": ["eat", "food", "cookie", "have"], "answer": "I ate... a chocolate cookie... from a bakery... 15 minutes ago." },
-      { "match": ["allergy", "allergic", "peanut", "nuts"], "answer": "I'm allergic... to peanuts. I think... cross-contamination." },
-      { "match": ["epipen", "adrenaline", "medication", "use"], "answer": "I forgot... my EpiPen... at home. Please help." },
-      { "match": ["dizzy", "faint", "lightheaded"], "answer": "I feel... really dizzy... like I'm going to pass out." }
+      {
+        "match": [
+          "eat",
+          "food",
+          "cookie",
+          "have"
+        ],
+        "answer": "I ate... a chocolate cookie... from a bakery... 15 minutes ago."
+      },
+      {
+        "match": [
+          "allergy",
+          "allergic",
+          "peanut",
+          "nuts"
+        ],
+        "answer": "I'm allergic... to peanuts. I think... cross-contamination."
+      },
+      {
+        "match": [
+          "epipen",
+          "adrenaline",
+          "medication",
+          "use"
+        ],
+        "answer": "I forgot... my EpiPen... at home. Please help."
+      },
+      {
+        "match": [
+          "dizzy",
+          "faint",
+          "lightheaded"
+        ],
+        "answer": "I feel... really dizzy... like I'm going to pass out."
+      }
     ],
-    "fallbackResponses": ["I can't... breathe...", "My throat... is closing...", "Help... me..."],
-    "evaluationFocus": ["Recognize anaphylaxis immediately", "Identify the need for IM epinephrine over antihistamines"]
+    "fallbackResponses": [
+      "I can't... breathe...",
+      "My throat... is closing...",
+      "Help... me..."
+    ],
+    "evaluationFocus": [
+      "Recognize anaphylaxis immediately",
+      "Identify the need for IM epinephrine over antihistamines"
+    ]
+  },
+  {
+    "id": "case-cardio-100",
+    "name": "Cardio Patient 1",
+    "age": 50,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-101",
+    "name": "Cardio Patient 2",
+    "age": 51,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-102",
+    "name": "Cardio Patient 3",
+    "age": 52,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-103",
+    "name": "Cardio Patient 4",
+    "age": 53,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-104",
+    "name": "Cardio Patient 5",
+    "age": 54,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-105",
+    "name": "Cardio Patient 6",
+    "age": 55,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-106",
+    "name": "Cardio Patient 7",
+    "age": 56,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-107",
+    "name": "Cardio Patient 8",
+    "age": 57,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
+  },
+  {
+    "id": "case-cardio-108",
+    "name": "Cardio Patient 9",
+    "age": 58,
+    "role": "Patient",
+    "complaint": "Chest pain and shortness of breath",
+    "specialty": "Cardiology",
+    "complexity": "Moderate",
+    "urgency": "Urgent",
+    "personality": "Anxious",
+    "summary": "Patient with typical angina symptoms.",
+    "vitals": "Temp 37.0 C, HR 90, RR 18, BP 130/85, SpO2 96%",
+    "history": "Hypertension, Hyperlipidemia",
+    "keyFacts": [
+      {
+        "label": "Onset",
+        "value": "Gradual over last 2 hours"
+      },
+      {
+        "label": "Associated symptoms",
+        "value": "Shortness of breath, sweating"
+      }
+    ],
+    "expectedDiagnosis": [
+      "angina",
+      "myocardial infarction",
+      "acute coronary syndrome"
+    ],
+    "differentialDiagnoses": [
+      "GERD",
+      "Panic attack",
+      "Pulmonary embolism"
+    ],
+    "redFlags": [
+      "Radiating chest pain",
+      "Diaphoresis"
+    ],
+    "expectedQuestions": [
+      "Does the pain radiate anywhere?",
+      "Are you short of breath?"
+    ],
+    "recommendedTests": [
+      "ECG",
+      "Troponin",
+      "Chest X-ray"
+    ],
+    "communicationGoals": [
+      "Reassure patient",
+      "Explain need for urgent ECG"
+    ],
+    "keywords": [
+      "chest",
+      "pain",
+      "sweat",
+      "breath",
+      "radiate"
+    ],
+    "hints": [
+      "Ask if the pain moves to the jaw or arm.",
+      "Ask about sweating."
+    ],
+    "scriptedAnswers": [
+      {
+        "match": [
+          "radiate",
+          "move",
+          "arm",
+          "jaw"
+        ],
+        "answer": "The pain seems to go down my left arm."
+      },
+      {
+        "match": [
+          "sweat",
+          "diaphoresis"
+        ],
+        "answer": "Yes, I feel very clammy and sweaty."
+      },
+      {
+        "match": [
+          "breath",
+          "short"
+        ],
+        "answer": "I feel like I can't catch my breath properly."
+      }
+    ],
+    "fallbackResponses": [
+      "My chest feels very tight.",
+      "I'm worried it's a heart attack."
+    ],
+    "evaluationFocus": [
+      "Recognize cardiac chest pain",
+      "Order appropriate investigations"
+    ]
   }
 ]

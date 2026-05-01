@@ -14,6 +14,10 @@ export default function Landing() {
     else navigate("/login");
   };
 
+  const handleTryDemo = () => {
+    navigate("/simulator?demo=cardiology");
+  };
+
   return (
     <>
 
@@ -55,7 +59,7 @@ export default function Landing() {
                         </div>
                         <div className="start-practicing2">Start Practicing</div>
                       </button>
-                      <button className="button12" onClick={handleStartPracticing}>
+                      <button className="button12" onClick={handleTryDemo}>
                         <div className="try-demo-case2">Try Demo Case</div>
                       </button>
                     </div>

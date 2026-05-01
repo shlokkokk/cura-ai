@@ -387,19 +387,88 @@ const server = http.createServer(async (request, response) => {
           normalizedFilter.includes(c.specialty.toLowerCase())
         );
         
-      }
-      
-      // Ensure we always have a queue of at least 10 cases (if available) to bypass AI generation delay
-      if (filteredCases.length < 10) {
-        const remainingCases = caseStudies.filter(c => !filteredCases.find(fc => fc.id === c.id));
-        const shuffled = remainingCases.sort(() => 0.5 - Math.random());
-        filteredCases = [...filteredCases, ...shuffled.slice(0, 10 - filteredCases.length)];
+        // Also include any previously AI-generated cases for this specialty
+        for (const [id, cachedCase] of aiCaseCache.entries()) {
+          if (cachedCase.specialty && cachedCase.specialty.toLowerCase().includes(normalizedFilter)) {
+            if (!filteredCases.find(fc => fc.id === id)) {
+              filteredCases.push(cachedCase);
+            }
+          }
+        }
+
+        // AI case generation helper
+        const generateSpecialtyCases = async (count, specialty) => {
+          const aiGenPrompt = `Generate ${count} realistic virtual patient case(s) for medical specialty: "${specialty}".
+Return a JSON array. Each case object must have: name (string), age (number), role (string), complaint (string), specialty: "${specialty}", complexity ("Low"/"Moderate"/"High"), urgency (string), personality (string), summary (string), vitals (string), history (string), expectedDiagnosis (array), differentialDiagnoses (array of 3-4), redFlags (array of 3-5), expectedQuestions (array of 5), recommendedTests (array of 4-5), communicationGoals (array of 2), hints (array of 3), evaluationFocus (array of 3).
+Make cases medically accurate and diverse. Return ONLY valid JSON array, no markdown.`;
+
+          let aiCases = null;
+          if (isGeminiConfigured()) {
+            aiCases = await generateGeminiJson({ prompt: aiGenPrompt }).catch(() => null);
+          }
+          if (!aiCases && await isOllamaAvailable()) {
+            aiCases = await generateOllamaJson({ prompt: aiGenPrompt }).catch(() => null);
+          }
+          
+          const generated = [];
+          if (aiCases) {
+            const casesArray = Array.isArray(aiCases) ? aiCases : [aiCases];
+            for (let i = 0; i < casesArray.length; i++) {
+              const aiCase = casesArray[i];
+              const caseId = `ai-${specialty.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}-${i}`;
+              const fullCase = {
+                ...aiCase,
+                id: caseId,
+                specialty: specialty,
+                keywords: [],
+                scriptedAnswers: [],
+                fallbackResponses: [
+                  "I'm not sure what else to tell you, doctor.",
+                  "Can you ask me something more specific?",
+                  "I've told you everything I can think of."
+                ]
+              };
+              aiCaseCache.set(caseId, fullCase);
+              generated.push(fullCase);
+            }
+            console.log(`[AI Case Gen] Generated ${generated.length} cases for ${specialty}`);
+          }
+          return generated;
+        };
+
+        if (filteredCases.length === 0) {
+          // NO matching cases at all — we MUST wait for AI to generate at least one
+          console.log(`[AI Case Gen] No cases for "${specialtyFilter}", generating 1 with AI to unblock...`);
+          try {
+            const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 45000));
+            const generated = await Promise.race([generateSpecialtyCases(1, specialtyFilter), timeout]);
+            filteredCases = generated;
+            
+            // Generate 2 more in background
+            console.log(`[AI Case Gen] Background generating 2 more for "${specialtyFilter}"`);
+            generateSpecialtyCases(2, specialtyFilter).catch(err => {
+              console.error(`[AI Case Gen] Background generation failed:`, err.message);
+            });
+          } catch (err) {
+            console.error(`[AI Case Gen] Failed/timed out for ${specialtyFilter}:`, err.message);
+          }
+        } else if (filteredCases.length < 3) {
+          // Have some cases — return them immediately, generate more in the background
+          const casesToGenerate = 3 - filteredCases.length;
+          console.log(`[AI Case Gen] Background generating ${casesToGenerate} more for "${specialtyFilter}"`);
+          generateSpecialtyCases(casesToGenerate, specialtyFilter).catch(err => {
+            console.error(`[AI Case Gen] Background generation failed:`, err.message);
+          });
+          // Don't await — respond immediately with what we have
+        }
       }
 
+      // Return ONLY specialty-matched cases (no random backfill from other specialties)
       sendJson(response, 200, { 
         cases: filteredCases.map(sanitizeCase), 
         specialty: specialtyFilter || null,
-        generated: specialtyFilter && filteredCases.length > 0 && filteredCases[0].id?.startsWith('ai-'),
+        generated: specialtyFilter && filteredCases.some(c => c.id?.startsWith('ai-')),
+        totalAvailable: filteredCases.length,
         requestId 
       }, context);
       return;
@@ -594,7 +663,17 @@ const server = http.createServer(async (request, response) => {
         return;
       }
 
-      const session = await createSession(caseStudy, body.learnerName, body.userId);
+      let sessionUserId = body.userId;
+      if (sessionUserId) {
+        // If Supabase is active, ensure the ID is a valid UUID, otherwise it crashes with 22P02
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionUserId);
+        if (getStorageMode() === 'supabase' && !isUuid) {
+          console.warn(`[Sessions] Invalid UUID for user: ${sessionUserId}. Falling back to anonymous session.`);
+          sessionUserId = null;
+        }
+      }
+
+      const session = await createSession(caseStudy, body.learnerName, sessionUserId);
       sendJson(response, 201, {
         session: {
           id: session.id,

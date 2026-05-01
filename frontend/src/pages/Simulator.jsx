@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
@@ -158,8 +158,14 @@ export default function Simulator() {
     return () => clearInterval(timer);
   }, [isEmergencyMode, timeLeft, sessionId, evaluation]);
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const demoSpecialty = searchParams.get('demo');
+  const demoUserObj = React.useMemo(() => ({ id: null, name: 'Demo User', specialization: 'Cardiology' }), []);
+  const effectiveUser = user || (demoSpecialty === 'cardiology' ? demoUserObj : null);
+
   useEffect(() => {
-    if (!user) {
+    if (!effectiveUser) {
       navigate('/login');
       return;
     }
@@ -167,7 +173,8 @@ export default function Simulator() {
     const fetchCases = async () => {
       setGeneratingAI(true);
       try {
-        const specialtyParam = user.specialization ? `?specialty=${encodeURIComponent(user.specialization)}` : '';
+        const specialtyToUse = demoSpecialty === 'cardiology' ? 'Cardiology' : effectiveUser.specialization;
+        const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
         const data = await api(`/api/cases${specialtyParam}`);
         
         if (data.cases && data.cases.length > 0) {
@@ -194,7 +201,7 @@ export default function Simulator() {
     };
     fetchCases();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, navigate]);
+  }, [effectiveUser, navigate, demoSpecialty]);
 
   useEffect(() => {
     if (chatLogRef.current) {
@@ -221,7 +228,7 @@ export default function Simulator() {
     setActiveCase(patient);
     try {
       // For AI-generated cases, pass the full case data so the server can use it
-      const payload = { userId: user.id, caseId };
+      const payload = { userId: effectiveUser.id, caseId };
       if (caseId.startsWith('ai-')) {
         payload.caseData = patient;
       }
@@ -310,7 +317,7 @@ export default function Simulator() {
     navigate('/');
   };
 
-  if (!user) return null;
+  if (!effectiveUser) return null;
 
   return (
     <div className="figma-chat-bot">
@@ -346,7 +353,7 @@ export default function Simulator() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <button className="figma-chat-avatar" onClick={handleLogout} title="Logout">
-            {user.name.substring(0, 2).toUpperCase()}
+            {effectiveUser.name.substring(0, 2).toUpperCase()}
           </button>
         </div>
       </header>
@@ -377,7 +384,8 @@ export default function Simulator() {
 
           <div className="figma-tests-actions">
             <button className="figma-test-action-btn" onClick={async () => {
-              const specialtyParam = user.specialization ? `?specialty=${encodeURIComponent(user.specialization)}` : '';
+              const specialtyToUse = demoSpecialty === 'cardiology' ? 'Cardiology' : effectiveUser.specialization;
+              const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
               const data = await api(`/api/cases${specialtyParam}`);
               setCases(data.cases);
               if (data.cases.length > 0) loadCase(data.cases[0].id, data.cases, data.cases[0]);
@@ -419,7 +427,7 @@ export default function Simulator() {
               )}
             </div>
             <div className="figma-chat-specialty-badge">
-              {isEmergencyMode ? 'EMERGENCY' : (activeCase?.specialty || user.specialization || 'General')}
+              {isEmergencyMode ? 'EMERGENCY' : (activeCase?.specialty || effectiveUser.specialization || 'General')}
             </div>
           </div>
 

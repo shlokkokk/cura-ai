@@ -28,7 +28,11 @@ async function requestGemini({ prompt, systemInstruction, responseMimeType, maxO
       temperature: 0.7,
       topP: 0.9,
       maxOutputTokens,
-      ...(responseMimeType ? { responseMimeType } : {})
+      ...(responseMimeType ? { responseMimeType } : {}),
+      // Limit thinking budget to keep responses fast
+      thinkingConfig: {
+        thinkingBudget: 1024
+      }
     }
   };
 
@@ -39,14 +43,19 @@ async function requestGemini({ prompt, systemInstruction, responseMimeType, maxO
     };
   }
 
+  // Add timeout to prevent hanging requests
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 40000);
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-goog-api-key": GEMINI_API_KEY
     },
-    body: JSON.stringify(requestBody)
-  });
+    body: JSON.stringify(requestBody),
+    signal: controller.signal
+  }).finally(() => clearTimeout(timeoutId));
 
   if (!response.ok) {
     const detail = await response.text();

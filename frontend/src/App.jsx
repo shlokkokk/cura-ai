@@ -32,11 +32,7 @@ function AppRoutes() {
           <Dashboard />
         </ProtectedRoute>
       } />
-      <Route path="/simulator" element={
-        <ProtectedRoute>
-          <Simulator />
-        </ProtectedRoute>
-      } />
+      <Route path="/simulator" element={<Simulator />} />
       <Route path="/profile" element={
         <ProtectedRoute>
           <Profile />
