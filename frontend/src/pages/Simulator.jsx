@@ -38,12 +38,7 @@ export default function Simulator() {
   // Cardiology medical report images mapped by condition keywords
   const cardiologyReports = [
     { id: 'ecg-interpretation', title: 'ECG — 12 Lead Interpretation', image: '/reports/ecg-interpretation.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
-    { id: 'ecg-pattern-comparison', title: 'ECG — Pattern Comparison', image: '/reports/ecg-pattern-comparison.png', type: 'Reference', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure', 'atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib', 'tachycardia', 'fast heart', 'anxiety', 'normal', 'baseline', 'stable'] },
-    { id: 'ecg-afib', title: 'ECG — Atrial Fibrillation', image: '/reports/ecg-afib.png', type: 'ECG', keywords: ['atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib'] },
-    { id: 'ecg-tachy', title: 'ECG — Sinus Tachycardia', image: '/reports/ecg-sinus-tachycardia.png', type: 'ECG', keywords: ['tachycardia', 'fast heart', 'anxiety', 'chest', 'breath'] },
-    { id: 'ecg-normal', title: 'ECG — Normal Sinus Rhythm', image: '/reports/ecg-normal.png', type: 'ECG', keywords: ['normal', 'baseline', 'stable', 'angina'] },
-    { id: 'cxr-chf', title: 'Chest X-Ray — Cardiomegaly', image: '/reports/chest-xray-chf.png', type: 'Imaging', keywords: ['heart failure', 'chf', 'cardiomegaly', 'edema', 'congestion', 'shortness'] },
-    { id: 'lab-troponin', title: 'Lab — Cardiac Troponin Panel', image: '/reports/lab-troponin.png', type: 'Lab', keywords: ['troponin', 'cardiac', 'myocardial', 'infarction', 'acs', 'chest pain', 'heart attack'] }
+    { id: 'ecg-pattern-comparison', title: 'ECG — Pattern Comparison', image: '/reports/ecg-pattern-comparison.png', type: 'Reference', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure', 'atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib', 'tachycardia', 'fast heart', 'anxiety', 'normal', 'baseline', 'stable'] }
   ];
 
   // Get relevant reports for the current cardiology case
@@ -66,10 +61,8 @@ export default function Simulator() {
     const matched = cardiologyReports.filter(report =>
       report.keywords.some(kw => caseText.includes(kw))
     );
-    // Always include at least 3 reports for any cardiology case
-    const defaults = cardiologyReports.filter(r => 
-      r.id === 'ecg-interpretation' || r.id === 'lab-troponin' || r.id === 'ecg-pattern-comparison'
-    );
+    // Always include the available reports for any cardiology case
+    const defaults = cardiologyReports;
     for (const d of defaults) {
       if (!matched.find(m => m.id === d.id)) matched.push(d);
     }
