@@ -37,7 +37,8 @@ export default function Simulator() {
 
   // Cardiology medical report images mapped by condition keywords
   const cardiologyReports = [
-    { id: 'ecg-stemi', title: 'ECG — ST Elevation (STEMI)', image: '/reports/ecg-stemi.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
+    { id: 'ecg-interpretation', title: 'ECG — 12 Lead Interpretation', image: '/reports/ecg-interpretation.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
+    { id: 'ecg-pattern-comparison', title: 'ECG — Pattern Comparison', image: '/reports/ecg-pattern-comparison.png', type: 'Reference', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure', 'atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib', 'tachycardia', 'fast heart', 'anxiety', 'normal', 'baseline', 'stable'] },
     { id: 'ecg-afib', title: 'ECG — Atrial Fibrillation', image: '/reports/ecg-afib.png', type: 'ECG', keywords: ['atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib'] },
     { id: 'ecg-tachy', title: 'ECG — Sinus Tachycardia', image: '/reports/ecg-sinus-tachycardia.png', type: 'ECG', keywords: ['tachycardia', 'fast heart', 'anxiety', 'chest', 'breath'] },
     { id: 'ecg-normal', title: 'ECG — Normal Sinus Rhythm', image: '/reports/ecg-normal.png', type: 'ECG', keywords: ['normal', 'baseline', 'stable', 'angina'] },
@@ -67,7 +68,7 @@ export default function Simulator() {
     );
     // Always include at least 3 reports for any cardiology case
     const defaults = cardiologyReports.filter(r => 
-      r.id === 'ecg-stemi' || r.id === 'lab-troponin' || r.id === 'ecg-normal'
+      r.id === 'ecg-interpretation' || r.id === 'lab-troponin' || r.id === 'ecg-pattern-comparison'
     );
     for (const d of defaults) {
       if (!matched.find(m => m.id === d.id)) matched.push(d);
