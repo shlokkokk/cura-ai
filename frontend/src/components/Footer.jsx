@@ -29,6 +29,10 @@ export default function Footer() {
               <div className="header4">
                 <div className="features4">Features</div>
               </div>
+              <div className="start-sharpening-your2">Safe Practice</div>
+              <div className="start-sharpening-your2">Smart AI Patients</div>
+              <div className="start-sharpening-your2">Multi-Specialties</div>
+              <div className="start-sharpening-your2">Progress Tracking</div>
             </div>
             <div className="column-22">
               <div className="header5">
