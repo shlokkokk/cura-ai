@@ -31,8 +31,45 @@ export default function Simulator() {
   const [toastMessage, setToastMessage] = useState(null);
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
   const [timeLeft, setTimeLeft] = useState(600);
+  const [lightboxImg, setLightboxImg] = useState(null);
   
   const chatLogRef = useRef(null);
+
+  // Cardiology medical report images mapped by condition keywords
+  const cardiologyReports = [
+    { id: 'ecg-stemi', title: 'ECG — ST Elevation (STEMI)', image: '/reports/ecg-stemi.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
+    { id: 'ecg-afib', title: 'ECG — Atrial Fibrillation', image: '/reports/ecg-afib.png', type: 'ECG', keywords: ['atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib'] },
+    { id: 'ecg-tachy', title: 'ECG — Sinus Tachycardia', image: '/reports/ecg-sinus-tachycardia.png', type: 'ECG', keywords: ['tachycardia', 'fast heart', 'anxiety', 'chest', 'breath'] },
+    { id: 'ecg-normal', title: 'ECG — Normal Sinus Rhythm', image: '/reports/ecg-normal.png', type: 'ECG', keywords: ['normal', 'baseline', 'stable', 'angina'] },
+    { id: 'cxr-chf', title: 'Chest X-Ray — Cardiomegaly', image: '/reports/chest-xray-chf.png', type: 'Imaging', keywords: ['heart failure', 'chf', 'cardiomegaly', 'edema', 'congestion', 'shortness'] },
+    { id: 'lab-troponin', title: 'Lab — Cardiac Troponin Panel', image: '/reports/lab-troponin.png', type: 'Lab', keywords: ['troponin', 'cardiac', 'myocardial', 'infarction', 'acs', 'chest pain', 'heart attack'] }
+  ];
+
+  // Get relevant reports for the current cardiology case
+  const getReportsForCase = (caseData) => {
+    if (!caseData || caseData.specialty?.toLowerCase() !== 'cardiology') return [];
+    const caseText = [
+      caseData.complaint,
+      caseData.summary,
+      ...(caseData.expectedDiagnosis || []),
+      ...(caseData.differentialDiagnoses || []),
+      ...(caseData.recommendedTests || [])
+    ].join(' ').toLowerCase();
+    
+    const matched = cardiologyReports.filter(report =>
+      report.keywords.some(kw => caseText.includes(kw))
+    );
+    // Always include at least 2 reports for any cardiology case
+    if (matched.length < 2) {
+      const defaults = cardiologyReports.filter(r => r.id === 'ecg-stemi' || r.id === 'lab-troponin');
+      for (const d of defaults) {
+        if (!matched.find(m => m.id === d.id)) matched.push(d);
+      }
+    }
+    return matched.slice(0, 4);
+  };
+
+  const activeReports = getReportsForCase(activeCase);
 
   // Format AI text to remove markdown stars
   const cleanMarkdown = (text) => {
@@ -497,6 +534,47 @@ export default function Simulator() {
             )}
           </div>
 
+          {/* Patient Reports — Cardiology images */}
+          {activeReports.length > 0 && (
+            <div style={{ marginTop: '12px', padding: '0' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '1rem' }}>📋</span> Patient Reports
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {activeReports.map(report => (
+                  <div 
+                    key={report.id}
+                    onClick={() => setLightboxImg(report)}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: '10px',
+                      border: '1px solid var(--border)',
+                      overflow: 'hidden',
+                      background: 'var(--surface)',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(138,124,255,0.15)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
+                  >
+                    <img 
+                      src={report.image} 
+                      alt={report.title}
+                      style={{ width: '100%', height: '80px', objectFit: 'cover', display: 'block' }}
+                    />
+                    <div style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)', lineHeight: '1.3' }}>{report.title}</div>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>{report.type} • Click to view</div>
+                      </div>
+                      <span style={{ fontSize: '1rem', opacity: 0.5 }}>🔍</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Hint & Abort Buttons */}
           <div className="figma-patient-actions">
             <button className="figma-hint-btn" onClick={handleHint}>Hints</button>
@@ -635,6 +713,56 @@ export default function Simulator() {
           {toastMessage}
         </div>
       )}
+      {/* ─── Report Image Lightbox ─── */}
+      {lightboxImg && (
+        <div 
+          onClick={() => setLightboxImg(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 20000,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            padding: '24px',
+            animation: 'fadeInUp 0.25s ease-out'
+          }}
+        >
+          <div style={{ 
+            background: 'white', borderRadius: '16px', overflow: 'hidden',
+            maxWidth: '900px', width: '100%', maxHeight: '85vh',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+            display: 'flex', flexDirection: 'column'
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ 
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 20px', borderBottom: '1px solid #e5e7eb',
+              background: 'linear-gradient(135deg, #f8f9ff 0%, #f0f1ff 100%)'
+            }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: '#1e293b' }}>{lightboxImg.title}</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#6b7280' }}>{lightboxImg.type} Report • For educational simulation only</p>
+              </div>
+              <button 
+                onClick={() => setLightboxImg(null)}
+                style={{ 
+                  background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: '8px',
+                  width: '36px', height: '36px', cursor: 'pointer', fontSize: '1.2rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#374151', transition: 'background 0.2s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
+              >✕</button>
+            </div>
+            <div style={{ overflow: 'auto', padding: '16px', display: 'flex', justifyContent: 'center', background: '#fafafa' }}>
+              <img 
+                src={lightboxImg.image} 
+                alt={lightboxImg.title}
+                style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: '8px' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
