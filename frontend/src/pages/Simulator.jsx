@@ -48,23 +48,29 @@ export default function Simulator() {
   // Get relevant reports for the current cardiology case
   const getReportsForCase = (caseData) => {
     if (!caseData || caseData.specialty?.toLowerCase() !== 'cardiology') return [];
+    // Use only fields that sanitizeCase sends to the frontend
+    // (expectedDiagnosis is NOT sent — it's the answer key)
     const caseText = [
-      caseData.complaint,
-      caseData.summary,
-      ...(caseData.expectedDiagnosis || []),
+      caseData.complaint || '',
+      caseData.summary || '',
+      caseData.vitals || '',
+      caseData.personality || '',
+      caseData.urgency || '',
       ...(caseData.differentialDiagnoses || []),
-      ...(caseData.recommendedTests || [])
+      ...(caseData.recommendedTests || []),
+      ...(caseData.redFlags || []),
+      ...(caseData.hints || [])
     ].join(' ').toLowerCase();
     
     const matched = cardiologyReports.filter(report =>
       report.keywords.some(kw => caseText.includes(kw))
     );
-    // Always include at least 2 reports for any cardiology case
-    if (matched.length < 2) {
-      const defaults = cardiologyReports.filter(r => r.id === 'ecg-stemi' || r.id === 'lab-troponin');
-      for (const d of defaults) {
-        if (!matched.find(m => m.id === d.id)) matched.push(d);
-      }
+    // Always include at least 3 reports for any cardiology case
+    const defaults = cardiologyReports.filter(r => 
+      r.id === 'ecg-stemi' || r.id === 'lab-troponin' || r.id === 'ecg-normal'
+    );
+    for (const d of defaults) {
+      if (!matched.find(m => m.id === d.id)) matched.push(d);
     }
     return matched.slice(0, 4);
   };
