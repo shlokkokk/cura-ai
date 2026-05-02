@@ -167,7 +167,7 @@ export default function PatientHistory() {
         <div className="dashboard-container" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           <div className="dash-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '20px', padding: '30px' }}>
             <div className="dash-section-header" style={{ marginBottom: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: '800', margin: '0', color: 'var(--text)' }}>Patient History</h1>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: '800', margin: '0', color: 'var(--text)' }}>Previous Cases</h1>
               <p style={{ color: 'var(--muted)', marginTop: '8px', fontSize: '0.95rem' }}>
                 View details of all past virtual patients you have treated. Click on any record to view the full chat transcript and evaluation.
               </p>

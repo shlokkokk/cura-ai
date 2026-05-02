@@ -16,7 +16,7 @@ export default function Sidebar() {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: '📊' },
     { name: 'Simulation Lab', path: '/simulator', icon: '🏥' },
-    { name: 'Patient History', path: '/history', icon: '📋' },
+    { name: 'Previous Cases', path: '/history', icon: '📋' },
     { name: 'My Profile', path: '/profile', icon: '👤' },
   ];
 

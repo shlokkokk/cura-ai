@@ -14,7 +14,7 @@ export default function About() {
               <p className="section-eyebrow">Our Mission</p>
               <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '24px', letterSpacing: '-0.02em' }}>Built by doctors, <br/>for the future of medicine.</h1>
               <p style={{ fontSize: '1.25rem', color: 'var(--muted)', lineHeight: '1.8' }}>
-                Cura AI was founded with a single mission: to provide universally accessible, highly realistic clinical training to healthcare professionals across the globe, supporting SDG 3: Good Health and Well-being.
+                Cura AI was founded with a single mission: to provide universally accessible, highly realistic clinical training to healthcare professionals across the globe, supporting SDG3 and SDG 4.
               </p>
             </motion.div>
           </div>
@@ -25,7 +25,7 @@ export default function About() {
             <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
               <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '24px' }}>The Hackathon Story</h2>
               <p style={{ fontSize: '1.1rem', color: 'var(--muted)', lineHeight: '1.8', marginBottom: '20px' }}>
-                Cura AI was born out of a frantic 48-hour medical technology hackathon. Our team noticed a critical flaw in traditional medical education: students learn textbook theory, but lack the opportunity to practice the art of patient conversation before facing real humans in pain.
+                Cura AI was born out of inspiration from GNEC hackathon to achieve the SDG3 and SDG4 goals from United Nations. Our team noticed a critical flaw in traditional medical education: students learn textbook theory, but lack the opportunity to practice the art of patient conversation before facing real humans in pain.
               </p>
               <p style={{ fontSize: '1.1rem', color: 'var(--muted)', lineHeight: '1.8' }}>
                 By combining the incredible reasoning capabilities of Large Language Models with strict, evidence-based medical rubrics, we successfully created a zero-risk environment where clinicians can safely make mistakes, learn from detailed feedback, and ultimately save lives.
