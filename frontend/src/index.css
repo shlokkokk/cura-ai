@@ -925,6 +925,9 @@ h1, h2, h3, h4, h5, h6 {
 .test-item {
   display: flex;
   align-items: center;
+  text-align: left;
+  width: 100%;
+  background: transparent;
   gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--r-sm);
