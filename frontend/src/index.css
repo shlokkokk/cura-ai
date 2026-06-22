@@ -1702,6 +1702,8 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: var(--r-2xl);
   padding: var(--sp-6) var(--sp-8);
   box-shadow: 0 4px 48px rgba(0,0,0,0.15);
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .reg-form-header { margin-bottom: var(--sp-4); }
