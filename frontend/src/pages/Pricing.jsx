@@ -1,93 +1,265 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
+const PLANS = [
+  {
+    name: 'Student',
+    price: '$0',
+    period: 'Free forever',
+    desc: 'Perfect for medical students getting started with clinical reasoning practice.',
+    features: [
+      '5 Case Studies per month',
+      'Basic AI feedback after each session',
+      'Standard progress tracking',
+      'Community support',
+    ],
+    cta: 'Get Started Free',
+    action: '/register',
+    highlight: false,
+  },
+  {
+    name: 'Professional',
+    price: '$29',
+    period: '/month',
+    desc: 'For residents and junior doctors requiring rigorous, unlimited preparation.',
+    features: [
+      'Unlimited case studies',
+      'Advanced rubric evaluation',
+      'Differential diagnosis breakdown',
+      'Emergency mode scenarios',
+      'Full session PDF reports',
+      'Priority 24/7 support',
+    ],
+    cta: 'Start 14-Day Free Trial',
+    action: '/register',
+    highlight: true,
+    badge: 'Most Popular',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'Can I use CURA.AI on my phone?',
+    a: 'Yes. The web application is fully responsive. You can practice clinical scenarios on any modern mobile device or tablet.',
+  },
+  {
+    q: 'Who creates the clinical cases?',
+    a: 'All scenarios are designed and validated by medical educators to ensure accuracy and strict adherence to clinical guidelines.',
+  },
+  {
+    q: 'Can medical schools purchase bulk licenses?',
+    a: 'Absolutely. We offer Enterprise plans for universities and residency programs with administrative dashboards to monitor student progress. Contact us for custom pricing.',
+  },
+  {
+    q: 'Is there a free trial for the Professional plan?',
+    a: 'Yes — 14 days full access, no credit card required. Downgrade to free any time.',
+  },
+];
 
 export default function Pricing() {
   const navigate = useNavigate();
+  const [openFaq, setOpenFaq] = useState(null);
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
-      <main style={{ flex: 1, background: 'var(--bg)' }}>
-        <section style={{ padding: '100px 20px 60px', textAlign: 'center' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <p className="section-eyebrow">Transparent Pricing</p>
-              <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '24px', letterSpacing: '-0.02em' }}>Invest in your clinical excellence</h1>
-              <p style={{ fontSize: '1.25rem', color: 'var(--muted)', lineHeight: '1.6', marginBottom: '40px' }}>
-                Whether you're a medical student prepping for OSCEs or a residency program looking to scale training, we have a plan for you.
-              </p>
-            </motion.div>
-          </div>
 
-          <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
-            {/* Student Tier */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '24px', padding: '40px', textAlign: 'left' }}
-            >
-              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '12px' }}>Student</h3>
-              <p style={{ color: 'var(--muted)', height: '48px' }}>Perfect for medical students getting started with clinical reasoning.</p>
-              <div style={{ fontSize: '3.5rem', fontWeight: '800', margin: '24px 0', color: 'var(--text)' }}>
-                $0<span style={{ fontSize: '1.2rem', color: 'var(--muted)', fontWeight: 'normal' }}>/mo</span>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {['5 Case Studies per month', 'Basic AI Feedback', 'Standard Progress Tracking', 'Community Support'].map((feature, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: '500' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={() => navigate('/register')} className="btn btn-outline btn-lg" style={{ width: '100%', justifyContent: 'center' }}>Get Started Free</button>
-            </motion.div>
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <section style={{
+        paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
+        textAlign: 'center',
+        position: 'relative',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0,201,177,0.05) 0%, transparent 70%)',
+        }} />
+        <div className="container" style={{ maxWidth: 720, position: 'relative' }}>
+          <div className="section-label">Transparent Pricing</div>
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900,
+            letterSpacing: '-0.04em', lineHeight: 1.1,
+            margin: '16px 0 20px',
+          }}>
+            Invest in your<br />
+            <span style={{
+              background: 'var(--grad-brand)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
+              clinical excellence
+            </span>
+          </h1>
+          <p style={{ fontSize: 'var(--fs-lg)', color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 560, margin: '0 auto' }}>
+            Whether you're a medical student prepping for OSCEs or a residency program scaling clinical training —
+            we have a plan for you.
+          </p>
+        </div>
+      </section>
 
-            {/* Professional Tier */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
-              style={{ background: 'var(--surface)', border: '2px solid var(--primary)', borderRadius: '24px', padding: '40px', textAlign: 'left', position: 'relative', boxShadow: '0 20px 40px rgba(109,40,217,0.15)' }}
-            >
-              <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: 'var(--primary)', color: 'white', padding: '6px 16px', borderRadius: '999px', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '1px' }}>MOST POPULAR</div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '12px' }}>Professional</h3>
-              <p style={{ color: 'var(--muted)', height: '48px' }}>For residents and practicing doctors requiring rigorous preparation.</p>
-              <div style={{ fontSize: '3.5rem', fontWeight: '800', margin: '24px 0', color: 'var(--text)' }}>
-                $29<span style={{ fontSize: '1.2rem', color: 'var(--muted)', fontWeight: 'normal' }}>/mo</span>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 40px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {['Unlimited Case Studies', 'Advanced Rubric Evaluation', 'Differential Diagnosis Breakdown', 'Priority 24/7 Support'].map((feature, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: '500' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={() => navigate('/register')} className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }}>Start 14-Day Free Trial</button>
-            </motion.div>
-          </div>
-        </section>
+      {/* ── Plans ─────────────────────────────────────────────────── */}
+      <section style={{ padding: 'var(--sp-20) 0', borderBottom: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 900 }}>
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24,
+            alignItems: 'start',
+          }}>
+            {PLANS.map(({ name, price, period, desc, features, cta, action, highlight, badge }) => (
+              <div
+                key={name}
+                style={{
+                  background: 'var(--surface)',
+                  border: highlight ? '2px solid var(--teal)' : '1px solid var(--border)',
+                  borderRadius: 'var(--r-xl)',
+                  padding: 'var(--sp-8)',
+                  position: 'relative',
+                  boxShadow: highlight ? 'var(--shadow-teal)' : 'none',
+                }}
+              >
+                {badge && (
+                  <div style={{
+                    position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)',
+                    background: 'var(--teal)', color: '#050810',
+                    padding: '5px 16px', borderRadius: 'var(--r-full)',
+                    fontSize: 'var(--fs-xs)', fontWeight: 800, letterSpacing: '0.06em',
+                    textTransform: 'uppercase', whiteSpace: 'nowrap',
+                  }}>
+                    {badge}
+                  </div>
+                )}
 
-        {/* FAQ Section */}
-        <section style={{ padding: '80px 20px', background: 'white', borderTop: '1px solid var(--border)' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', textAlign: 'center', marginBottom: '60px' }}>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {[
-                { q: "Can I use Cura AI on my phone?", a: "Yes, our web application is fully responsive. You can practice clinical scenarios on any modern mobile device or tablet." },
-                { q: "Who creates the clinical cases?", a: "All of our scenarios are designed and validated by a board-certified team of medical educators to ensure medical accuracy and strict adherence to clinical guidelines." },
-                { q: "Can medical schools purchase bulk licenses?", a: "Absolutely. We offer Enterprise plans for universities and residency programs which include administrative dashboards to monitor student progress. Contact us for custom pricing." }
-              ].map((faq, i) => (
-                <div key={i} style={{ background: 'var(--bg)', padding: '30px', borderRadius: '16px', border: '1px solid var(--border)' }}>
-                  <h4 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '12px' }}>{faq.q}</h4>
-                  <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>{faq.a}</p>
+                <div style={{ marginBottom: 'var(--sp-5)' }}>
+                  <h3 style={{ fontSize: 'var(--fs-xl)', fontWeight: 700, marginBottom: 8 }}>{name}</h3>
+                  <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)', minHeight: 40 }}>{desc}</p>
                 </div>
-              ))}
+
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 'var(--sp-6)' }}>
+                  <span style={{
+                    fontSize: 'var(--fs-5xl)', fontWeight: 900, letterSpacing: '-0.04em',
+                    fontFamily: 'var(--mono)', color: highlight ? 'var(--teal)' : 'var(--text)',
+                  }}>
+                    {price}
+                  </span>
+                  <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}>{period}</span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 'var(--sp-8)' }}>
+                  {features.map(f => (
+                    <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 'var(--fs-sm)' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={highlight ? 'var(--teal)' : 'var(--success)'} strokeWidth="2.5">
+                        <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+                      </svg>
+                      <span style={{ color: 'var(--text-2)' }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => navigate(action)}
+                  className={`btn ${highlight ? 'btn-primary' : 'btn-outline'} btn-lg`}
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  {cta}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}>
+            No credit card required to start. Cancel anytime.
+          </p>
+        </div>
+      </section>
+
+      {/* ── FAQ ───────────────────────────────────────────────────── */}
+      <section style={{ padding: 'var(--sp-20) 0', borderBottom: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 720 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div className="section-label">Got questions?</div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: 800, letterSpacing: '-0.03em' }}>
+              Frequently Asked
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {FAQS.map(({ q, a }, i) => (
+              <div
+                key={i}
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid ' + (openFaq === i ? 'var(--border-acc)' : 'var(--border)'),
+                  borderRadius: 'var(--r-lg)',
+                  overflow: 'hidden',
+                  transition: 'border-color var(--t)',
+                }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  style={{
+                    width: '100%', textAlign: 'left',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: 'var(--sp-5) var(--sp-5)',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: 'var(--fs-base)', fontWeight: 600, color: 'var(--text)',
+                    gap: 12,
+                  }}
+                >
+                  {q}
+                  <svg
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2"
+                    style={{ flexShrink: 0, transition: 'transform var(--t)', transform: openFaq === i ? 'rotate(45deg)' : 'none' }}
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </button>
+                {openFaq === i && (
+                  <div style={{
+                    padding: '0 var(--sp-5) var(--sp-5)',
+                    fontSize: 'var(--fs-sm)', color: 'var(--text-2)',
+                    lineHeight: 1.7,
+                    borderTop: '1px solid var(--border)',
+                    paddingTop: 'var(--sp-4)',
+                  }}>
+                    {a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ───────────────────────────────────────────────────── */}
+      <section className="cta-section">
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <h2 className="cta-title">
+            Ready to level up<br />
+            <span style={{ background: 'var(--grad-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              your clinical skills?
+            </span>
+          </h2>
+          <p className="cta-sub">Start for free today. No credit card required.</p>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => navigate('/register')} className="btn btn-primary btn-xl">Create Free Account</button>
+            <button onClick={() => navigate('/features')} className="btn btn-outline btn-xl">See All Features</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
+            <span>© {new Date().getFullYear()} CURA.AI — Synapse Team</span>
+            <div style={{ display: 'flex', gap: 20 }}>
+              <Link to="/" className="footer-link">Home</Link>
+              <Link to="/features" className="footer-link">Features</Link>
+              <Link to="/simulator" className="footer-link">Simulator</Link>
             </div>
           </div>
-        </section>
-      </main>
-      <Footer />
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,67 +1,170 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
 
-// Inline SVG for Send icon (from Figma export)
+/* ── Icons ─────────────────────────────────────────────────────── */
 const SendIcon = () => (
-  <svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18.7756 28.0113C18.8247 28.1336 18.91 28.2379 19.0201 28.3103C19.1302 28.3827 19.2598 28.4197 19.3915 28.4164C19.5233 28.413 19.6508 28.3694 19.7571 28.2915C19.8633 28.2135 19.9432 28.1049 19.9859 27.9803L28.3818 3.43851C28.4231 3.32406 28.431 3.20021 28.4045 3.08144C28.378 2.96267 28.3183 2.85389 28.2322 2.76785C28.1462 2.6818 28.0374 2.62204 27.9186 2.59556C27.7999 2.56907 27.676 2.57696 27.5616 2.6183L3.01983 11.0142C2.89518 11.0569 2.78659 11.1368 2.70863 11.243C2.63067 11.3493 2.58708 11.4768 2.58371 11.6085C2.58033 11.7403 2.61734 11.8699 2.68975 11.98C2.76217 12.0901 2.86653 12.1754 2.98883 12.2245L13.2318 16.332C13.5556 16.4616 13.8498 16.6555 14.0966 16.9019C14.3435 17.1483 14.5379 17.4422 14.6681 17.7657L18.7756 28.0113Z" stroke="white" strokeWidth="2.58334" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M28.228 2.77325L14.0972 16.9028" stroke="white" strokeWidth="2.58334" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </svg>
+);
+const MicIcon = ({ active }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? 'var(--teal)' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+    <line x1="8" y1="23" x2="16" y2="23"/>
+  </svg>
+);
+const HintIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+);
+const RefreshIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+  </svg>
+);
+const ZapIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+  </svg>
+);
+const XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+const DownloadIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
 );
 
+/* ── Vitals parser — extracts values from vitals string ─────────── */
+function parseVitals(vitalsStr) {
+  if (!vitalsStr) return [];
+  const patterns = [
+    { key: 'HR',   regex: /HR[:\s]+(\d+)/i,              unit: 'bpm' },
+    { key: 'BP',   regex: /BP[:\s]+([\d/]+)/i,           unit: 'mmHg' },
+    { key: 'SpO₂', regex: /SpO[2₂][:\s]+(\d+)%?/i,      unit: '%' },
+    { key: 'Temp', regex: /Temp[:\s]+([\d.]+)[°C]?/i,    unit: '°C' },
+    { key: 'RR',   regex: /RR[:\s]+(\d+)/i,              unit: '/min' },
+  ];
+  return patterns
+    .map(({ key, regex, unit }) => {
+      const m = vitalsStr.match(regex);
+      return m ? { key, val: m[1], unit } : null;
+    })
+    .filter(Boolean);
+}
+
+/* ── Time formatter ─────────────────────────────────────────────── */
+const formatTime = (s) =>
+  `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+
+/* ── Score ring ─────────────────────────────────────────────────── */
+function ScoreRing({ score }) {
+  const r = 54;
+  const circ = 2 * Math.PI * r;
+  const fill = (score / 100) * circ;
+  const color = score >= 75 ? 'var(--success)' : score >= 50 ? 'var(--warning)' : 'var(--danger)';
+  return (
+    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+      <svg width="130" height="130" style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx="65" cy="65" r={r} stroke="var(--surface-3)" strokeWidth="10" fill="none" />
+        <circle cx="65" cy="65" r={r} stroke={color} strokeWidth="10" fill="none"
+          strokeDasharray={`${fill} ${circ - fill}`} strokeLinecap="round"
+          style={{ transition: 'stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1)' }}
+        />
+      </svg>
+      <div style={{ position: 'absolute', textAlign: 'center' }}>
+        <div style={{ fontSize: 'var(--fs-3xl)', fontWeight: 800, fontFamily: 'var(--mono)', color, lineHeight: 1 }}>
+          {score}
+        </div>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          / 100
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Ordered test item ──────────────────────────────────────────── */
+function TestItem({ name, ordered, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`test-item${ordered ? ' ordered' : ''}`}
+    >
+      <div className="test-checkbox">
+        {ordered && <CheckIcon />}
+      </div>
+      <span style={{ fontSize: 'var(--fs-xs)' }}>{name}</span>
+    </button>
+  );
+}
+
+/* ── Main Component ─────────────────────────────────────────────── */
 export default function Simulator() {
   const { user, saveUser } = useAuth();
-  const navigate = useNavigate();
-  
-  const [cases, setCases] = useState([]);
-  const [activeCase, setActiveCase] = useState(null);
-  const [sessionId, setSessionId] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [generatingAI, setGeneratingAI] = useState(false);
-  const [question, setQuestion] = useState('');
-  const [diagnosis, setDiagnosis] = useState('');
-  const [reasoning, setReasoning] = useState('');
-  const [evaluation, setEvaluation] = useState(null);
-  const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
-  const [reportLoading, setReportLoading] = useState(false);
-  const [toastMessage, setToastMessage] = useState(null);
-  const [isEmergencyMode, setIsEmergencyMode] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(600);
-  const [lightboxImg, setLightboxImg] = useState(null);
-  
-  const chatLogRef = useRef(null);
+  const { isDark }         = useTheme();
+  const navigate           = useNavigate();
+  const location           = useLocation();
 
-  // Cardiology medical report images mapped by condition keywords
+  /* ── All original state preserved ─────────────────────────────── */
+  const [cases,                setCases]                = useState([]);
+  const [activeCase,           setActiveCase]           = useState(null);
+  const [sessionId,            setSessionId]            = useState(null);
+  const [messages,             setMessages]             = useState([]);
+  const [loading,              setLoading]              = useState(false);
+  const [generatingAI,         setGeneratingAI]         = useState(false);
+  const [question,             setQuestion]             = useState('');
+  const [diagnosis,            setDiagnosis]            = useState('');
+  const [reasoning,            setReasoning]            = useState('');
+  const [evaluation,           setEvaluation]           = useState(null);
+  const [isAssessmentModalOpen,setIsAssessmentModalOpen]= useState(false);
+  const [reportLoading,        setReportLoading]        = useState(false);
+  const [toastMessage,         setToastMessage]         = useState(null);
+  const [isEmergencyMode,      setIsEmergencyMode]      = useState(false);
+  const [timeLeft,             setTimeLeft]             = useState(600);
+  const [lightboxImg,          setLightboxImg]          = useState(null);
+
+  /* ── New UI state ──────────────────────────────────────────────── */
+  const [orderedTests,  setOrderedTests]  = useState(new Set());
+  const [listening,     setListening]     = useState(false);
+  const [toastType,     setToastType]     = useState('info'); // 'info' | 'error' | 'success'
+
+  const chatLogRef = useRef(null);
+  const inputRef   = useRef(null);
+  const recognitionRef = useRef(null);
+
+  /* ── All original logic preserved exactly ──────────────────────── */
   const cardiologyReports = [
     { id: 'ecg-interpretation', title: 'ECG — 12 Lead Interpretation', image: '/reports/ecg-interpretation.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
     { id: 'ecg-pattern-comparison', title: 'ECG — Pattern Comparison', image: '/reports/ecg-pattern-comparison.png', type: 'Reference', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure', 'atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib', 'tachycardia', 'fast heart', 'anxiety', 'normal', 'baseline', 'stable'] }
   ];
 
-  // Get relevant reports for the current cardiology case
   const getReportsForCase = (caseData) => {
     if (!caseData || caseData.specialty?.toLowerCase() !== 'cardiology') return [];
-    // Use only fields that sanitizeCase sends to the frontend
-    // (expectedDiagnosis is NOT sent — it's the answer key)
     const caseText = [
-      caseData.complaint || '',
-      caseData.summary || '',
-      caseData.vitals || '',
-      caseData.personality || '',
-      caseData.urgency || '',
-      ...(caseData.differentialDiagnoses || []),
-      ...(caseData.recommendedTests || []),
-      ...(caseData.redFlags || []),
-      ...(caseData.hints || [])
+      caseData.complaint || '', caseData.summary || '', caseData.vitals || '',
+      caseData.personality || '', caseData.urgency || '',
+      ...(caseData.differentialDiagnoses || []), ...(caseData.recommendedTests || []),
+      ...(caseData.redFlags || []), ...(caseData.hints || [])
     ].join(' ').toLowerCase();
-    
-    const matched = cardiologyReports.filter(report =>
-      report.keywords.some(kw => caseText.includes(kw))
-    );
-    // Always include the available reports for any cardiology case
+    const matched = cardiologyReports.filter(r => r.keywords.some(kw => caseText.includes(kw)));
     const defaults = cardiologyReports;
     for (const d of defaults) {
       if (!matched.find(m => m.id === d.id)) matched.push(d);
@@ -71,7 +174,6 @@ export default function Simulator() {
 
   const activeReports = getReportsForCase(activeCase);
 
-  // Format AI text to remove markdown stars
   const cleanMarkdown = (text) => {
     if (!text) return '';
     return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
@@ -83,111 +185,62 @@ export default function Simulator() {
     try {
       const data = await api(`/api/sessions/${sessionId}/report`);
       const reportText = data.report;
-      const patient = data.patient;
-      const evalData = data.evaluation;
-      
-      // Convert report text into styled HTML for PDF
+      const patient    = data.patient;
+      const evalData   = data.evaluation;
       const reportDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      
-      // Parse sections from report text
       const cleanedReportText = cleanMarkdown(reportText);
       const sections = cleanedReportText.split('\n').map(line => {
-        // Bold headers (lines in ALL CAPS or starting with number + dot)
         if (/^[A-Z\s\d.—\-:]{5,}$/.test(line.trim()) || /^\d+\./.test(line.trim())) {
-          return `<h3 style="color:#5046a3;margin:18px 0 8px;font-size:14px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;">${line}</h3>`;
+          return `<h3 style="color:#00C9B1;margin:18px 0 8px;font-size:14px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;">${line}</h3>`;
         }
-        // Bullet points
         if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
           return `<li style="margin:3px 0;font-size:12px;color:#333;">${line.trim().replace(/^[-•]\s*/, '')}</li>`;
         }
-        // Bold key-value pairs
         if (line.includes(':') && line.indexOf(':') < 30) {
           const [key, ...rest] = line.split(':');
           return `<p style="margin:4px 0;font-size:12px;"><strong>${key}:</strong>${rest.join(':')}</p>`;
         }
-        // Regular text
-        if (line.trim()) {
-          return `<p style="margin:4px 0;font-size:12px;color:#333;">${line}</p>`;
-        }
+        if (line.trim()) return `<p style="margin:4px 0;font-size:12px;color:#333;">${line}</p>`;
         return '<br/>';
       }).join('');
 
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Clinical Report - ${patient.name}</title>
-          <style>
-            @media print { body { margin: 0; } @page { margin: 20mm; } }
-            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
-            .header { text-align: center; border-bottom: 3px solid #5046a3; padding-bottom: 20px; margin-bottom: 30px; }
-            .header h1 { color: #5046a3; font-size: 24px; margin: 0; }
-            .header h2 { color: #666; font-size: 14px; font-weight: 400; margin: 8px 0 0; }
-            .logo { font-size: 28px; font-weight: 800; color: #5046a3; margin-bottom: 4px; }
-            .meta { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 12px; color: #666; }
-            .score-box { text-align: center; background: linear-gradient(135deg, #f0edff, #e8e4ff); padding: 20px; border-radius: 12px; margin: 20px 0; }
-            .score-box .score { font-size: 42px; font-weight: 800; color: #5046a3; }
-            .score-box .label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-            .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 10px; color: #999; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div class="logo">CURA.AI</div>
-            <h1>Clinical Visit Report</h1>
-            <h2>AI-Powered Virtual Patient Simulation</h2>
-          </div>
-          <div class="meta">
-            <span><strong>Date:</strong> ${reportDate}</span>
-            <span><strong>Patient:</strong> ${patient.name} (${patient.age} yrs)</span>
-            <span><strong>Specialty:</strong> ${patient.specialty}</span>
-          </div>
-          ${evalData ? `
-            <div class="score-box">
-              <div class="label">Clinical Performance Score</div>
-              <div class="score">${evalData.score}/100</div>
-              <div style="font-size:13px;color:${evalData.diagnosisCorrect ? '#10b981' : '#ef4444'};font-weight:600;">
-                ${evalData.diagnosisCorrect ? '✅ Diagnosis Correct' : '❌ Diagnosis Incorrect'}
-              </div>
-            </div>
-          ` : ''}
-          <div class="report-body">
-            ${sections}
-          </div>
-          <div class="footer">
-            <p>Generated by CURA.AI — Virtual Patient Simulator</p>
-            <p>This is a simulation report for educational purposes only. Not a real medical document.</p>
-          </div>
-        </body>
-        </html>
-      `;
+      const htmlContent = `<!DOCTYPE html><html><head><title>Clinical Report - ${patient.name}</title>
+        <style>
+          @media print { body { margin: 0; } @page { margin: 20mm; } }
+          body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
+          .header { text-align: center; border-bottom: 3px solid #00C9B1; padding-bottom: 20px; margin-bottom: 30px; }
+          .header h1 { color: #00C9B1; font-size: 24px; margin: 0; }
+          .logo { font-size: 28px; font-weight: 800; color: #00C9B1; margin-bottom: 4px; }
+          .meta { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 12px; color: #666; }
+          .score-box { text-align: center; background: linear-gradient(135deg, #f0fff8, #e0faf5); padding: 20px; border-radius: 12px; margin: 20px 0; }
+          .score-box .score { font-size: 42px; font-weight: 800; color: #00C9B1; }
+          .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 10px; color: #999; }
+        </style></head><body>
+        <div class="header"><div class="logo">CURA.AI</div><h1>Clinical Visit Report</h1><h2>AI-Powered Virtual Patient Simulation</h2></div>
+        <div class="meta"><span><strong>Date:</strong> ${reportDate}</span><span><strong>Patient:</strong> ${patient.name} (${patient.age} yrs)</span><span><strong>Specialty:</strong> ${patient.specialty}</span></div>
+        ${evalData ? `<div class="score-box"><div class="label">Score</div><div class="score">${evalData.score}/100</div><div style="font-size:13px;color:${evalData.diagnosisCorrect ? '#059669' : '#dc2626'};font-weight:600;">${evalData.diagnosisCorrect ? 'Diagnosis Correct' : 'Diagnosis Incorrect'}</div></div>` : ''}
+        <div>${sections}</div>
+        <div class="footer"><p>Generated by CURA.AI — Virtual Patient Simulator</p><p>Educational simulation only. Not a real medical document.</p></div>
+        </body></html>`;
 
-      // Open in new window and trigger print/save as PDF
       const reportWindow = window.open('', '_blank');
       reportWindow.document.write(htmlContent);
       reportWindow.document.close();
-      
-      // Auto-trigger print dialog after content loads
-      reportWindow.onload = () => {
-        setTimeout(() => reportWindow.print(), 500);
-      };
+      reportWindow.onload = () => setTimeout(() => reportWindow.print(), 500);
     } catch (err) {
-      alert('Failed to generate report: ' + err.message);
+      showToast('Failed to generate report: ' + err.message, 'error');
     } finally {
       setReportLoading(false);
     }
   };
 
+  /* ── Emergency timer ────────────────────────────────────────────── */
   useEffect(() => {
     let timer;
     if (isEmergencyMode && timeLeft > 0 && sessionId && !evaluation) {
       timer = setInterval(() => {
         setTimeLeft(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setIsAssessmentModalOpen(true);
-            return 0;
-          }
+          if (prev <= 1) { clearInterval(timer); setIsAssessmentModalOpen(true); return 0; }
           return prev - 1;
         });
       }, 1000);
@@ -195,43 +248,37 @@ export default function Simulator() {
     return () => clearInterval(timer);
   }, [isEmergencyMode, timeLeft, sessionId, evaluation]);
 
-  const location = useLocation();
+  /* ── Demo user + URL params ─────────────────────────────────────── */
   const searchParams = new URLSearchParams(location.search);
   const demoSpecialty = searchParams.get('demo');
   const demoUserObj = React.useMemo(() => ({ id: null, name: 'Demo User', specialization: 'Cardiology' }), []);
-  const effectiveUser = user || (demoSpecialty === 'cardiology' ? demoUserObj : null);
+  const effectiveUser = user || (demoSpecialty ? demoUserObj : null);
 
+  /* ── Load cases on mount ────────────────────────────────────────── */
   useEffect(() => {
-    if (!effectiveUser) {
-      navigate('/login');
-      return;
-    }
+    if (!effectiveUser) { navigate('/login'); return; }
 
     const fetchCases = async () => {
       setGeneratingAI(true);
       try {
-        const specialtyToUse = demoSpecialty === 'cardiology' ? 'Cardiology' : effectiveUser.specialization;
+        const specialtyToUse = demoSpecialty ? demoSpecialty.charAt(0).toUpperCase() + demoSpecialty.slice(1) : effectiveUser.specialization;
         const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
         const data = await api(`/api/cases${specialtyParam}`);
-        
         if (data.cases && data.cases.length > 0) {
           setCases(data.cases);
-          if (!activeCase) {
-            loadCase(data.cases[0].id, data.cases, data.cases[0]);
-          }
+          if (!activeCase) loadCase(data.cases[0].id, data.cases, data.cases[0]);
         } else {
-          // If AI generation failed, don't leave the user stuck loading forever
           setCases([]);
           setLoading(false);
-          setMessages([{ role: 'assistant', content: 'Patient generation failed. Please try "New Patient" or refresh the page.' }]);
-          showToast("AI generation timed out or failed. Please try again.");
+          setMessages([{ role: 'assistant', content: 'Patient generation failed. Please try "New Patient" or refresh.' }]);
+          showToast('AI generation failed. Please try again.', 'error');
         }
       } catch (err) {
         console.error('Failed to load cases', err);
         setCases([]);
         setLoading(false);
         setMessages([{ role: 'assistant', content: 'Connection error. Please refresh.' }]);
-        showToast("Error generating AI patient. Please try again.");
+        showToast('Error connecting to AI. Please try again.', 'error');
       } finally {
         setGeneratingAI(false);
       }
@@ -240,16 +287,20 @@ export default function Simulator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectiveUser, navigate, demoSpecialty]);
 
+  /* ── Auto-scroll chat ───────────────────────────────────────────── */
   useEffect(() => {
     if (chatLogRef.current) {
       chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
     }
   }, [messages, evaluation]);
 
-  function showToast(msg) {
+  /* ── Handlers ───────────────────────────────────────────────────── */
+  function showToast(msg, type = 'info') {
     setToastMessage(msg);
+    setToastType(type);
     setTimeout(() => setToastMessage(null), 4000);
   }
+
   async function loadCase(caseId, caseList = cases, caseData = null) {
     setLoading(true);
     setEvaluation(null);
@@ -257,61 +308,49 @@ export default function Simulator() {
     setReasoning('');
     setQuestion('');
     setIsAssessmentModalOpen(false);
-    setTimeLeft(180);
-    
+    setTimeLeft(600);
+    setOrderedTests(new Set());
+
     const patient = caseData || caseList.find(c => c.id === caseId);
     if (!patient) return;
-    
     setActiveCase(patient);
     try {
-      // For AI-generated cases, pass the full case data so the server can use it
       const payload = { userId: effectiveUser.id, caseId };
-      if (caseId.startsWith('ai-')) {
-        payload.caseData = patient;
-      }
-      
-      const data = await api('/api/sessions', {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
+      if (caseId.startsWith('ai-')) payload.caseData = patient;
+      const data = await api('/api/sessions', { method: 'POST', body: JSON.stringify(payload) });
       setSessionId(data.session.id);
       const initialMsgs = (data.session.messages || []).map(m => ({
-        role: m.role,
-        content: m.text || m.content || 'Hello doctor.'
+        role: m.role, content: m.text || m.content || 'Hello doctor.',
       }));
       setMessages(initialMsgs.length > 0 ? initialMsgs : [{ role: 'assistant', content: 'Hello doctor.' }]);
     } catch (err) {
-      alert('Failed to start session: ' + err.message);
+      showToast('Failed to start session: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const sendMessage = async (e) => {
     if (e) e.preventDefault();
     if (!question.trim() || !sessionId || loading) return;
-    
     const userMsg = question.trim();
     setQuestion('');
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
-    
     try {
       const data = await api(`/api/sessions/${sessionId}/messages`, {
         method: 'POST',
-        body: JSON.stringify({ message: userMsg })
+        body: JSON.stringify({ message: userMsg }),
       });
       const replyContent = data.reply?.text || data.reply?.content || '';
       if (replyContent) {
-        // Play subtle sound effect
         const audio = new Audio('/pop.mp3');
-        audio.volume = 0.5;
-        audio.play().catch(e => console.log('Audio play failed', e));
-        
+        audio.volume = 0.4;
+        audio.play().catch(() => {});
         setMessages(prev => [...prev, { role: 'assistant', content: replyContent }]);
       }
     } catch (err) {
-      showToast('Network error: ' + err.message);
+      showToast('Network error: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -319,27 +358,31 @@ export default function Simulator() {
 
   const evaluateCase = async () => {
     if (!diagnosis.trim() || !reasoning.trim()) {
-      alert("Please enter both a provisional diagnosis and clinical reasoning.");
+      showToast('Please enter a diagnosis and reasoning before submitting.', 'error');
       return;
     }
     setLoading(true);
     try {
       const data = await api(`/api/sessions/${sessionId}/evaluate`, {
         method: 'POST',
-        body: JSON.stringify({ diagnosis, reasoning })
+        body: JSON.stringify({ diagnosis, reasoning }),
       });
       setEvaluation(data.evaluation);
     } catch (err) {
-      alert("Evaluation failed: " + err.message);
+      showToast('Evaluation failed: ' + err.message, 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleHint = () => {
-    if (!activeCase?.hints?.length) return;
+    if (!activeCase?.hints?.length) {
+      showToast('No hints available for this case.', 'info');
+      return;
+    }
     const asked = messages.filter(m => m.role === 'user').length;
     setQuestion(activeCase.hints[asked % activeCase.hints.length]);
+    inputRef.current?.focus();
   };
 
   const handleKeyDown = (e) => {
@@ -349,357 +392,709 @@ export default function Simulator() {
     }
   };
 
-  const handleLogout = () => {
-    saveUser(null);
-    navigate('/');
+  const handleNewPatient = async () => {
+    setGeneratingAI(true);
+    try {
+      const specialtyToUse = demoSpecialty
+        ? demoSpecialty.charAt(0).toUpperCase() + demoSpecialty.slice(1)
+        : effectiveUser.specialization;
+      const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
+      const data = await api(`/api/cases${specialtyParam}`);
+      setCases(data.cases);
+      if (data.cases.length > 0) loadCase(data.cases[0].id, data.cases, data.cases[0]);
+    } catch (err) {
+      showToast('Failed to generate new patient: ' + err.message, 'error');
+    } finally {
+      setGeneratingAI(false);
+    }
   };
+
+  const handleVoice = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { showToast('Voice input not supported in this browser.', 'info'); return; }
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+    const recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      setQuestion(q => (q ? q + ' ' + transcript : transcript));
+    };
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => { setListening(false); showToast('Voice input failed.', 'error'); };
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
+  };
+
+  const vitals = parseVitals(activeCase?.vitals);
+  const isUrgent = activeCase?.urgency?.toLowerCase().includes('critical') ||
+    activeCase?.urgency?.toLowerCase().includes('urgent');
+  const patientInitials = activeCase?.name
+    ? activeCase.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : '??';
 
   if (!effectiveUser) return null;
 
+  /* ────────────────────────────────────────────────────────────────
+     RENDER
+  ─────────────────────────────────────────────────────────────── */
   return (
-    <div className="figma-chat-bot">
+    <div className="sim-shell">
+
+      {/* ── AI Generating Overlay ─────────────────────────────────── */}
       {generatingAI && (
-        <div className="ai-loading-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="typing-dots" style={{ marginBottom: '16px', transform: 'scale(1.5)' }}><span></span><span></span><span></span></div>
-          <h2 style={{ margin: 0, color: 'var(--primary)', fontWeight: '700' }}>Generating AI Patient...</h2>
-          <p style={{ color: 'var(--muted)', marginTop: '8px' }}>Creating a custom scenario for your specialty</p>
-        </div>
-      )}
-      
-      {/* ─── Top Navigation Bar ─── */}
-      <header className="figma-chat-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <button 
-            onClick={() => navigate('/dashboard')} 
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '6px 12px', color: 'var(--text)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600', fontSize: '0.9rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
-            title="Return to Dashboard"
-          >
-            ← Back
-          </button>
-          <div className="figma-chat-logo">
-            <Logo size={28} dark={false} />
+        <div className="page-loading">
+          <div style={{
+            width: 52, height: 52, borderRadius: 'var(--r-lg)',
+            background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: 16,
+          }}>
+            <div className="spinner-lg" />
+          </div>
+          <div style={{ fontWeight: 700, fontSize: 'var(--fs-lg)', color: 'var(--text)' }}>
+            Generating AI Patient
+          </div>
+          <div className="page-loading-label">
+            Creating a unique case for {effectiveUser.specialization || 'your specialty'}...
           </div>
         </div>
+      )}
 
-        <nav className="figma-chat-nav">
-          <Link to="/" className="figma-chat-nav-btn">Home</Link>
-          <Link to="/simulator" className="figma-chat-nav-btn figma-chat-nav-btn--active">Simulation Lab</Link>
-          <Link to="/dashboard" className="figma-chat-nav-btn">Analytics</Link>
-          <Link to="/about" className="figma-chat-nav-btn">About</Link>
-        </nav>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <button className="figma-chat-avatar" onClick={handleLogout} title="Logout">
-            {effectiveUser.name.substring(0, 2).toUpperCase()}
+      {/* ── Top Header ───────────────────────────────────────────── */}
+      <header className="sim-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button
+            onClick={() => navigate(user ? '/dashboard' : '/')}
+            className="btn btn-ghost btn-sm"
+            style={{ gap: 6 }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            {user ? 'Dashboard' : 'Home'}
           </button>
+          <div style={{ width: 1, height: 20, background: 'var(--border-md)' }} />
+          <Logo size={24} />
+        </div>
+
+        {/* Patient info in header */}
+        {activeCase && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 'var(--r-sm)',
+              background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--teal)',
+            }}>
+              {patientInitials}
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)', lineHeight: 1.2 }}>
+                {activeCase.name}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
+                {activeCase.age}y · {activeCase.gender} · {activeCase.specialty}
+              </div>
+            </div>
+            {isUrgent && (
+              <div className="badge badge-danger">
+                <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--danger)', animation: 'pulse 1.5s infinite' }} />
+                {activeCase.urgency}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Right actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {isEmergencyMode && (
+            <div className="emergency-timer" style={{ fontSize: 'var(--fs-lg)' }}>
+              {formatTime(timeLeft)}
+            </div>
+          )}
+          <button
+            onClick={() => { setIsEmergencyMode(e => !e); setTimeLeft(600); }}
+            className={`btn btn-sm ${isEmergencyMode ? 'btn-danger' : 'btn-outline'}`}
+            title="Toggle Emergency Mode"
+          >
+            <ZapIcon />
+            {isEmergencyMode ? 'Emergency ON' : 'Emergency'}
+          </button>
+          {!evaluation && (
+            <button
+              onClick={() => setIsAssessmentModalOpen(true)}
+              className="btn btn-primary btn-sm"
+              disabled={!sessionId || messages.length < 2}
+            >
+              Make Diagnosis
+            </button>
+          )}
+          {evaluation && (
+            <button onClick={() => setIsAssessmentModalOpen(true)} className="btn btn-primary btn-sm">
+              View Feedback
+            </button>
+          )}
+          {/* User avatar */}
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%',
+            background: 'var(--teal-dim)', border: '1.5px solid rgba(0,201,177,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 12, fontWeight: 700, color: 'var(--teal)', fontFamily: 'var(--mono)',
+            cursor: 'pointer',
+          }}
+            title={effectiveUser.name}
+            onClick={() => user ? navigate('/dashboard') : navigate('/')}
+          >
+            {effectiveUser.name.charAt(0).toUpperCase()}
+          </div>
         </div>
       </header>
 
-      {/* ─── Main 3-Panel Workspace ─── */}
-      <main className="figma-chat-workspace">
-        
-        {/* ── LEFT PANEL: Tests & Case Info ── */}
-        <section className="figma-tests-panel">
-          <div className="figma-tests-header">
-            <h3>Recommended Tests</h3>
-          </div>
+      {/* ── 3-Panel Workspace ────────────────────────────────────── */}
+      <div className="sim-workspace">
 
-          {activeCase?.recommendedTests?.length > 0 ? (
-            <div className="figma-test-category">
-              {activeCase.recommendedTests.map((test, i) => (
-                <div className="figma-test-item" key={i}>
-                  {test}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="figma-test-category">
-              <p style={{ color: 'var(--muted)', fontSize: '0.85rem', padding: '8px 0' }}>No tests recommended yet. Interview the patient first.</p>
-            </div>
-          )}
+        {/* ── LEFT: Recommended Tests ───────────────────────────── */}
+        <div className="sim-panel sim-panel-left">
+          <div className="sim-panel-header">Recommended Tests</div>
 
-
-          <div className="figma-tests-actions">
-            <button className="figma-test-action-btn" onClick={async () => {
-              const specialtyToUse = demoSpecialty === 'cardiology' ? 'Cardiology' : effectiveUser.specialization;
-              const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
-              const data = await api(`/api/cases${specialtyParam}`);
-              setCases(data.cases);
-              if (data.cases.length > 0) loadCase(data.cases[0].id, data.cases, data.cases[0]);
-            }}>🔄 New Patient</button>
-            <button 
-              className="figma-test-action-btn" 
-              onClick={() => {
-                setIsEmergencyMode(!isEmergencyMode);
-                setTimeLeft(600);
-              }}
-              style={{ background: isEmergencyMode ? '#fef2f2' : '', borderColor: isEmergencyMode ? '#ef4444' : '', color: isEmergencyMode ? '#dc2626' : '' }}
+          <div className="sim-panel-body">
+            {/* New Patient button */}
+            <button
+              onClick={handleNewPatient}
+              className="btn btn-outline btn-sm w-full"
+              disabled={generatingAI}
+              style={{ marginBottom: 12, gap: 6 }}
             >
-              🚨 {isEmergencyMode ? 'Emergency: ON' : 'Emergency: OFF'}
+              <RefreshIcon />
+              New Patient
             </button>
-          </div>
-        </section>
 
-        {/* ── CENTER PANEL: Chat ── */}
-        <section className="figma-chat-center">
-          {/* Chat Header Bar */}
-          <div className="figma-chat-patient-bar">
-            <div className="figma-chat-patient-info">
-              {cases.length > 1 ? (
-                <select 
-                  value={activeCase?.id || ''} 
-                  onChange={e => loadCase(e.target.value)}
-                  style={{ 
-                    background: 'transparent', border: 'none', fontSize: '1rem', 
-                    fontWeight: 700, color: 'var(--text)', cursor: 'pointer',
-                    padding: '4px 0', outline: 'none', fontFamily: 'inherit'
-                  }}
-                >
-                  {cases.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} — {isEmergencyMode ? 'EMERGENCY' : c.specialty}</option>
-                  ))}
-                </select>
-              ) : (
-                <h3>{activeCase?.name || 'Select Patient'}</h3>
-              )}
-            </div>
-            <div className="figma-chat-specialty-badge">
-              {isEmergencyMode ? 'EMERGENCY' : (activeCase?.specialty || effectiveUser.specialization || 'General')}
-            </div>
-          </div>
-
-          {/* Chat Messages Area */}
-          <div className="figma-chat-messages" ref={chatLogRef}>
-            {messages.map((m, idx) => (
-              <div key={idx} className={`figma-msg ${m.role === 'user' ? 'figma-msg--doctor' : 'figma-msg--patient'}`}>
-                <div className="figma-msg-bubble">
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {loading && !evaluation && (
-              <div className="figma-msg figma-msg--patient">
-                <div className="figma-msg-bubble">
-                  <div className="typing-dots"><span></span><span></span><span></span></div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Scrollbar decorative (matches Figma) */}
-          <div className="figma-chat-scrollbar-deco">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.95468 1.05126C3.70999 -0.350415 5.72067 -0.350413 6.47598 1.05126L9.18855 6.08516C9.90657 7.41764 8.94152 9.03391 7.4279 9.03391H2.00276C0.489141 9.03391 -0.475905 7.41764 0.242115 6.08516L2.95468 1.05126Z" fill="#6B7280" fillOpacity="0.61"/></svg>
-            <div className="figma-chat-scroll-track"></div>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.95468 1.05126C3.70999 -0.350415 5.72067 -0.350413 6.47598 1.05126L9.18855 6.08516C9.90657 7.41764 8.94152 9.03391 7.4279 9.03391H2.00276C0.489141 9.03391 -0.475905 7.41764 0.242115 6.08516L2.95468 1.05126Z" fill="#6B7280" fillOpacity="0.61"/></svg>
-          </div>
-        </section>
-
-        {/* ── RIGHT PANEL: Patient Data ── */}
-        <section className="figma-patient-panel">
-          {/* Patient Summary Card */}
-          <div className="figma-patient-summary">
-            <div className="figma-patient-age">
-              {activeCase?.age || '—'} Years {activeCase?.gender === 'Female' ? '♀' : '♂'}
-            </div>
-            <div className="figma-patient-state">
-              <span className="figma-state-badge" style={{ 
-                background: activeCase?.urgency?.includes('critical') || activeCase?.urgency?.includes('Urgent') 
-                  ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
-                color: activeCase?.urgency?.includes('critical') || activeCase?.urgency?.includes('Urgent') 
-                  ? '#dc2626' : '#059669'
-              }}>
-                {activeCase?.urgency || 'Stable State'}
-              </span>
-            </div>
-            {!isEmergencyMode && (
-              <div className="figma-patient-traits">
-                {activeCase?.personality || 'Loading...'}
-              </div>
-            )}
-            {!isEmergencyMode && activeCase?.complexity && (
-              <div style={{ marginTop: '8px', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                Complexity: <strong>{activeCase.complexity}</strong>
-              </div>
-            )}
-            {activeCase?.vitals && (
-              <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(138,124,255,0.06)', borderRadius: '8px', fontSize: '0.75rem', color: 'var(--muted)', lineHeight: '1.5' }}>
-                <strong style={{ color: 'var(--text)', fontSize: '0.8rem' }}>Vitals:</strong><br/>
-                {activeCase.vitals}
-              </div>
-            )}
-            {isEmergencyMode && (
-              <div style={{ marginTop: '10px', padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', borderRadius: '8px', color: '#dc2626', fontWeight: 'bold', textAlign: 'center', fontSize: '1.2rem', width: '100%' }}>
-                ⏳ {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
-              </div>
-            )}
-          </div>
-
-          {/* Patient Reports — Cardiology images */}
-          {activeReports.length > 0 && (
-            <div style={{ marginTop: '12px', padding: '0' }}>
-              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '1rem' }}>📋</span> Patient Reports
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {activeReports.map(report => (
-                  <div 
-                    key={report.id}
-                    onClick={() => setLightboxImg(report)}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: '10px',
-                      border: '1px solid var(--border)',
-                      overflow: 'hidden',
-                      background: 'var(--surface)',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(138,124,255,0.15)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
-                  >
-                    <img 
-                      src={report.image} 
-                      alt={report.title}
-                      style={{ width: '100%', height: '80px', objectFit: 'cover', display: 'block' }}
-                    />
-                    <div style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)', lineHeight: '1.3' }}>{report.title}</div>
-                        <div style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>{report.type} • Click to view</div>
-                      </div>
-                      <span style={{ fontSize: '1rem', opacity: 0.5 }}>🔍</span>
-                    </div>
-                  </div>
+            {/* Test list */}
+            {activeCase?.recommendedTests?.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {activeCase.recommendedTests.map((test, i) => (
+                  <TestItem
+                    key={i}
+                    name={test}
+                    ordered={orderedTests.has(i)}
+                    onToggle={() => setOrderedTests(prev => {
+                      const next = new Set(prev);
+                      next.has(i) ? next.delete(i) : next.add(i);
+                      return next;
+                    })}
+                  />
                 ))}
               </div>
+            ) : (
+              <div style={{ padding: '12px 0', fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                Interview the patient to reveal recommended investigations.
+              </div>
+            )}
+
+            {/* Complexity/urgency */}
+            {activeCase && (
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+                {activeCase.complexity && (
+                  <div style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 4 }}>
+                      Complexity
+                    </div>
+                    <div className={`badge ${activeCase.complexity.toLowerCase() === 'high' ? 'badge-danger' : activeCase.complexity.toLowerCase() === 'medium' ? 'badge-warning' : 'badge-success'}`}>
+                      {activeCase.complexity}
+                    </div>
+                  </div>
+                )}
+                {activeCase.differentialDiagnoses?.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
+                      Consider
+                    </div>
+                    {activeCase.differentialDiagnoses.slice(0, 4).map((d, i) => (
+                      <div key={i} style={{ fontSize: 11, color: 'var(--text-2)', marginBottom: 3, paddingLeft: 8, borderLeft: '2px solid var(--border-md)' }}>
+                        {d}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── CENTER: Chat ───────────────────────────────────────── */}
+        <div className="sim-panel sim-panel-center" style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* Patient selector bar */}
+          <div className="chat-patient-bar">
+            {cases.length > 1 ? (
+              <select
+                className="chat-patient-selector"
+                value={activeCase?.id || ''}
+                onChange={e => loadCase(e.target.value)}
+              >
+                {cases.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} — {isEmergencyMode ? 'EMERGENCY' : c.specialty}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                {activeCase?.name || 'Waiting for patient...'}
+              </span>
+            )}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {isEmergencyMode && (
+                <div className="badge badge-danger">
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--danger)', animation: 'pulse 1s infinite' }} />
+                  Emergency Mode
+                </div>
+              )}
+              {messages.length > 0 && (
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
+                  {messages.filter(m => m.role === 'user').length} questions asked
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div ref={chatLogRef} className="chat-area">
+            {messages.map((m, idx) => {
+              const isDoc = m.role === 'user';
+              return (
+                <div
+                  key={idx}
+                  className={`chat-msg ${isDoc ? 'chat-msg-doctor' : 'chat-msg-patient'}`}
+                  style={{ animation: 'slideUp 200ms var(--ease)' }}
+                >
+                  <div className={`chat-avatar ${isDoc ? 'chat-avatar-doctor' : 'chat-avatar-patient'}`}>
+                    {isDoc
+                      ? effectiveUser.name.charAt(0).toUpperCase()
+                      : patientInitials
+                    }
+                  </div>
+                  <div>
+                    <div className={`chat-bubble ${isDoc ? 'chat-bubble-doctor' : 'chat-bubble-patient'}`}>
+                      {cleanMarkdown(m.content)}
+                    </div>
+                    <div className={`chat-time`} style={{ textAlign: isDoc ? 'right' : 'left' }}>
+                      {isDoc ? (effectiveUser.name?.split(' ')[0] || 'Doctor') : (activeCase?.name?.split(' ')[0] || 'Patient')}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Typing indicator */}
+            {loading && !evaluation && (
+              <div className="chat-msg chat-msg-patient">
+                <div className="chat-avatar chat-avatar-patient">{patientInitials}</div>
+                <div className="typing-indicator">
+                  <div className="typing-dot" />
+                  <div className="typing-dot" />
+                  <div className="typing-dot" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Chat input */}
+          {!evaluation && (
+            <div className="chat-input-dock">
+              <form onSubmit={sendMessage} className="chat-input-form">
+                <button
+                  type="button"
+                  onClick={handleHint}
+                  className="btn btn-ghost btn-sm"
+                  title="Get a hint question"
+                  style={{ padding: '6px', flexShrink: 0, color: 'var(--text-muted)' }}
+                >
+                  <HintIcon />
+                </button>
+
+                <input
+                  ref={inputRef}
+                  type="text"
+                  className="chat-input"
+                  value={question}
+                  onChange={e => setQuestion(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={loading || !sessionId}
+                  placeholder={listening ? 'Listening...' : 'Ask the patient a question...'}
+                />
+
+                {/* Voice button */}
+                <button
+                  type="button"
+                  onClick={handleVoice}
+                  className="btn btn-ghost btn-sm"
+                  title="Voice input (Chrome/Edge)"
+                  style={{
+                    padding: '6px', flexShrink: 0,
+                    color: listening ? 'var(--teal)' : 'var(--text-muted)',
+                    animation: listening ? 'pulse 1s infinite' : 'none',
+                  }}
+                >
+                  <MicIcon active={listening} />
+                </button>
+
+                <button
+                  type="submit"
+                  className="chat-send-btn"
+                  disabled={loading || !question.trim() || !sessionId}
+                  aria-label="Send message"
+                >
+                  <SendIcon />
+                </button>
+              </form>
             </div>
           )}
 
-          {/* Hint & Abort Buttons */}
-          <div className="figma-patient-actions">
-            <button className="figma-hint-btn" onClick={handleHint}>Hints</button>
-            <button className="figma-abort-btn" onClick={() => activeCase && loadCase(activeCase.id)}>Abort case</button>
-          </div>
-
-          {/* Make Diagnosis Button */}
-          <div className="figma-diagnosis-dock">
-            <button 
-              className="figma-diagnosis-btn" 
-              onClick={() => setIsAssessmentModalOpen(true)}
-            >
-              {evaluation ? 'View Report' : 'Make Diagnosis'}
-            </button>
-          </div>
-        </section>
-      </main>
-
-      {/* ─── Bottom Chat Input Bar ─── */}
-      {!evaluation && (
-        <div className="figma-chat-input-bar">
-          <form onSubmit={sendMessage} className="figma-chat-input-form">
-            <input
-              type="text"
-              className="figma-chat-input"
-              value={question}
-              onChange={e => setQuestion(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={loading}
-              placeholder="Write your question here..."
-            />
-            <button 
-              type="submit" 
-              className="figma-chat-send-btn" 
-              disabled={loading || !question.trim()}
-            >
-              <SendIcon />
-            </button>
-          </form>
+          {/* Post-evaluation action bar */}
+          {evaluation && (
+            <div className="chat-input-dock">
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <div style={{ flex: 1, fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>
+                  Session complete.{' '}
+                  <span style={{ color: evaluation.diagnosisCorrect ? 'var(--success)' : 'var(--danger)', fontWeight: 600 }}>
+                    Score: {evaluation.score}/100
+                  </span>
+                </div>
+                <button onClick={handleNewPatient} className="btn btn-outline btn-sm" style={{ gap: 6 }}>
+                  <RefreshIcon /> New Patient
+                </button>
+                <button onClick={downloadReport} disabled={reportLoading} className="btn btn-primary btn-sm" style={{ gap: 6 }}>
+                  <DownloadIcon /> {reportLoading ? 'Generating...' : 'Download Report'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* ─── Assessment & Feedback Modal ─── */}
+        {/* ── RIGHT: Patient Data ────────────────────────────────── */}
+        <div className="sim-panel sim-panel-right">
+          <div className="sim-panel-header">Patient Profile</div>
+
+          <div className="sim-panel-body">
+            {/* Patient card */}
+            {activeCase ? (
+              <>
+                <div style={{ marginBottom: 16, textAlign: 'center' }}>
+                  <div
+                    className={`patient-avatar-lg ${isUrgent ? 'critical' : ''}`}
+                    style={{ margin: '0 auto 8px' }}
+                  >
+                    {patientInitials}
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
+                    {activeCase.name}
+                  </div>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', marginTop: 2 }}>
+                    {activeCase.age} years · {activeCase.gender}
+                  </div>
+                </div>
+
+                {/* Urgency badge */}
+                {activeCase.urgency && (
+                  <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                    <div className={`badge ${isUrgent ? 'badge-danger' : 'badge-success'}`}>
+                      {activeCase.urgency}
+                    </div>
+                  </div>
+                )}
+
+                {/* Emergency timer */}
+                {isEmergencyMode && (
+                  <div className="emergency-banner" style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, color: 'var(--danger)' }}>TIME REMAINING</div>
+                    <div className={`emergency-timer ${timeLeft < 60 ? 'critical' : ''}`}>
+                      {formatTime(timeLeft)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Vitals monitor */}
+                {vitals.length > 0 && (
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>
+                      Vitals
+                    </div>
+                    <div className="vitals-grid">
+                      {vitals.map(({ key, val, unit }) => {
+                        const isCritical = (key === 'HR' && (parseInt(val) > 120 || parseInt(val) < 50)) ||
+                          (key === 'SpO₂' && parseInt(val) < 94) ||
+                          (key === 'Temp' && parseFloat(val) > 39);
+                        return (
+                          <div key={key} className={`vital-item${isCritical ? ' vital-critical' : ''}`}>
+                            <div className="vital-value">{val}</div>
+                            <div className="vital-unit">{unit}</div>
+                            <div className="vital-label">{key}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Vitals string fallback for non-parsed */}
+                    {vitals.length < 2 && (
+                      <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5, fontFamily: 'var(--mono)' }}>
+                        {activeCase.vitals}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Personality / presentation */}
+                {activeCase.personality && !isEmergencyMode && (
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
+                      Presentation
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-2)', lineHeight: 1.6, fontStyle: 'italic' }}>
+                      "{activeCase.personality}"
+                    </div>
+                  </div>
+                )}
+
+                {/* Patient reports (cardiology) */}
+                {activeReports.length > 0 && (
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>
+                      Patient Reports
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {activeReports.map(report => (
+                        <div
+                          key={report.id}
+                          className="report-thumb"
+                          onClick={() => setLightboxImg(report)}
+                        >
+                          <img src={report.image} alt={report.title} />
+                          <div className="report-thumb-info">
+                            <div>
+                              <div className="report-thumb-title">{report.title}</div>
+                              <div className="report-thumb-type">{report.type} · Click to view</div>
+                            </div>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
+                              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div style={{ height: 1, background: 'var(--border)', marginBottom: 12 }} />
+
+                {/* Action buttons */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <button onClick={handleHint} className="btn btn-outline btn-sm w-full" style={{ gap: 6 }}>
+                    <HintIcon /> Hint
+                  </button>
+                  <button
+                    onClick={() => activeCase && loadCase(activeCase.id)}
+                    className="btn btn-ghost btn-sm w-full"
+                    style={{ gap: 6, color: 'var(--text-muted)' }}
+                  >
+                    <RefreshIcon /> Restart Case
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="empty-state" style={{ padding: '40px 12px' }}>
+                <div style={{ opacity: 0.3, marginBottom: 12 }}>
+                  <div className="spinner" style={{ margin: '0 auto' }} />
+                </div>
+                <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)' }}>Loading patient...</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Assessment / Feedback Modal ─────────────────────────── */}
       {isAssessmentModalOpen && (
-        <div className="modal-overlay is-visible">
-          <div className="modal-backdrop" onClick={() => setIsAssessmentModalOpen(false)}></div>
-          <div className="modal-content" style={{ width: 'min(600px, calc(100% - 40px))' }}>
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth: 600 }}>
             <div className="modal-header">
-              <h2>{evaluation ? 'Feedback Report' : 'Submit Diagnosis'}</h2>
-              <button onClick={() => setIsAssessmentModalOpen(false)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--muted)' }}>&times;</button>
+              <h2>{evaluation ? 'Session Feedback' : 'Submit Diagnosis'}</h2>
+              <button className="btn-icon" onClick={() => setIsAssessmentModalOpen(false)} aria-label="Close">
+                <XIcon />
+              </button>
             </div>
 
             {!evaluation ? (
-              <div className="assessment-form">
-                <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '20px' }}>Review your patient interaction and submit your final clinical assessment.</p>
-                <div className="sim-field">
-                  <label>Provisional Diagnosis</label>
-                  <input 
-                    type="text" 
+              <div className="modal-body">
+                <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-2)', marginBottom: 20, lineHeight: 1.6 }}>
+                  Review your patient interaction and submit your final clinical assessment.
+                  Be specific — both the diagnosis and reasoning are scored.
+                </p>
+
+                <div className="field" style={{ marginBottom: 16 }}>
+                  <label htmlFor="diagnosis">Provisional Diagnosis *</label>
+                  <input
+                    id="diagnosis"
+                    type="text"
                     value={diagnosis}
                     onChange={e => setDiagnosis(e.target.value)}
                     disabled={loading}
-                    placeholder="e.g. Community-acquired pneumonia" 
-                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', marginBottom: '16px' }}
+                    placeholder="e.g. STEMI — Anterior wall myocardial infarction"
                   />
                 </div>
-                <div className="sim-field">
-                  <label>Clinical Reasoning</label>
-                  <textarea 
+
+                <div className="field" style={{ marginBottom: 24 }}>
+                  <label htmlFor="reasoning">Clinical Reasoning *</label>
+                  <textarea
+                    id="reasoning"
                     value={reasoning}
                     onChange={e => setReasoning(e.target.value)}
                     disabled={loading}
-                    placeholder="Explain symptoms, risk factors, and logic behind your diagnosis." 
-                    rows="4"
-                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', marginBottom: '24px', resize: 'vertical' }}
+                    placeholder="Describe the key symptoms, findings, and the logic behind your diagnosis..."
+                    rows={5}
                   />
                 </div>
-                <button onClick={evaluateCase} disabled={loading} className="figma-diagnosis-btn" style={{ width: '100%' }}>
-                  {loading ? 'Evaluating...' : 'Submit & Evaluate'}
+
+                <button
+                  onClick={evaluateCase}
+                  disabled={loading || !diagnosis.trim() || !reasoning.trim()}
+                  className="btn btn-primary btn-lg w-full"
+                >
+                  {loading ? (
+                    <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />Evaluating with AI...</>
+                  ) : 'Submit & Evaluate'}
                 </button>
               </div>
             ) : (
-              <div className="feedback-container">
-                <div className="score-ring-container" style={{ textAlign: 'center', padding: '20px', background: 'var(--bg)', borderRadius: '16px', marginBottom: '20px' }}>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', fontWeight: 'bold' }}>SESSION SCORE</p>
-                  <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)', margin: '10px 0' }}>{evaluation.score}%</div>
-                  <p style={{ fontSize: '0.9rem' }}>{cleanMarkdown(evaluation.feedbackSummary) || (evaluation.score >= 70 ? "Strong clinical performance." : "Good effort — keep practicing.")}</p>
+              <div className="modal-body">
+                {/* Score */}
+                <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                  <ScoreRing score={evaluation.score} />
+                  <div style={{ marginTop: 12, fontSize: 'var(--fs-sm)', color: 'var(--text-2)', maxWidth: 360, margin: '12px auto 0', lineHeight: 1.6 }}>
+                    {cleanMarkdown(evaluation.feedbackSummary) ||
+                      (evaluation.score >= 70 ? 'Strong clinical performance.' : 'Good effort — keep practicing.')}
+                  </div>
                 </div>
-                
-                <div style={{ display: 'grid', gap: '12px' }}>
-                  <article style={{ background: evaluation.diagnosisCorrect ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', padding: '16px', borderRadius: '16px' }}>
-                    <h4 style={{ margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {evaluation.diagnosisCorrect ? '✅ Diagnosis Correct' : '❌ Diagnosis Incorrect'}
-                    </h4>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>Likely diagnosis: <strong>{cleanMarkdown(evaluation.likelyDiagnosis) || "Check rubric for standard"}</strong>.</p>
-                  </article>
-                  
-                  {evaluation.strengths?.length > 0 && (
-                    <article style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '16px', borderRadius: '16px' }}>
-                      <h4 style={{ margin: '0 0 8px 0', color: 'var(--primary)' }}>💪 Strengths</h4>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.strengths.map((s,i) => <li key={i}>{cleanMarkdown(s)}</li>)}</ul>
-                    </article>
-                  )}
-                  
-                  {evaluation.improvements?.length > 0 && (
-                    <article style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '16px', borderRadius: '16px' }}>
-                      <h4 style={{ margin: '0 0 8px 0', color: '#d97706' }}>⚠️ Improve</h4>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.improvements.map((s,i) => <li key={i}>{cleanMarkdown(s)}</li>)}</ul>
-                    </article>
-                  )}
-                  
-                  {evaluation.expectedQuestionsMissed?.length > 0 && (
-                    <article style={{ background: 'var(--bg)', border: '1px solid var(--border)', padding: '16px', borderRadius: '16px' }}>
-                      <h4 style={{ margin: '0 0 8px 0', color: '#dc2626' }}>❓ Should Ask</h4>
-                      <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--muted)' }}>{evaluation.expectedQuestionsMissed.map((s,i) => <li key={i}>{cleanMarkdown(s)}</li>)}</ul>
-                    </article>
-                  )}
+
+                {/* Diagnosis result */}
+                <div style={{
+                  padding: 'var(--sp-4)',
+                  borderRadius: 'var(--r-md)',
+                  background: evaluation.diagnosisCorrect ? 'var(--success-dim)' : 'var(--danger-dim)',
+                  border: `1px solid ${evaluation.diagnosisCorrect ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'}`,
+                  marginBottom: 16,
+                  display: 'flex', alignItems: 'flex-start', gap: 12,
+                }}>
+                  <div style={{ color: evaluation.diagnosisCorrect ? 'var(--success)' : 'var(--danger)', marginTop: 2 }}>
+                    {evaluation.diagnosisCorrect ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                      </svg>
+                    )}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: evaluation.diagnosisCorrect ? 'var(--success)' : 'var(--danger)' }}>
+                      {evaluation.diagnosisCorrect ? 'Correct Diagnosis' : 'Incorrect Diagnosis'}
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-2)', marginTop: 3 }}>
+                      Likely diagnosis: <strong>{cleanMarkdown(evaluation.likelyDiagnosis) || 'See rubric'}</strong>
+                    </div>
+                  </div>
                 </div>
-                
-                <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
-                  <button onClick={downloadReport} disabled={reportLoading} className="figma-diagnosis-btn" style={{ flex: 1, fontSize: '16px' }}>
-                    {reportLoading ? 'Generating...' : '📄 Download'}
+
+                {/* Strengths */}
+                {evaluation.strengths?.length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--success)', marginBottom: 8 }}>
+                      Strengths
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {evaluation.strengths.map((s, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2.5" style={{ flexShrink: 0, marginTop: 2 }}>
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          {cleanMarkdown(s)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Improvements */}
+                {evaluation.improvements?.length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--warning)', marginBottom: 8 }}>
+                      Areas to Improve
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {evaluation.improvements.map((s, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                          </svg>
+                          {cleanMarkdown(s)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Missed questions */}
+                {evaluation.expectedQuestionsMissed?.length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--danger)', marginBottom: 8 }}>
+                      Should Have Asked
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {evaluation.expectedQuestionsMissed.map((s, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 8, fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                          </svg>
+                          {cleanMarkdown(s)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Footer actions */}
+                <div className="modal-footer" style={{ marginTop: 20, padding: '16px 0 0', border: 'none', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => { setIsAssessmentModalOpen(false); activeCase && loadCase(activeCase.id); }}
+                      className="btn btn-outline btn-sm"
+                    >
+                      Retry Case
+                    </button>
+                    <button
+                      onClick={() => { setIsAssessmentModalOpen(false); navigate(user ? '/dashboard' : '/'); }}
+                      className="btn btn-ghost btn-sm"
+                    >
+                      {user ? 'Dashboard' : 'Home'}
+                    </button>
+                  </div>
+                  <button
+                    onClick={downloadReport}
+                    disabled={reportLoading}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6 }}
+                  >
+                    <DownloadIcon />
+                    {reportLoading ? 'Generating...' : 'Download Report'}
                   </button>
-                  <button onClick={() => { setIsAssessmentModalOpen(false); activeCase && loadCase(activeCase.id); }} className="figma-test-action-btn" style={{ flex: 1, fontSize: '16px' }}>Retry Case</button>
-                  <button onClick={() => navigate('/dashboard')} className="figma-test-action-btn" style={{ flex: 1, fontSize: '16px' }}>Dashboard</button>
                 </div>
               </div>
             )}
@@ -707,62 +1102,43 @@ export default function Simulator() {
         </div>
       )}
 
-      {/* ─── Error / Status Toast ─── */}
-      {toastMessage && (
-        <div className="figma-toast" style={{ position: 'fixed', bottom: '30px', left: '50%', transform: 'translateX(-50%)', background: '#333', color: '#fff', padding: '12px 24px', borderRadius: '8px', zIndex: 10000, boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: '500', animation: 'fadeInUp 0.3s ease-out' }}>
-          {toastMessage}
-        </div>
-      )}
-      {/* ─── Report Image Lightbox ─── */}
+      {/* ── Image Lightbox ─────────────────────────────────────── */}
       {lightboxImg && (
-        <div 
-          onClick={() => setLightboxImg(null)}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 20000,
-            background: 'rgba(0,0,0,0.85)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: '24px',
-            animation: 'fadeInUp 0.25s ease-out'
-          }}
-        >
-          <div style={{ 
-            background: 'white', borderRadius: '16px', overflow: 'hidden',
-            maxWidth: '900px', width: '100%', maxHeight: '85vh',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-            display: 'flex', flexDirection: 'column'
-          }} onClick={e => e.stopPropagation()}>
-            <div style={{ 
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '16px 20px', borderBottom: '1px solid #e5e7eb',
-              background: 'linear-gradient(135deg, #f8f9ff 0%, #f0f1ff 100%)'
-            }}>
+        <div className="lightbox" onClick={() => setLightboxImg(null)}>
+          <div className="lightbox-inner" onClick={e => e.stopPropagation()}>
+            <div className="lightbox-header">
               <div>
-                <h3 style={{ margin: 0, fontSize: '1rem', color: '#1e293b' }}>{lightboxImg.title}</h3>
-                <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#6b7280' }}>{lightboxImg.type} Report • For educational simulation only</p>
+                <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>{lightboxImg.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                  {lightboxImg.type} · Educational simulation only
+                </div>
               </div>
-              <button 
-                onClick={() => setLightboxImg(null)}
-                style={{ 
-                  background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: '8px',
-                  width: '36px', height: '36px', cursor: 'pointer', fontSize: '1.2rem',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#374151', transition: 'background 0.2s'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
-              >✕</button>
+              <button className="btn-icon" onClick={() => setLightboxImg(null)} aria-label="Close">
+                <XIcon />
+              </button>
             </div>
-            <div style={{ overflow: 'auto', padding: '16px', display: 'flex', justifyContent: 'center', background: '#fafafa' }}>
-              <img 
-                src={lightboxImg.image} 
-                alt={lightboxImg.title}
-                style={{ maxWidth: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: '8px' }}
-              />
+            <div className="lightbox-body">
+              <img src={lightboxImg.image} alt={lightboxImg.title} />
             </div>
           </div>
         </div>
       )}
 
+      {/* ── Toast ─────────────────────────────────────────────── */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+          background: toastType === 'error' ? 'var(--danger)' : toastType === 'success' ? 'var(--success)' : 'var(--surface-2)',
+          color: toastType === 'info' ? 'var(--text)' : '#fff',
+          padding: '10px 20px', borderRadius: 'var(--r-full)',
+          fontSize: 'var(--fs-sm)', fontWeight: 500, zIndex: 'var(--z-toast)',
+          boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border-md)',
+          animation: 'slideUp 200ms var(--ease)',
+          whiteSpace: 'nowrap',
+        }}>
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }

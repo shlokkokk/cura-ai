@@ -1,5 +1,23 @@
 const http = require("http");
-const { randomUUID } = require("crypto");
+const { randomUUID, scrypt, timingSafeEqual, randomBytes } = require("crypto");
+const { promisify } = require("util");
+const scryptAsync = promisify(scrypt);
+
+// Password hashing using Node built-in crypto (scrypt)
+async function hashPassword(password) {
+  const salt = randomBytes(16).toString('hex');
+  const buf = await scryptAsync(password, salt, 64);
+  return `${salt}:${buf.toString('hex')}`;
+}
+async function verifyPassword(supplied, stored) {
+  if (!stored) return false;
+  // Support legacy plain-text passwords (first login after migration)
+  if (!stored.includes(':')) return supplied === stored;
+  const [salt, hash] = stored.split(':');
+  const hashBuf = Buffer.from(hash, 'hex');
+  const suppliedBuf = await scryptAsync(supplied, salt, 64);
+  return timingSafeEqual(hashBuf, suppliedBuf);
+}
 const { URL } = require("url");
 const fs = require("fs");
 const path = require("path");
@@ -556,6 +574,11 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       if (regError) { badRequest(response, context, regError); return; }
 
       try {
+        // Hash password before storing
+        if (body.password) {
+          body.passwordHash = await hashPassword(body.password);
+          delete body.password;
+        }
         const user = await storage.createUser(body);
         sendJson(response, 201, { user: sanitizeUser(user), requestId }, context);
       } catch (err) {
@@ -572,6 +595,16 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
 
       const user = await storage.getUserByEmail(body.email);
       if (!user) { notFound(response, context, "No account found with this email. Please register first."); return; }
+
+      // Verify password — supports hashed (passwordHash) and legacy plain-text (password)
+      const storedCredential = user.passwordHash || user.password || null;
+      const isValid = storedCredential
+        ? await verifyPassword(body.password, storedCredential)
+        : true; // No password stored = allow (legacy demo accounts)
+      if (!isValid) {
+        sendJson(response, 401, { error: "Incorrect password. Please try again.", requestId }, context);
+        return;
+      }
       sendJson(response, 200, { user: sanitizeUser(user), requestId }, context);
       return;
     }

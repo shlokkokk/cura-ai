@@ -1,105 +1,299 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { motion } from 'framer-motion';
+
+const TEAM = [
+  {
+    initial: 'M',
+    name: 'Muddasir',
+    role: 'Lead Developer',
+    desc: 'Architect behind the AI integration, backend infrastructure, and simulator logic.',
+    color: 'var(--teal)',
+    bg: 'var(--teal-dim)',
+  },
+  {
+    initial: 'T',
+    name: 'Toqa Abdul-Hafez',
+    role: 'Team Lead & Designer',
+    desc: 'Leading the product vision and crafting the clinical user experience.',
+    color: 'var(--indigo)',
+    bg: 'var(--indigo-dim)',
+  },
+  {
+    initial: 'M',
+    name: 'Maham Taqi',
+    role: 'Presentation & Comms',
+    desc: 'Communicating our impact and refining the narrative around medical education.',
+    color: 'var(--warning)',
+    bg: 'var(--warning-dim)',
+  },
+  {
+    initial: 'A',
+    name: 'Abubakar Mughal',
+    role: 'Quality Assurance',
+    desc: 'Ensuring flawless platform execution, test coverage, and stability.',
+    color: 'var(--success)',
+    bg: 'var(--success-dim)',
+  },
+];
+
+const VALUES = [
+  {
+    num: '01',
+    title: 'Clinical Accuracy',
+    desc: 'We never compromise on medical facts. Every AI patient response is grounded in evidence-based guidelines and standard clinical pathways.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+    ),
+  },
+  {
+    num: '02',
+    title: 'Psychological Safety',
+    desc: 'A judgment-free zone where a wrong diagnosis is a celebrated learning opportunity, not a failure. Mistakes here save real lives later.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+  },
+  {
+    num: '03',
+    title: 'Universal Access',
+    desc: 'Democratising high-tier medical education so location and funding are no longer barriers. Supporting UN SDG3 and SDG4.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+    ),
+  },
+];
 
 export default function About() {
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
-      <main style={{ flex: 1, background: 'var(--bg)' }}>
-        <section style={{ padding: '100px 20px', textAlign: 'center', background: 'linear-gradient(180deg, var(--bg) 0%, white 100%)' }}>
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <p className="section-eyebrow">Our Mission</p>
-              <h1 style={{ fontSize: '3.5rem', fontWeight: '800', marginBottom: '24px', letterSpacing: '-0.02em' }}>Built by doctors, <br/>for the future of medicine.</h1>
-              <p style={{ fontSize: '1.25rem', color: 'var(--muted)', lineHeight: '1.8' }}>
-                Cura AI was founded with a single mission: to provide universally accessible, highly realistic clinical training to healthcare professionals across the globe, supporting SDG3 and SDG 4.
-              </p>
-            </motion.div>
-          </div>
-        </section>
 
-        <section style={{ padding: '80px 20px', background: 'white' }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
-            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-              <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '24px' }}>The Hackathon Story</h2>
-              <p style={{ fontSize: '1.1rem', color: 'var(--muted)', lineHeight: '1.8', marginBottom: '20px' }}>
-                Cura AI was born out of inspiration from GNEC hackathon to achieve the SDG3 and SDG4 goals from United Nations. Our team noticed a critical flaw in traditional medical education: students learn textbook theory, but lack the opportunity to practice the art of patient conversation before facing real humans in pain.
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <section style={{
+        paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
+        position: 'relative', overflow: 'hidden',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        {/* Grid bg */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          backgroundImage: 'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+          maskImage: 'radial-gradient(ellipse 70% 80% at 50% 0%, black 0%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 70% 80% at 50% 0%, black 0%, transparent 100%)',
+        }} />
+        <div className="container" style={{ position: 'relative', textAlign: 'center', maxWidth: 760, margin: '0 auto' }}>
+          <div className="section-label" style={{ justifyContent: 'center', display: 'inline-block' }}>Our Mission</div>
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900,
+            letterSpacing: '-0.04em', lineHeight: 1.1,
+            margin: '16px 0 24px', color: 'var(--text)',
+          }}>
+            Built by students,<br />
+            <span style={{
+              background: 'var(--grad-brand)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            }}>
+              for the future of medicine.
+            </span>
+          </h1>
+          <p style={{ fontSize: 'var(--fs-lg)', color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 32px' }}>
+            CURA.AI was founded with a single mission — to provide universally accessible,
+            highly realistic clinical training to healthcare professionals across the globe,
+            supporting UN SDG3 and SDG4.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link to="/simulator?demo=cardiology" className="btn btn-primary btn-lg">Try the Simulator</Link>
+            <Link to="/features" className="btn btn-outline btn-lg">Explore Features</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Origin Story ──────────────────────────────────────────── */}
+      <section className="section-sm" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 1100 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+            <div>
+              <div className="section-label">The Origin</div>
+              <h2 className="section-title" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)' }}>
+                The Hackathon Story
+              </h2>
+              <p style={{ color: 'var(--text-2)', lineHeight: 1.8, marginBottom: 20, fontSize: 'var(--fs-base)' }}>
+                CURA.AI was born at the GNEC hackathon, where our team identified a critical gap in medical education:
+                students master textbook theory, but rarely get to practice the art of patient conversation before
+                facing real humans in pain.
               </p>
-              <p style={{ fontSize: '1.1rem', color: 'var(--muted)', lineHeight: '1.8' }}>
-                By combining the incredible reasoning capabilities of Large Language Models with strict, evidence-based medical rubrics, we successfully created a zero-risk environment where clinicians can safely make mistakes, learn from detailed feedback, and ultimately save lives.
+              <p style={{ color: 'var(--text-2)', lineHeight: 1.8, fontSize: 'var(--fs-base)' }}>
+                By combining the reasoning capabilities of Large Language Models with strict, evidence-based medical
+                rubrics, we created a zero-risk environment where clinicians can safely make mistakes, receive
+                detailed feedback, and ultimately build the confidence to save lives.
               </p>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
-              <div style={{ background: 'var(--primary)', padding: '60px', textAlign: 'center', color: 'white' }}>
-                <svg width="64" height="64" viewBox="0 0 32 32" fill="none" style={{ margin: '0 auto 24px' }}>
-                  <rect width="32" height="32" rx="8" fill="white"/>
-                  <path d="M16 8C12 8 9 11 9 14.5C9 18 12 20 14 21.5V23C14 23.6 14.4 24 15 24H17C17.6 24 18 23.6 18 23V21.5C20 20 23 18 23 14.5C23 11 20 8 16 8Z" fill="#6D28D9"/>
-                </svg>
-                <h3 style={{ fontSize: '2rem', fontWeight: '800', margin: 0 }}>Cura AI Hub</h3>
-                <p style={{ opacity: 0.8, marginTop: '12px' }}>Established 2026</p>
+            </div>
+
+            {/* Visual card */}
+            <div style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border-md)',
+              borderRadius: 'var(--r-xl)',
+              padding: 'var(--sp-8)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}>
+              {/* Accent glow */}
+              <div style={{
+                position: 'absolute', top: -40, right: -40,
+                width: 200, height: 200,
+                background: 'radial-gradient(circle, rgba(0,201,177,0.07) 0%, transparent 70%)',
+                pointerEvents: 'none',
+              }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                <div style={{
+                  width: 52, height: 52, borderRadius: 'var(--r-md)',
+                  background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--teal)',
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 'var(--fs-lg)' }}>CURA.AI</div>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
+                    Synapse Team · Est. 2026
+                  </div>
+                </div>
               </div>
-            </motion.div>
-          </div>
-        </section>
-
-        <section style={{ padding: '100px 20px', background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center', marginBottom: '80px' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '60px' }}>Our Core Values</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
               {[
-                { title: 'Clinical Accuracy', desc: 'We never compromise on medical facts. Our AI is rigidly bound by standard medical guidelines.' },
-                { title: 'Psychological Safety', desc: 'A judgment-free zone where making the wrong diagnosis is celebrated as a learning opportunity.' },
-                { title: 'Universal Access', desc: 'Democratizing high-tier medical education so location and funding are no longer barriers to excellence.' }
-              ].map((value, i) => (
-                <div key={i}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--primary-bg)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>{i + 1}</div>
-                  <h4 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '12px' }}>{value.title}</h4>
-                  <p style={{ color: 'var(--muted)', lineHeight: '1.6' }}>{value.desc}</p>
+                { label: 'Specialties covered', val: '10+' },
+                { label: 'AI providers supported', val: '3' },
+                { label: 'Cases generated', val: 'Unlimited' },
+                { label: 'Session feedback items', val: '5 categories' },
+              ].map(({ label, val }) => (
+                <div key={label} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: 'var(--sp-3) 0', borderBottom: '1px solid var(--border)',
+                }}>
+                  <span style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>{label}</span>
+                  <span style={{ fontFamily: 'var(--mono)', fontWeight: 700, color: 'var(--teal)', fontSize: 'var(--fs-sm)' }}>{val}</span>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '20px' }}>Meet the Synapse Team</h2>
-            <p style={{ fontSize: '1.1rem', color: 'var(--muted)', lineHeight: '1.8', marginBottom: '40px', maxWidth: '700px', margin: '0 auto 40px auto' }}>
-              We are a passionate team of developers, medical professionals, and AI enthusiasts dedicated to revolutionizing medical education.
+      {/* ── Core Values ───────────────────────────────────────────── */}
+      <section className="section-sm" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 1100 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div className="section-label">What We Stand For</div>
+            <h2 className="section-title" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', marginBottom: 0 }}>
+              Our Core Values
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            {VALUES.map(({ num, title, desc, icon }) => (
+              <div key={num} className="feature-card">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div className="feature-icon" style={{ marginBottom: 0 }}>{icon}</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: 'var(--fs-xs)', color: 'var(--text-faint)' }}>
+                    {num}
+                  </div>
+                </div>
+                <h3 style={{ fontSize: 'var(--fs-lg)', fontWeight: 700, marginBottom: 8 }}>{title}</h3>
+                <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-2)', lineHeight: 1.7 }}>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Team ──────────────────────────────────────────────────── */}
+      <section className="section-sm" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="container" style={{ maxWidth: 1100 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <div className="section-label">The People</div>
+            <h2 className="section-title" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', marginBottom: 12 }}>
+              Meet the Synapse Team
+            </h2>
+            <p style={{ fontSize: 'var(--fs-base)', color: 'var(--text-2)', maxWidth: 560, margin: '0 auto' }}>
+              A passionate team of developers, clinicians, and AI enthusiasts dedicated to
+              revolutionising medical education.
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px' }}>
-              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #6D28D9, #8a7cff)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>M</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Muddasir</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Lead Developer</p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Architect behind the AI integration and simulator logic.</p>
-              </div>
-              
-              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #EC4899, #F472B6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>T</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Toqa Abdul-Hafez</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Team Leader & Designer</p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Leading the vision and crafting the user experience.</p>
-              </div>
-              
-              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #F59E0B, #FCD34D)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>M</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Maham Taqi</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Presentation & Editing</p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Communicating our impact and refining our story.</p>
-              </div>
+          </div>
 
-              <div style={{ background: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #3B82F6, #93C5FD)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', fontWeight: 'bold', margin: '0 auto 20px' }}>A</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Abubakar Mughal</h3>
-                <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '0.9rem', marginBottom: '12px' }}>Quality Assurance</p>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Ensuring flawless execution and platform stability.</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+            {TEAM.map(({ initial, name, role, desc, color, bg }) => (
+              <div key={name} style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r-xl)',
+                padding: 'var(--sp-6)',
+                textAlign: 'center',
+                transition: 'border-color var(--t), transform var(--t), box-shadow var(--t)',
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'var(--border-md)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
+              >
+                <div style={{
+                  width: 72, height: 72, borderRadius: '50%',
+                  background: bg, border: `2px solid ${color}33`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 28, fontWeight: 800, color, fontFamily: 'var(--mono)',
+                  margin: '0 auto var(--sp-4)',
+                }}>
+                  {initial}
+                </div>
+                <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>{name}</h3>
+                <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color, marginBottom: 10 }}>{role}</div>
+                <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', lineHeight: 1.6 }}>{desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ───────────────────────────────────────────────────── */}
+      <section className="cta-section">
+        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+          <h2 className="cta-title">
+            Ready to practice<br />
+            <span style={{ background: 'var(--grad-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              without risk?
+            </span>
+          </h2>
+          <p className="cta-sub">
+            Join thousands of medical students improving their clinical reasoning with CURA.AI.
+          </p>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link to="/register" className="btn btn-primary btn-xl">Create Free Account</Link>
+            <Link to="/simulator?demo=cardiology" className="btn btn-outline btn-xl">Try Demo</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ────────────────────────────────────────────────── */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>
+            <span>© {new Date().getFullYear()} CURA.AI — Synapse Team</span>
+            <div style={{ display: 'flex', gap: 20 }}>
+              <Link to="/" className="footer-link">Home</Link>
+              <Link to="/features" className="footer-link">Features</Link>
+              <Link to="/simulator" className="footer-link">Simulator</Link>
             </div>
           </div>
-        </section>
-      </main>
-      <Footer />
+        </div>
+      </footer>
     </div>
   );
 }

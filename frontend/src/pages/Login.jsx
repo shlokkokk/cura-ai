@@ -1,140 +1,224 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
+import Logo from '../components/Logo';
+
+const EyeIcon = ({ open }) => open ? (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+) : (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+);
+
+const AUTH_FEATURES = [
+  {
+    title: 'Real clinical conversations',
+    desc: 'AI patients respond with authentic symptoms, emotions, and history — not scripted keywords.',
+  },
+  {
+    title: 'Rubric-based grading',
+    desc: 'Every session scored on history-taking, diagnosis accuracy, red flags, and communication.',
+  },
+  {
+    title: 'Track your progress',
+    desc: 'Performance dashboard shows improvement over time across specialties and case types.',
+  },
+];
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [showPwd, setShowPwd] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showPwd, setShowPwd]   = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+
   const { saveUser } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { isDark }   = useTheme();
+  const navigate     = useNavigate();
+  const location     = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
     setLoading(true);
     setError('');
     try {
       const data = await api('/api/users/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: email.trim(), password }),
       });
       saveUser(data.user);
-      const searchParams = new URLSearchParams(location.search);
-      const redirect = searchParams.get('redirect') || '/dashboard';
+      const redirect = new URLSearchParams(location.search).get('redirect') || '/dashboard';
       navigate(redirect);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Sign in failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
-      {/* Left Panel: Informative Notes */}
-      <div style={{ flex: 1, background: 'linear-gradient(135deg, #1a1035, #6D28D9)', color: 'white', padding: '60px', flexDirection: 'column', justifyContent: 'space-between', display: window.innerWidth < 900 ? 'none' : 'flex' }} className="auth-left-panel">
-        <div>
-          <Link to="/" style={{ textDecoration: 'none', display: 'inline-block' }}>
-            <Logo size={40} dark={true} />
-          </Link>
+    <div className="auth-shell">
+      {/* ── Left panel ─────────────────────────────────────────── */}
+      <div className="auth-left" aria-hidden="true">
+        <div className="auth-left-glow" />
+        <div className="auth-left-pattern" />
+
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <Logo size={32} />
         </div>
-        <div style={{ maxWidth: '480px' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '24px', lineHeight: '1.2' }}>Master your clinical reasoning.</h2>
-          <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.6', marginBottom: '40px' }}>
-            Join thousands of medical professionals using Cura AI to practice diagnosis, patient communication, and critical thinking in a safe, hyper-realistic simulated environment.
+
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 400 }}>
+          <h2 style={{ fontSize: 'var(--fs-3xl)', fontWeight: 800, letterSpacing: '-0.03em', color: '#fff', marginBottom: 12, lineHeight: 1.2 }}>
+            Master clinical<br />decision-making.
+          </h2>
+          <p style={{ fontSize: 'var(--fs-sm)', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: 36 }}>
+            Practice patient consultations, sharpen diagnostic reasoning,
+            and build confidence — in a completely risk-free environment.
           </p>
-          <div style={{ display: 'grid', gap: '24px' }}>
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🎙️</div>
-              <div>
-                <h4 style={{ fontWeight: '600', marginBottom: '4px' }}>Natural Conversations</h4>
-                <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>Speak to virtual patients just like you would in a real clinic.</p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {AUTH_FEATURES.map(({ title, desc }) => (
+              <div key={title} style={{ display: 'flex', gap: 14 }}>
+                <div style={{
+                  width: 8, height: 8, borderRadius: '50%',
+                  background: 'var(--teal)', marginTop: 6, flexShrink: 0,
+                  boxShadow: '0 0 8px var(--teal)',
+                }} />
+                <div>
+                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'rgba(255,255,255,0.9)', marginBottom: 2 }}>
+                    {title}
+                  </div>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+                    {desc}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📊</div>
-              <div>
-                <h4 style={{ fontWeight: '600', marginBottom: '4px' }}>Instant Rubric Feedback</h4>
-                <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>Get evaluated on differentials, red flags, and empathy instantly.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '30px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)' }}>
-          &copy; {new Date().getFullYear()} Cura AI. Built for the future of medicine.
+
+        <div style={{ position: 'relative', zIndex: 1, fontSize: 'var(--fs-xs)', color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--mono)' }}>
+          © {new Date().getFullYear()} CURA.AI — Synapse Team
         </div>
       </div>
 
-      {/* Right Panel: Login Form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: 'var(--bg)', position: 'relative' }}>
-        <Link to="/" style={{ position: 'absolute', top: '40px', right: '40px', color: 'var(--muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '500', transition: 'color 0.2s' }} onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--muted)'}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          Back to Home
+      {/* ── Right panel: form ───────────────────────────────────── */}
+      <div className="auth-right">
+        <Link
+          to="/"
+          style={{
+            position: 'absolute', top: 24, left: 28,
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontSize: 'var(--fs-sm)', color: 'var(--text-muted)',
+            textDecoration: 'none', transition: 'color var(--t)',
+          }}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Back
         </Link>
-        
-        <div className="auth-box" style={{ width: '100%', maxWidth: '440px' }}>
-          <div className="mobile-logo" style={{ marginBottom: '40px', display: 'none' }}>
-            <Link to="/" style={{ textDecoration: 'none' }}>
-              <Logo size={40} dark={false} />
-            </Link>
-          </div>
-          <div className="auth-icon" style={{ display: 'none' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" strokeWidth="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          </div>
-          <h1 className="auth-title" style={{ textAlign: 'left', fontSize: '2rem', marginBottom: '8px' }}>Welcome Back</h1>
-          <p className="auth-subtitle" style={{ textAlign: 'left', marginBottom: '32px' }}>Sign in to continue your clinical training.</p>
-          
-          {error && <div style={{ color: 'var(--danger)', padding: '10px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', marginBottom: '16px', fontSize: '0.9rem' }}>{error}</div>}
 
-          <form onSubmit={handleSubmit} className="auth-form" style={{ marginTop: '24px' }}>
-            <div className="sim-field">
-              <label htmlFor="email">Email address</label>
-              <input type="email" id="email" placeholder="doctor@example.com" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} />
+        <div className="auth-box">
+          <div style={{ marginBottom: 32 }}>
+            <h1 className="auth-title">Welcome back</h1>
+            <p className="auth-subtitle">Sign in to continue your clinical training.</p>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger" style={{ marginBottom: 20 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              {error}
             </div>
-            
-            <div className="sim-field">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <label htmlFor="password">Password</label>
-                <a href="#" style={{ fontSize: '0.8rem', color: 'var(--primary)', textDecoration: 'none' }}>Forgot Password?</a>
+          )}
+
+          <form onSubmit={handleSubmit} className="auth-form" noValidate>
+            <div className="field">
+              <label htmlFor="login-email">Email address</label>
+              <input
+                id="login-email"
+                type="email"
+                placeholder="doctor@hospital.org"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="field">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label htmlFor="login-password">Password</label>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', cursor: 'default' }}>
+                  {/* Future: Forgot Password link */}
+                </span>
               </div>
-              <div className="pwd-wrapper" style={{ position: 'relative' }}>
-                <input 
-                  type={showPwd ? "text" : "password"} 
-                  id="password" 
-                  placeholder="••••••••" 
-                  required 
-                  autoComplete="current-password" 
-                  style={{ paddingRight: '40px' }}
+              <div className="input-group">
+                <input
+                  id="login-password"
+                  type={showPwd ? 'text' : 'password'}
+                  placeholder="••••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  disabled={loading}
                 />
-                <button type="button" className="pwd-toggle" onClick={() => setShowPwd(!showPwd)} aria-label="Toggle password visibility" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {!showPwd ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  ) : (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  )}
+                <button
+                  type="button"
+                  className="input-action"
+                  onClick={() => setShowPwd(v => !v)}
+                  aria-label={showPwd ? 'Hide password' : 'Show password'}
+                >
+                  <EyeIcon open={showPwd} />
                 </button>
               </div>
             </div>
-            
-            <div className="auth-form__actions" style={{ marginTop: '20px' }}>
-              <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={loading}>
-                {loading ? 'Signing in...' : 'Sign In'}
-              </button>
-            </div>
-            
-            <div className="auth-divider" style={{ margin: '20px 0' }}>or</div>
-            
-            <div className="auth-form__actions">
-              <Link to="/register" className="btn btn-outline" style={{ width: '100%', textAlign: 'center' }}>Don't have an account? Register</Link>
-            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg w-full"
+              disabled={loading || !email.trim() || !password.trim()}
+              style={{ marginTop: 8 }}
+            >
+              {loading ? (
+                <>
+                  <div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />
+                  Signing in...
+                </>
+              ) : 'Sign In'}
+            </button>
           </form>
+
+          <div className="divider" style={{ margin: '20px 0' }}>or</div>
+
+          <Link
+            to="/simulator?demo=cardiology"
+            className="btn btn-outline btn-lg w-full"
+            style={{ textAlign: 'center', justifyContent: 'center' }}
+          >
+            Try Demo — No Account Required
+          </Link>
+
+          <p className="auth-footer-link" style={{ marginTop: 24 }}>
+            New to CURA.AI?{' '}
+            <Link to="/register" style={{ color: 'var(--teal)', fontWeight: 600 }}>
+              Create a free account
+            </Link>
+          </p>
         </div>
       </div>
     </div>

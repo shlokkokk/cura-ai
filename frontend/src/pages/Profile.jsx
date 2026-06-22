@@ -9,22 +9,29 @@ const SPECIALTIES = [
   'Endocrinology', 'General Surgery', 'Orthopedics', 'Pediatrics',
   'Dermatology', 'Psychiatry', 'Ophthalmology', 'ENT',
   'Gastroenterology', 'Nephrology', 'Urology', 'Obstetrics & Gynecology',
-  'Dentistry', 'Emergency Medicine', 'Oncology', 'Radiology', 'Genetics'
+  'Emergency Medicine', 'Oncology', 'Radiology', 'Hematology', 'Genetics'
+];
+
+const ROLES = [
+  { value: 'student',    label: 'Medical Student' },
+  { value: 'resident',   label: 'Resident / Intern' },
+  { value: 'faculty',    label: 'Doctor / Faculty' },
+  { value: 'researcher', label: 'Medical Researcher' },
 ];
 
 export default function Profile() {
   const { user, saveUser } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    institution: user?.institution || '',
-    role: user?.role || 'student',
-    yearOfStudy: user?.yearOfStudy || '',
-    specialization: user?.specialization || ''
+    name:          user?.name || '',
+    institution:   user?.institution || '',
+    role:          user?.role || 'student',
+    yearOfStudy:   user?.yearOfStudy || '',
+    specialization:user?.specialization || '',
   });
-  const [saving, setSaving] = useState(false);
+  const [saving,  setSaving]  = useState(false);
   const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [error,   setError]   = useState('');
 
   if (!user) { navigate('/login'); return null; }
 
@@ -38,10 +45,10 @@ export default function Profile() {
     try {
       const data = await api(`/api/users/${user.id}`, {
         method: 'PUT',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
       saveUser(data.user);
-      setMessage('Profile updated successfully! Your simulator cases will now match your specialty.');
+      setMessage('Profile updated. Your simulator will now use cases matched to your specialty.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,121 +59,165 @@ export default function Profile() {
   const profileComplete = formData.name && formData.specialization && formData.role;
 
   return (
-    <div className="app-layout">
+    <div className="dash-page" style={{ display: 'flex' }}>
       <Sidebar />
-      <main className="app-main" style={{ padding: '40px 20px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-          
-          {/* Profile Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '40px' }}>
-            <div style={{ 
-              width: '80px', height: '80px', borderRadius: '20px', 
-              background: `linear-gradient(135deg, ${user.avatarColor || '#7C3AED'}, ${user.avatarColor || '#7C3AED'}dd)`, 
-              color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              fontSize: '2rem', fontWeight: '800', flexShrink: 0 
+      <main className="app-main-with-sidebar">
+        <div className="dash-content">
+
+          {/* Header */}
+          <div className="dash-header">
+            <div>
+              <h1 className="dash-greeting">Your Profile</h1>
+              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)', marginTop: 4 }}>
+                Update your details to personalise the AI simulation experience.
+              </div>
+            </div>
+          </div>
+
+          {/* Profile card header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 20,
+            padding: 'var(--sp-6)',
+            background: 'linear-gradient(135deg, rgba(0,201,177,0.08) 0%, rgba(129,140,248,0.05) 100%)',
+            border: '1px solid var(--border-acc)', borderRadius: 'var(--r-xl)',
+            marginBottom: 'var(--sp-6)',
+          }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: 'var(--r-lg)',
+              background: 'var(--teal-dim)', border: '2px solid rgba(0,201,177,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, fontWeight: 800, color: 'var(--teal)',
+              fontFamily: 'var(--mono)', flexShrink: 0,
             }}>
               {user.name.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h1 style={{ fontSize: '1.8rem', fontWeight: '800', margin: '0 0 4px' }}>{user.name}</h1>
-              <p style={{ color: 'var(--muted)', margin: 0 }}>
-                {user.specialization || 'No specialty set'} · {user.role === 'faculty' ? 'Doctor / Faculty' : 'Medical Student'}
-              </p>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 800, color: 'var(--text)' }}>
+                {user.name}
+              </div>
+              <div style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)', marginTop: 3 }}>
+                {user.email}
+                {user.specialization && (
+                  <> · <span style={{ color: 'var(--teal)' }}>{user.specialization}</span></>
+                )}
+                {user.institution && (
+                  <> · {user.institution}</>
+                )}
+              </div>
               {!profileComplete && (
-                <div style={{ 
-                  marginTop: '8px', padding: '8px 16px', background: 'rgba(251, 191, 36, 0.1)', 
-                  border: '1px solid rgba(251, 191, 36, 0.3)', borderRadius: '8px', 
-                  fontSize: '0.85rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '6px'
-                }}>
-                  ⚠️ Complete your profile to get specialty-matched patients
+                <div className="alert alert-warning" style={{ marginTop: 12, padding: '8px 14px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  Complete your profile to receive specialty-matched AI patients in the simulator.
                 </div>
               )}
             </div>
           </div>
 
-          {/* Success/Error Messages */}
           {message && (
-            <div style={{ padding: '16px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', marginBottom: '24px', color: '#059669', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              ✅ {message}
+            <div className="alert alert-success" style={{ marginBottom: 'var(--sp-5)' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+              </svg>
+              {message}
             </div>
           )}
           {error && (
-            <div style={{ padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', marginBottom: '24px', color: '#dc2626', fontSize: '0.9rem' }}>
+            <div className="alert alert-danger" style={{ marginBottom: 'var(--sp-5)' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
               {error}
             </div>
           )}
 
-          {/* Profile Form */}
           <form onSubmit={handleSave}>
-            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '20px', padding: '30px', marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>Personal Information</h2>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div className="sim-field">
-                  <label>Full Name</label>
-                  <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+            {/* Personal info */}
+            <div className="chart-card" style={{ marginBottom: 'var(--sp-5)' }}>
+              <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', marginBottom: 4 }}>Personal Information</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+                Your basic account details.
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+                <div className="field">
+                  <label htmlFor="prof-name">Full Name *</label>
+                  <input id="prof-name" type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Dr. Jane Smith" />
                 </div>
-                <div className="sim-field">
-                  <label>Email</label>
-                  <input type="email" value={user.email} disabled style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+                <div className="field">
+                  <label htmlFor="prof-email">Email</label>
+                  <input id="prof-email" type="email" value={user.email} disabled style={{ opacity: 0.55, cursor: 'not-allowed' }} />
                 </div>
-                <div className="sim-field">
-                  <label>Institution</label>
-                  <input type="text" name="institution" value={formData.institution} onChange={handleChange} placeholder="e.g. Harvard Medical School" />
+                <div className="field">
+                  <label htmlFor="prof-institution">Institution</label>
+                  <input id="prof-institution" type="text" name="institution" value={formData.institution} onChange={handleChange} placeholder="e.g. Harvard Medical School (optional)" />
                 </div>
-                <div className="sim-field">
-                  <label>Year of Study</label>
-                  <input type="text" name="yearOfStudy" value={formData.yearOfStudy} onChange={handleChange} placeholder="e.g. MS3, PGY-1" />
+                <div className="field">
+                  <label htmlFor="prof-year">Year / Level</label>
+                  <input id="prof-year" type="text" name="yearOfStudy" value={formData.yearOfStudy} onChange={handleChange} placeholder="e.g. MS3, PGY-1, Attending" />
                 </div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '20px', padding: '30px', marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '8px' }}>Medical Specialty</h2>
-              <p style={{ color: 'var(--muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
-                Your specialty determines which AI patients you'll receive in the Simulation Lab. Choose your area of practice or study.
-              </p>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div className="sim-field">
-                  <label>Role</label>
-                  <select name="role" value={formData.role} onChange={handleChange}>
-                    <option value="student">🎓 Medical Student</option>
-                    <option value="faculty">👨‍⚕️ Doctor / Faculty</option>
-                    <option value="researcher">🔬 Medical Researcher</option>
+            {/* Specialty */}
+            <div className="chart-card" style={{ marginBottom: 'var(--sp-5)' }}>
+              <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', marginBottom: 4 }}>Medical Specialty</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', marginBottom: 24, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+                Your specialty determines which AI patients you receive in the Simulation Lab.
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+                <div className="field">
+                  <label htmlFor="prof-role">Role *</label>
+                  <select id="prof-role" name="role" value={formData.role} onChange={handleChange}>
+                    {ROLES.map(({ value, label }) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
                   </select>
                 </div>
-                <div className="sim-field">
-                  <label>Specialization *</label>
-                  <select name="specialization" value={formData.specialization} onChange={handleChange} required>
-                    <option value="">Select your specialty...</option>
+                <div className="field">
+                  <label htmlFor="prof-spec">Specialization *</label>
+                  <select id="prof-spec" name="specialization" value={formData.specialization} onChange={handleChange} required>
+                    <option value="">Select specialty...</option>
                     {SPECIALTIES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
               </div>
 
               {formData.specialization && (
-                <div style={{ 
-                  marginTop: '20px', padding: '16px 20px', 
-                  background: 'linear-gradient(135deg, rgba(138,124,255,0.08), rgba(67,217,173,0.08))', 
-                  borderRadius: '12px', border: '1px solid var(--border)',
-                  display: 'flex', alignItems: 'center', gap: '12px'
+                <div style={{
+                  marginTop: 20, padding: 'var(--sp-4) var(--sp-5)',
+                  background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.2)',
+                  borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', gap: 14,
                 }}>
-                  <span style={{ fontSize: '1.5rem' }}>🩺</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                  </svg>
                   <div>
-                    <strong style={{ fontSize: '0.95rem' }}>{formData.specialization}</strong>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)' }}>
-                      AI patients in the simulator will be tailored to this specialty
-                    </p>
+                    <div style={{ fontWeight: 600, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>
+                      {formData.specialization}
+                    </div>
+                    <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', marginTop: 2 }}>
+                      AI patients will be tailored to this specialty
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            <button type="submit" className="btn btn-primary btn-lg" disabled={saving} style={{ width: '100%' }}>
-              {saving ? 'Saving...' : 'Save Profile'}
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg"
+              disabled={saving || !formData.name.trim() || !formData.specialization}
+              style={{ width: '100%' }}
+            >
+              {saving ? (
+                <><div className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />Saving...</>
+              ) : 'Save Profile'}
             </button>
           </form>
+
         </div>
       </main>
     </div>
