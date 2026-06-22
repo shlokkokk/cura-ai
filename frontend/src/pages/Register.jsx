@@ -166,7 +166,7 @@ export default function Register() {
 
         {/* Logo */}
         <div className="reg-left-logo">
-          <Logo size={28} />
+          <Logo size={28} color="#fff" />
         </div>
 
         {/* Main copy */}

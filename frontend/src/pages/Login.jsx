@@ -72,7 +72,7 @@ export default function Login() {
         <div className="auth-left-pattern" />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <Logo size={32} />
+          <Logo size={32} color="#fff" />
         </div>
 
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 400 }}>
