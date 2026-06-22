@@ -2,40 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
-const TEAM = [
-  {
-    initial: 'M',
-    name: 'Muddasir',
-    role: 'Lead Developer',
-    desc: 'Architect behind the AI integration, backend infrastructure, and simulator logic.',
-    color: 'var(--teal)',
-    bg: 'var(--teal-dim)',
-  },
-  {
-    initial: 'T',
-    name: 'Toqa Abdul-Hafez',
-    role: 'Team Lead & Designer',
-    desc: 'Leading the product vision and crafting the clinical user experience.',
-    color: 'var(--indigo)',
-    bg: 'var(--indigo-dim)',
-  },
-  {
-    initial: 'M',
-    name: 'Maham Taqi',
-    role: 'Presentation & Comms',
-    desc: 'Communicating our impact and refining the narrative around medical education.',
-    color: 'var(--warning)',
-    bg: 'var(--warning-dim)',
-  },
-  {
-    initial: 'A',
-    name: 'Abubakar Mughal',
-    role: 'Quality Assurance',
-    desc: 'Ensuring flawless platform execution, test coverage, and stability.',
-    color: 'var(--success)',
-    bg: 'var(--success-dim)',
-  },
-];
 
 const VALUES = [
   {
@@ -217,50 +183,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── Team ──────────────────────────────────────────────────── */}
-      <section className="section-sm" style={{ borderBottom: '1px solid var(--border)' }}>
-        <div className="container" style={{ maxWidth: 1100 }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div className="section-label">The People</div>
-            <h2 className="section-title" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', marginBottom: 12 }}>
-              Meet the Synapse Team
-            </h2>
-            <p style={{ fontSize: 'var(--fs-base)', color: 'var(--text-2)', maxWidth: 560, margin: '0 auto' }}>
-              A passionate team of developers, clinicians, and AI enthusiasts dedicated to
-              revolutionising medical education.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
-            {TEAM.map(({ initial, name, role, desc, color, bg }) => (
-              <div key={name} style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--r-xl)',
-                padding: 'var(--sp-6)',
-                textAlign: 'center',
-                transition: 'border-color var(--t), transform var(--t), box-shadow var(--t)',
-              }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'var(--border-md)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
-              >
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: bg, border: `2px solid ${color}33`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28, fontWeight: 800, color, fontFamily: 'var(--mono)',
-                  margin: '0 auto var(--sp-4)',
-                }}>
-                  {initial}
-                </div>
-                <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 4 }}>{name}</h3>
-                <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 600, color, marginBottom: 10 }}>{role}</div>
-                <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', lineHeight: 1.6 }}>{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="cta-section">

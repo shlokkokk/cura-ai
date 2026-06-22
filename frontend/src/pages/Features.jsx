@@ -1,6 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+
+// Small wrapper component to scroll-translate the mock visual cards relative to the text
+function ScrollParallax({ children, order }) {
+  const [offset, setOffset] = useState(0);
+  const elementRef = useRef(null);
+
+  useEffect(() => {
+    let animFrameId;
+
+    const handleScroll = () => {
+      if (!elementRef.current) return;
+      const rect = elementRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      const elementCenter = rect.top + rect.height / 2;
+      const viewportCenter = windowHeight / 2;
+      const distanceFromCenter = elementCenter - viewportCenter;
+
+      const translateVal = distanceFromCenter * 0.06;
+      const clampedVal = Math.max(-40, Math.min(40, translateVal));
+
+      setOffset(clampedVal);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(animFrameId);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={elementRef}
+      style={{
+        order,
+        transform: `translateY(${offset}px)`,
+        transition: 'transform 0.12s cubic-bezier(0.25, 1, 0.5, 1)',
+        willChange: 'transform',
+        width: '100%',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 const SPECIALTIES = [
   'Cardiology', 'Neurology', 'Emergency Medicine', 'Respiratory', 'Endocrinology',
@@ -214,62 +267,63 @@ export default function Features() {
                 </div>
 
                 {/* Visual card */}
-                <div style={{
-                  order: isEven ? 2 : 1,
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border-md)',
-                  borderRadius: 'var(--r-xl)',
-                  overflow: 'hidden',
-                  boxShadow: 'var(--shadow-lg)',
-                }}>
-                  {/* Header bar */}
+                <ScrollParallax order={isEven ? 2 : 1}>
                   <div style={{
-                    background: 'var(--surface-2)',
-                    padding: 'var(--sp-3) var(--sp-4)',
-                    borderBottom: '1px solid var(--border)',
-                    display: 'flex', alignItems: 'center', gap: 8,
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border-md)',
+                    borderRadius: 'var(--r-xl)',
+                    overflow: 'hidden',
+                    boxShadow: 'var(--shadow-lg)',
                   }}>
-                    <div style={{ display: 'flex', gap: 5 }}>
-                      {['#EF4444','#F59E0B','#22C55E'].map(c => (
-                        <div key={c} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />
+                    {/* Header bar */}
+                    <div style={{
+                      background: 'var(--surface-2)',
+                      padding: 'var(--sp-3) var(--sp-4)',
+                      borderBottom: '1px solid var(--border)',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                    }}>
+                      <div style={{ display: 'flex', gap: 5 }}>
+                        {['#EF4444','#F59E0B','#22C55E'].map(c => (
+                          <div key={c} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />
+                        ))}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginLeft: 4 }}>
+                        CURA.AI — {title}
+                      </div>
+                    </div>
+
+                    {/* Feature visual */}
+                    <div style={{ padding: 'var(--sp-6)' }}>
+                      <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 16 }}>
+                        Feature Preview
+                      </div>
+                      {bullets.map((b, bi) => (
+                        <div key={b} style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: 'var(--sp-3) var(--sp-4)',
+                          borderRadius: 'var(--r-md)',
+                          background: bi === 0 ? 'var(--teal-dim)' : 'var(--surface-2)',
+                          border: '1px solid ' + (bi === 0 ? 'rgba(0,201,177,0.15)' : 'var(--border)'),
+                          marginBottom: 8,
+                          transition: 'all var(--t)',
+                        }}>
+                          <div style={{
+                            width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                            background: bi === 0 ? 'var(--teal)' : 'var(--border-str)',
+                          }} />
+                          <div style={{ fontSize: 'var(--fs-sm)', color: bi === 0 ? 'var(--teal)' : 'var(--text-2)', fontWeight: bi === 0 ? 600 : 400 }}>
+                            {b}
+                          </div>
+                          {bi === 0 && (
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2.5" style={{ marginLeft: 'auto' }}>
+                              <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                          )}
+                        </div>
                       ))}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginLeft: 4 }}>
-                      CURA.AI — {title}
-                    </div>
                   </div>
-
-                  {/* Feature visual */}
-                  <div style={{ padding: 'var(--sp-6)' }}>
-                    <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 16 }}>
-                      Feature Preview
-                    </div>
-                    {bullets.map((b, bi) => (
-                      <div key={b} style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        padding: 'var(--sp-3) var(--sp-4)',
-                        borderRadius: 'var(--r-md)',
-                        background: bi === 0 ? 'var(--teal-dim)' : 'var(--surface-2)',
-                        border: '1px solid ' + (bi === 0 ? 'rgba(0,201,177,0.15)' : 'var(--border)'),
-                        marginBottom: 8,
-                        transition: 'all var(--t)',
-                      }}>
-                        <div style={{
-                          width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                          background: bi === 0 ? 'var(--teal)' : 'var(--border-str)',
-                        }} />
-                        <div style={{ fontSize: 'var(--fs-sm)', color: bi === 0 ? 'var(--teal)' : 'var(--text-2)', fontWeight: bi === 0 ? 600 : 400 }}>
-                          {b}
-                        </div>
-                        {bi === 0 && (
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2.5" style={{ marginLeft: 'auto' }}>
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                </ScrollParallax>
               </div>
             </div>
           </section>
