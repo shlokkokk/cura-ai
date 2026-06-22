@@ -1968,8 +1968,8 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   gap: var(--sp-3);
-  margin-top: var(--sp-3.5);
-  padding-top: var(--sp-3.5);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
   border-top: 1px solid var(--border);
   flex-wrap: wrap;
 }
