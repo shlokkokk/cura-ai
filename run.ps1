@@ -8,9 +8,9 @@ Clear-Host
 
 Write-Host @"
 ============================================================
-          🩺  CURA.AI DEV ENVIRONMENT LAUNCHER  🩺          
+             CURA.AI DEV ENVIRONMENT LAUNCHER               
 ============================================================
-"@ -ForegroundColor Teal
+"@ -ForegroundColor Cyan
 
 $backendPort = 3000
 $frontendPort = 5173
@@ -62,12 +62,12 @@ try {
     $frontendProc = Start-Process cmd -ArgumentList "/c npm run dev" -WorkingDirectory "frontend" -NoNewWindow -PassThru
     Write-Host "[+] Frontend server started (PID: $($frontendProc.Id))." -ForegroundColor Green
     
-    Write-Host "`n============================================================" -ForegroundColor Teal
-    Write-Host "  🚀 CURA.AI IS NOW RUNNING LIVE!" -ForegroundColor Green
-    Write-Host "  → Local App URL:  http://localhost:5173" -ForegroundColor Yellow
-    Write-Host "  → Backend API:    http://localhost:3000" -ForegroundColor Yellow
-    Write-Host "  → Press Ctrl+C in this window to stop all services" -ForegroundColor Cyan
-    Write-Host "============================================================`n" -ForegroundColor Teal
+    Write-Host "`n============================================================" -ForegroundColor Cyan
+    Write-Host "  CURA.AI IS NOW RUNNING LIVE!" -ForegroundColor Green
+    Write-Host "  - Local App URL:  http://localhost:5173" -ForegroundColor Yellow
+    Write-Host "  - Backend API:    http://localhost:3000" -ForegroundColor Yellow
+    Write-Host "  - Press Ctrl+C in this window to stop all services" -ForegroundColor Cyan
+    Write-Host "============================================================`n" -ForegroundColor Cyan
 
     # Monitor loop
     while ($true) {
@@ -87,8 +87,8 @@ catch {
 }
 finally {
     # Graceful teardown
-    Write-Host "`n============================================================" -ForegroundColor Teal
-    Write-Host "  🛑 TEARDOWN: Halting servers & releasing ports..." -ForegroundColor Yellow
+    Write-Host "`n============================================================" -ForegroundColor Cyan
+    Write-Host "  TEARDOWN: Halting servers & releasing ports..." -ForegroundColor Yellow
     
     # Stop backend
     if ($backendProc -and -not $backendProc.HasExited) {
@@ -108,5 +108,5 @@ finally {
     Clear-Port $frontendPort
     
     Write-Host "  Teardown complete. All ports cleanly released." -ForegroundColor Green
-    Write-Host "============================================================" -ForegroundColor Teal
+    Write-Host "============================================================" -ForegroundColor Cyan
 }

@@ -50,6 +50,12 @@ const {
   isOpenAIConfigured,
   OPENAI_MODEL
 } = require("./src/services/openai");
+const {
+  generateGroqReply,
+  generateGroqJson,
+  isGroqConfigured,
+  GROQ_MODEL
+} = require("./src/services/groq");
 const { storage, getStorageMode } = require("./src/storage");
 const { applyRateLimit, startCleanupTimer } = require("./src/http/rateLimiter");
 const {
@@ -375,12 +381,16 @@ const server = http.createServer(async (request, response) => {
       const ollamaReady = await isOllamaAvailable();
       const geminiReady = isGeminiConfigured();
       const openaiReady = isOpenAIConfigured();
+      const groqReady = isGroqConfigured();
       let activeProvider = "local-scripted";
       let activeModel = "local-scripted";
       
       if (geminiReady) {
         activeProvider = "gemini";
         activeModel = GEMINI_MODEL;
+      } else if (groqReady) {
+        activeProvider = "groq";
+        activeModel = GROQ_MODEL;
       } else if (openaiReady) {
         activeProvider = "openai";
         activeModel = OPENAI_MODEL;
@@ -394,6 +404,7 @@ const server = http.createServer(async (request, response) => {
         activeModel,
         providers: {
           gemini: { available: geminiReady, model: GEMINI_MODEL },
+          groq: { available: groqReady, model: GROQ_MODEL },
           openai: { available: openaiReady, model: OPENAI_MODEL },
           ollama: { available: ollamaReady, model: OLLAMA_MODEL, baseUrl: OLLAMA_BASE_URL }
         },
@@ -434,6 +445,9 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
           let aiCases = null;
           if (isGeminiConfigured()) {
             aiCases = await generateGeminiJson({ prompt: aiGenPrompt }).catch(() => null);
+          }
+          if (!aiCases && isGroqConfigured()) {
+            aiCases = await generateGroqJson({ prompt: aiGenPrompt }).catch(() => null);
           }
           if (!aiCases && isOpenAIConfigured()) {
             aiCases = await generateOpenAIJson({ prompt: aiGenPrompt }).catch(() => null);
@@ -786,75 +800,49 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       let replyProvider = "local-scripted";
       let replyModel = "local-scripted";
 
-      if (isGeminiConfigured()) {
+      const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
+
+      if (isGeminiConfigured() && !replyText) {
         try {
-          const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
-          replyText = await generateGeminiReply({
-            prompt,
-            systemInstruction
-          });
+          replyText = await generateGeminiReply({ prompt, systemInstruction });
           replyProvider = "gemini";
           replyModel = GEMINI_MODEL;
         } catch (error) {
-          console.error("Gemini failed, trying OpenAI fallback:", error.message);
-          // Fallback to OpenAI, then Ollama if Gemini fails
-          if (isOpenAIConfigured()) {
-            try {
-              const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
-              replyText = await generateOpenAIReply({ prompt, systemInstruction });
-              replyProvider = "openai";
-              replyModel = OPENAI_MODEL;
-            } catch (openaiError) {
-              console.error("OpenAI also failed, trying Ollama:", openaiError.message);
-              if (await isOllamaAvailable()) {
-                try {
-                  const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
-                  replyText = await generateOllamaReply({ prompt, systemInstruction });
-                  replyProvider = "ollama";
-                  replyModel = OLLAMA_MODEL;
-                } catch (ollamaError) {
-                  replyText = buildPatientReply(caseStudy, session.messages, messageText);
-                }
-              } else {
-                replyText = buildPatientReply(caseStudy, session.messages, messageText);
-              }
-            }
-          } else if (await isOllamaAvailable()) {
-            try {
-              const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
-              replyText = await generateOllamaReply({ prompt, systemInstruction });
-              replyProvider = "ollama";
-              replyModel = OLLAMA_MODEL;
-            } catch (ollamaError) {
-              replyText = buildPatientReply(caseStudy, session.messages, messageText);
-            }
-          } else {
-            replyText = buildPatientReply(caseStudy, session.messages, messageText);
-          }
+          console.error("[AI Cascade] Gemini failed:", error.message);
         }
-      } else if (isOpenAIConfigured()) {
-        // Use OpenAI as primary when Gemini is not configured
+      }
+
+      if (isGroqConfigured() && !replyText) {
         try {
-          const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
+          replyText = await generateGroqReply({ prompt, systemInstruction });
+          replyProvider = "groq";
+          replyModel = GROQ_MODEL;
+        } catch (error) {
+          console.error("[AI Cascade] Groq failed:", error.message);
+        }
+      }
+
+      if (isOpenAIConfigured() && !replyText) {
+        try {
           replyText = await generateOpenAIReply({ prompt, systemInstruction });
           replyProvider = "openai";
           replyModel = OPENAI_MODEL;
         } catch (error) {
-          console.error("OpenAI failed:", error.message);
-          replyText = buildPatientReply(caseStudy, session.messages, messageText);
+          console.error("[AI Cascade] OpenAI failed:", error.message);
         }
-      } else if (await isOllamaAvailable()) {
-        // Use Ollama as primary when neither Gemini nor OpenAI is configured
+      }
+
+      if (await isOllamaAvailable() && !replyText) {
         try {
-          const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
           replyText = await generateOllamaReply({ prompt, systemInstruction });
           replyProvider = "ollama";
           replyModel = OLLAMA_MODEL;
         } catch (error) {
-          console.error("Ollama failed:", error.message);
-          replyText = buildPatientReply(caseStudy, session.messages, messageText);
+          console.error("[AI Cascade] Ollama failed:", error.message);
         }
-      } else {
+      }
+
+      if (!replyText) {
         replyText = buildPatientReply(caseStudy, session.messages, messageText);
       }
 
@@ -907,6 +895,9 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       });
 
       let geminiEvaluation = null;
+      let evalProvider = "local-rubric";
+      let evalModel = "local-rubric";
+
       const evalPrompt = buildGeminiEvaluationPrompt(
         caseStudy,
         session.messages,
@@ -914,15 +905,36 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
         body.reasoning
       );
 
-      if (isGeminiConfigured()) {
+      if (isGeminiConfigured() && !geminiEvaluation) {
         geminiEvaluation = await generateGeminiJson({ prompt: evalPrompt }).catch(() => null);
+        if (geminiEvaluation) {
+          evalProvider = "gemini";
+          evalModel = GEMINI_MODEL;
+        }
       }
       
-      if (!geminiEvaluation && isOpenAIConfigured()) {
-        geminiEvaluation = await generateOpenAIJson({ prompt: evalPrompt }).catch(() => null);
+      if (isGroqConfigured() && !geminiEvaluation) {
+        geminiEvaluation = await generateGroqJson({ prompt: evalPrompt }).catch(() => null);
+        if (geminiEvaluation) {
+          evalProvider = "groq";
+          evalModel = GROQ_MODEL;
+        }
       }
-      if (!geminiEvaluation && await isOllamaAvailable()) {
+      
+      if (isOpenAIConfigured() && !geminiEvaluation) {
+        geminiEvaluation = await generateOpenAIJson({ prompt: evalPrompt }).catch(() => null);
+        if (geminiEvaluation) {
+          evalProvider = "openai";
+          evalModel = OPENAI_MODEL;
+        }
+      }
+
+      if (await isOllamaAvailable() && !geminiEvaluation) {
         geminiEvaluation = await generateOllamaJson({ prompt: evalPrompt }).catch(() => null);
+        if (geminiEvaluation) {
+          evalProvider = "ollama";
+          evalModel = OLLAMA_MODEL;
+        }
       }
 
       const mergedEvaluation = geminiEvaluation
@@ -983,8 +995,8 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
         ...mergedEvaluation,
         diagnosisSubmitted: body.diagnosis || null,
         reasoningSubmitted: body.reasoning || null,
-        provider: geminiEvaluation ? "gemini" : "local-rubric",
-        model: geminiEvaluation ? GEMINI_MODEL : "local-rubric",
+        provider: evalProvider,
+        model: evalModel,
         createdAt: new Date().toISOString()
       };
 
@@ -1169,14 +1181,18 @@ if (require.main === module) {
   server.listen(config.port, async () => {
     const ollamaReady = await isOllamaAvailable();
     console.log(`AI Virtual Patient Simulator backend running on http://localhost:${config.port}`);
-    console.log(`Storage: ${getStorageMode()} | Gemini: ${isGeminiConfigured() ? "enabled" : "disabled"} | OpenAI: ${isOpenAIConfigured() ? `enabled (${OPENAI_MODEL})` : "disabled"} | Ollama: ${ollamaReady ? `enabled (${OLLAMA_MODEL})` : "disabled"}`);
-    if (!isGeminiConfigured() && ollamaReady) {
+    console.log(`Storage: ${getStorageMode()} | Gemini: ${isGeminiConfigured() ? "enabled" : "disabled"} | Groq: ${isGroqConfigured() ? `enabled (${GROQ_MODEL})` : "disabled"} | OpenAI: ${isOpenAIConfigured() ? `enabled (${OPENAI_MODEL})` : "disabled"} | Ollama: ${ollamaReady ? `enabled (${OLLAMA_MODEL})` : "disabled"}`);
+    if (isGeminiConfigured()) {
+      console.log(`→ Using Gemini (${GEMINI_MODEL}) as primary AI provider`);
+    } else if (isGroqConfigured()) {
+      console.log(`→ Using Groq (${GROQ_MODEL}) as primary AI provider`);
+    } else if (isOpenAIConfigured()) {
+      console.log(`→ Using OpenAI (${OPENAI_MODEL}) as primary AI provider`);
+    } else if (ollamaReady) {
       console.log(`→ Using Ollama (${OLLAMA_MODEL}) as primary AI provider`);
-    } else if (isGeminiConfigured() && ollamaReady) {
-      console.log(`→ Using Gemini as primary, Ollama as fallback`);
-    } else if (!isGeminiConfigured() && !ollamaReady) {
+    } else {
       console.log(`⚠  No AI provider available! Using local scripted responses only.`);
-      console.log(`   To fix: run 'ollama pull qwen2.5:7b' or set GEMINI_API_KEY`);
+      console.log(`   To fix: run 'ollama pull qwen2.5:7b' or set GEMINI_API_KEY or GROQ_API_KEY`);
     }
   });
 
