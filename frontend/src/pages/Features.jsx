@@ -170,7 +170,7 @@ export default function Features() {
       }}>
         <div style={{
           position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,201,177,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(138,124,255,0.08) 0%, transparent 70%)',
         }} />
         <div className="container" style={{ maxWidth: 760, position: 'relative' }}>
           <div className="section-label">Advanced Capabilities</div>
@@ -208,7 +208,7 @@ export default function Features() {
         <div className="container">
           <div style={{ display: 'flex', gap: 'var(--sp-3)', overflow: 'hidden', flexWrap: 'wrap', justifyContent: 'center' }}>
             {SPECIALTIES.map(s => (
-              <div key={s} className="badge badge-teal" style={{ cursor: 'pointer' }}
+              <div key={s} className="badge badge-purple" style={{ cursor: 'pointer' }}
                 onClick={() => navigate(`/simulator?demo=${encodeURIComponent(s.toLowerCase())}`)}>
                 {s}
               </div>
@@ -243,7 +243,7 @@ export default function Features() {
                       {icon}
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: 'var(--fs-xs)', color: 'var(--teal)', fontWeight: 700 }}>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 'var(--fs-xs)', color: 'var(--purple)', fontWeight: 700 }}>
                         {sub}
                       </div>
                     </div>
@@ -257,7 +257,7 @@ export default function Features() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {bullets.map(b => (
                       <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2.5">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2.5">
                           <polyline points="20 6 9 17 4 12"/>
                         </svg>
                         {b}
@@ -302,20 +302,20 @@ export default function Features() {
                           display: 'flex', alignItems: 'center', gap: 12,
                           padding: 'var(--sp-3) var(--sp-4)',
                           borderRadius: 'var(--r-md)',
-                          background: bi === 0 ? 'var(--teal-dim)' : 'var(--surface-2)',
-                          border: '1px solid ' + (bi === 0 ? 'rgba(0,201,177,0.15)' : 'var(--border)'),
+                          background: bi === 0 ? 'var(--purple-dim)' : 'var(--surface-2)',
+                          border: '1px solid ' + (bi === 0 ? 'var(--border-md)' : 'var(--border)'),
                           marginBottom: 8,
                           transition: 'all var(--t)',
                         }}>
                           <div style={{
                             width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                            background: bi === 0 ? 'var(--teal)' : 'var(--border-str)',
+                            background: bi === 0 ? 'var(--purple)' : 'var(--border-str)',
                           }} />
-                          <div style={{ fontSize: 'var(--fs-sm)', color: bi === 0 ? 'var(--teal)' : 'var(--text-2)', fontWeight: bi === 0 ? 600 : 400 }}>
+                          <div style={{ fontSize: 'var(--fs-sm)', color: bi === 0 ? 'var(--purple)' : 'var(--text-2)', fontWeight: bi === 0 ? 600 : 400 }}>
                             {b}
                           </div>
                           {bi === 0 && (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" strokeWidth="2.5" style={{ marginLeft: 'auto' }}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2.5" style={{ marginLeft: 'auto' }}>
                               <polyline points="20 6 9 17 4 12"/>
                             </svg>
                           )}

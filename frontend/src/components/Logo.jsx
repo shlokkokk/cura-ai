@@ -1,29 +1,58 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-/** CURA.AI Logo — clean, med-themed, CSS-var aware */
+/**
+ * CURA.AI Logo — Figma-aligned, purple brand
+ * Uses DM Sans (loaded globally) + purple CSS variable
+ */
 export default function Logo({ size = 32, color = 'var(--text)' }) {
+  const isWhite = color === '#fff' || color === 'white';
+  const textColor = isWhite ? '#FFFFFF' : 'var(--text)';
+  const accentColor = isWhite ? 'rgba(255,255,255,0.85)' : 'var(--purple)';
+  const bgCenter = isWhite ? 'rgba(255,255,255,0.15)' : 'var(--bg)';
+
   return (
-    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Outer ring */}
-        <circle cx="20" cy="20" r="18" stroke="var(--teal)" strokeWidth="1.5" strokeDasharray="4 2" opacity="0.4" />
-        {/* Core circle */}
-        <circle cx="20" cy="20" r="13" fill="var(--teal-dim)" stroke="var(--teal)" strokeWidth="1.5" />
-        {/* Cross (medical) */}
-        <rect x="17" y="11" width="6" height="18" rx="2" fill="var(--teal)" />
-        <rect x="11" y="17" width="18" height="6" rx="2" fill="var(--teal)" />
-        {/* Center accent - fill dynamically with background or dark default if color is white */}
-        <circle cx="20" cy="20" r="2.5" fill={color === '#fff' || color === 'white' ? '#080d14' : 'var(--bg)'} />
+    <Link to="/" className="logo-container" aria-label="CURA.AI — Home">
+      {/* Medical cross icon — purple brand */}
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 40 40"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="logo-icon"
+      >
+        {/* Outer dashed ring */}
+        <circle
+          cx="20" cy="20" r="18"
+          stroke={isWhite ? 'rgba(255,255,255,0.4)' : 'var(--purple)'}
+          strokeWidth="1.5"
+          strokeDasharray="4 2.5"
+          opacity="0.45"
+        />
+        {/* Background fill */}
+        <circle
+          cx="20" cy="20" r="13"
+          fill={isWhite ? 'rgba(255,255,255,0.12)' : 'var(--purple-dim)'}
+          stroke={isWhite ? 'rgba(255,255,255,0.5)' : 'var(--purple)'}
+          strokeWidth="1.5"
+        />
+        {/* Medical cross — vertical */}
+        <rect x="17" y="11" width="6" height="18" rx="2"
+          fill={isWhite ? '#fff' : 'var(--purple)'}
+        />
+        {/* Medical cross — horizontal */}
+        <rect x="11" y="17" width="18" height="6" rx="2"
+          fill={isWhite ? '#fff' : 'var(--purple)'}
+        />
+        {/* Center accent dot */}
+        <circle cx="20" cy="20" r="2.5" fill={bgCenter} />
       </svg>
-      <span style={{
-        fontSize: size > 28 ? '1.2rem' : '1rem',
-        fontWeight: 800,
-        letterSpacing: '-0.02em',
-        color: color,
-        fontFamily: 'var(--font)',
-      }}>
-        CURA<span style={{ color: 'var(--teal)' }}>.AI</span>
+
+      {/* Wordmark */}
+      <span className="logo-text" style={{ color: textColor }}>
+        CURA<span className="logo-accent" style={{ color: accentColor }}>.AI</span>
       </span>
     </Link>
   );

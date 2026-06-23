@@ -191,7 +191,7 @@ export default function Simulator() {
       const cleanedReportText = cleanMarkdown(reportText);
       const sections = cleanedReportText.split('\n').map(line => {
         if (/^[A-Z\s\d.—\-:]{5,}$/.test(line.trim()) || /^\d+\./.test(line.trim())) {
-          return `<h3 style="color:#00C9B1;margin:18px 0 8px;font-size:14px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;">${line}</h3>`;
+          return `<h3 style="color:#8A7CFF;margin:18px 0 8px;font-size:14px;border-bottom:1px solid rgba(138,124,255,0.2);padding-bottom:4px;">${line}</h3>`;
         }
         if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
           return `<li style="margin:3px 0;font-size:12px;color:#333;">${line.trim().replace(/^[-•]\s*/, '')}</li>`;
@@ -208,12 +208,12 @@ export default function Simulator() {
         <style>
           @media print { body { margin: 0; } @page { margin: 20mm; } }
           body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
-          .header { text-align: center; border-bottom: 3px solid #00C9B1; padding-bottom: 20px; margin-bottom: 30px; }
-          .header h1 { color: #00C9B1; font-size: 24px; margin: 0; }
-          .logo { font-size: 28px; font-weight: 800; color: #00C9B1; margin-bottom: 4px; }
+          .header { text-align: center; border-bottom: 3px solid #8A7CFF; padding-bottom: 20px; margin-bottom: 30px; }
+          .header h1 { color: #8A7CFF; font-size: 24px; margin: 0; }
+          .logo { font-size: 28px; font-weight: 800; color: #8A7CFF; margin-bottom: 4px; }
           .meta { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 12px; color: #666; }
           .score-box { text-align: center; background: linear-gradient(135deg, #f0fff8, #e0faf5); padding: 20px; border-radius: 12px; margin: 20px 0; }
-          .score-box .score { font-size: 42px; font-weight: 800; color: #00C9B1; }
+          .score-box .score { font-size: 42px; font-weight: 800; color: #8A7CFF; }
           .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 10px; color: #999; }
         </style></head><body>
         <div class="header"><div class="logo">CURA.AI</div><h1>Clinical Visit Report</h1><h2>AI-Powered Virtual Patient Simulation</h2></div>

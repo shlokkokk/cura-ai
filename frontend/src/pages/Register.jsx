@@ -30,21 +30,21 @@ const BackIcon = () => (
   </svg>
 );
 
-/* ── ECG SVG path (decorative) ──────────────────────────────────── */
+/* ── ECG SVG path (decorative) — Purple brand ──────────────────── */
 const ECGPath = () => (
-  <svg viewBox="0 0 900 120" preserveAspectRatio="none" style={{ width: '100%', height: 80, opacity: 0.18 }}>
+  <svg viewBox="0 0 900 120" preserveAspectRatio="none" style={{ width: '100%', height: 80, opacity: 0.22 }}>
     <polyline
       fill="none"
-      stroke="url(#ecgGrad)"
+      stroke="url(#ecgGradReg)"
       strokeWidth="2"
       points="0,60 60,60 80,60 100,10 115,110 130,35 145,60 200,60 220,60 240,10 255,110 270,35 285,60 340,60 360,60 380,10 395,110 410,35 425,60 480,60 500,60 520,10 535,110 550,35 565,60 620,60 640,60 660,10 675,110 690,35 705,60 760,60 780,60 800,10 815,110 830,35 845,60 900,60"
     />
     <defs>
-      <linearGradient id="ecgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="rgba(0,201,177,0)"/>
-        <stop offset="30%" stopColor="#00C9B1"/>
-        <stop offset="70%" stopColor="#00C9B1"/>
-        <stop offset="100%" stopColor="rgba(0,201,177,0)"/>
+      <linearGradient id="ecgGradReg" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stopColor="rgba(138,124,255,0)"/>
+        <stop offset="25%"  stopColor="#8A7CFF"/>
+        <stop offset="75%"  stopColor="#A69AFF"/>
+        <stop offset="100%" stopColor="rgba(166,154,255,0)"/>
       </linearGradient>
     </defs>
   </svg>
@@ -210,7 +210,7 @@ export default function Register() {
           <div className="reg-social-proof">
             <div className="reg-proof-avatars">
               {['S','M','R','A','K'].map((l, i) => (
-                <div key={i} className="reg-proof-avatar" style={{ background: i % 2 === 0 ? 'rgba(0,201,177,0.35)' : 'rgba(99,102,241,0.35)' }}>{l}</div>
+                <div key={i} className="reg-proof-avatar" style={{ background: i % 2 === 0 ? 'rgba(138,124,255,0.35)' : 'rgba(166,154,255,0.25)' }}>{l}</div>
               ))}
             </div>
             <div className="reg-proof-text">

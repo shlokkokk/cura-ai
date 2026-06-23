@@ -166,10 +166,10 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  const TEAL = 'var(--teal)';
+  const TEAL = 'var(--purple)';
   const INDIGO = 'var(--indigo)';
-  const PIE_COLORS = ['#00C9B1','#818CF8','#FBBF24','#F87171','#34D399','#60A5FA','#F472B6'];
-  const gridColor = isDark ? 'rgba(148,163,184,0.08)' : 'rgba(0,0,0,0.06)';
+  const PIE_COLORS = ['#8A7CFF','#A69AFF','#6EE7D4','#FF7A8A','#6EE7B7','#B8AEFF','#7063E6'];
+  const gridColor = isDark ? 'rgba(138,124,255,0.08)' : 'rgba(138,124,255,0.06)';
   const axisColor = 'var(--text-muted)';
 
   const greetingHour = new Date().getHours();

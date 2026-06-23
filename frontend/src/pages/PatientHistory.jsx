@@ -46,7 +46,7 @@ export default function PatientHistory() {
       const reportDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       const sections = reportText.split('\n').map(line => {
         if (/^[A-Z\s\d.—\-:]{5,}$/.test(line.trim()) || /^\d+\./.test(line.trim())) {
-          return `<h3 style="color:#00C9B1;margin:18px 0 8px;font-size:14px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;">${line}</h3>`;
+          return `<h3 style="color:#8A7CFF;margin:18px 0 8px;font-size:14px;border-bottom:1px solid rgba(138,124,255,0.2);padding-bottom:4px;">${line}</h3>`;
         }
         if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
           return `<li style="margin:3px 0;font-size:12px;color:#333;">${line.trim().replace(/^[-•]\s*/, '')}</li>`;
@@ -63,19 +63,19 @@ export default function PatientHistory() {
         <style>
           @media print { body { margin: 0; } @page { margin: 20mm; } }
           body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; padding: 40px; max-width: 800px; margin: 0 auto; }
-          .header { text-align: center; border-bottom: 3px solid #00C9B1; padding-bottom: 20px; margin-bottom: 30px; }
-          .logo { font-size: 28px; font-weight: 800; color: #00C9B1; margin-bottom: 4px; }
+          .header { text-align: center; border-bottom: 3px solid #8A7CFF; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { font-size: 28px; font-weight: 800; color: #8A7CFF; margin-bottom: 4px; }
           .meta { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 12px; color: #666; }
           .score-box { text-align: center; background: linear-gradient(135deg, #f0fff8, #e0faf5); padding: 20px; border-radius: 12px; margin: 20px 0; }
-          .score-box .score { font-size: 42px; font-weight: 800; color: #00C9B1; }
+          .score-box .score { font-size: 42px; font-weight: 800; color: #8A7CFF; }
           .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 10px; color: #999; }
         </style></head><body>
         <div class="header"><div class="logo">CURA.AI</div><h1>Clinical Visit Report</h1></div>
         <div class="meta"><span><strong>Date:</strong> ${reportDate}</span><span><strong>Patient:</strong> ${patient.name} (${patient.age} yrs)</span><span><strong>Specialty:</strong> ${patient.specialty}</span></div>
         ${evalData ? `<div class="score-box"><div class="score">${evalData.score}/100</div><div style="font-size:13px;color:${evalData.diagnosisCorrect ? '#059669' : '#dc2626'};font-weight:600;">${evalData.diagnosisCorrect ? 'Diagnosis Correct' : 'Diagnosis Incorrect'}</div></div>` : ''}
         <div>${sections}</div>
-        <div style="margin-top:40px;border-top:2px solid #00C9B1;padding-top:20px;">
-          <h2 style="color:#00C9B1;font-size:18px;margin-bottom:16px;">Chat Transcript</h2>
+        <div style="margin-top:40px;border-top:2px solid #8A7CFF;padding-top:20px;">
+          <h2 style="color:#8A7CFF;font-size:18px;margin-bottom:16px;">Chat Transcript</h2>
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;">
             ${messages.map(m => `<div style="margin-bottom:12px;font-size:13px;"><span style="font-weight:700;color:${m.role === 'user' ? '#0284c7' : '#059669'};">${m.role === 'user' ? 'Doctor' : 'Patient'}:</span> <span style="color:#334155;">${m.text}</span></div>`).join('') || '<p style="color:#64748b;font-size:13px;">No chat history available.</p>'}
           </div>
