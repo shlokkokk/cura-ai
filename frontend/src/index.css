@@ -3491,7 +3491,6 @@ select:autofill:active {
 
 /* Center alignment for the hamburger mobile toggle icon */
 #nav-mobile-toggle {
-  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }

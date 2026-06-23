@@ -176,15 +176,14 @@ export default function Register() {
 
       {/* Centered Workspace Card */}
       <main className="reg-right">
+        {/* Back link */}
+        <Link to="/" className="reg-back-link">
+          <BackIcon />
+          Back to home
+        </Link>
 
         <div className="reg-form-card card-tech-corners">
           <div className="card-scanline" />
-
-          {/* Back link */}
-          <Link to="/" className="reg-back-link">
-            <BackIcon />
-            Back to home
-          </Link>
 
           {/* Logo & Header */}
           <div className="reg-form-header" style={{ textAlign: 'center' }}>
