@@ -3544,3 +3544,336 @@ select:autofill:active {
 
 
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   GSAP ANIMATION SUPPORT STYLES
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root { --shadow-teal: 0 0 40px rgba(138,124,255,0.20), 0 8px 32px rgba(138,124,255,0.12); }
+
+.hero-title { font-family: var(--font); font-size: clamp(2.6rem, 5.5vw, 5rem); font-weight: 900; letter-spacing: -0.045em; line-height: 1.06; color: var(--text); margin-bottom: var(--sp-6); display: flex; flex-direction: column; }
+.hero-title-line { display: block; overflow: visible; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: var(--sp-2); padding: 5px 14px; border-radius: var(--r-full); background: var(--purple-dim); border: 1px solid var(--border-md); font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--purple); font-family: var(--font-body); margin-bottom: var(--sp-5); }
+.hero-sub { font-size: var(--fs-lg); color: var(--text-2); line-height: 1.7; max-width: 520px; margin-bottom: var(--sp-8); font-family: var(--font-body); }
+.hero-actions { display: flex; gap: var(--sp-4); flex-wrap: wrap; align-items: center; }
+.hero-stat-item { text-align: left; }
+
+.ecg-container { position: absolute; bottom: 0; left: 0; right: 0; pointer-events: none; overflow: hidden; height: 60px; }
+.ecg-line { width: 100%; height: 100%; opacity: 0.25; }
+
+.stats-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--sp-10) 0; }
+.stats-bar-inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); text-align: center; }
+.stat-item { padding: var(--sp-4); }
+.stat-item-num { font-family: var(--mono); font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 800; color: var(--purple); letter-spacing: -0.03em; line-height: 1.1; margin-bottom: var(--sp-1); }
+.stat-item-lbl { font-size: var(--fs-xs); color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-body); }
+
+.hiw-section { padding: var(--sp-20) 0; position: relative; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.hiw-grid { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: var(--sp-4); align-items: center; }
+.hiw-connector { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hiw-card { background: var(--bg); border: 1px solid var(--border-md); border-radius: var(--r-xl); padding: var(--sp-8); position: relative; overflow: hidden; transition: border-color var(--t), box-shadow var(--t), transform var(--t); }
+.hiw-card:hover { border-color: var(--border-acc); box-shadow: var(--shadow-card); transform: translateY(-4px); }
+.hiw-num-badge { font-family: var(--mono); font-size: var(--fs-5xl); font-weight: 900; letter-spacing: -0.05em; opacity: 0.08; position: absolute; top: var(--sp-4); right: var(--sp-5); line-height: 1; pointer-events: none; }
+.hiw-icon-circle { width: 56px; height: 56px; border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center; margin-bottom: var(--sp-5); }
+.hiw-card-label { font-family: var(--mono); font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--sp-2); }
+.hiw-card-title { font-size: var(--fs-xl); font-weight: 700; color: var(--text); margin-bottom: var(--sp-3); font-family: var(--font); }
+.hiw-card-desc { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.7; font-family: var(--font-body); }
+.hiw-card-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; opacity: 0.6; }
+
+.reviews-section { padding: var(--sp-20) 0; background: var(--bg); position: relative; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.review-card { background: var(--surface); border: 1px solid var(--border-md); border-radius: var(--r-xl); padding: var(--sp-8); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: var(--sp-4); transition: border-color var(--t), box-shadow var(--t), transform var(--t); }
+.review-card:hover { border-color: var(--border-acc); box-shadow: var(--shadow-card); transform: translateY(-3px); }
+.review-quote-mark { font-family: Georgia, serif; font-size: 4rem; line-height: 1; margin-bottom: calc(-1 * var(--sp-4)); opacity: 0.6; }
+.review-stars { display: flex; gap: 3px; }
+.review-text { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.75; font-style: italic; font-family: var(--font-body); margin: 0; flex: 1; }
+.review-specialty-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--r-full); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-body); align-self: flex-start; }
+.review-author { display: flex; align-items: center; gap: var(--sp-3); }
+.review-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; font-family: var(--font); }
+.review-name { font-weight: 700; font-size: var(--fs-sm); color: var(--text); font-family: var(--font); }
+.review-role { font-size: var(--fs-xs); color: var(--text-muted); font-family: var(--font-body); }
+.review-card-glow { position: absolute; inset: 0; pointer-events: none; }
+
+.features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); margin-top: var(--sp-10); }
+.feature-card-span-2 { grid-column: span 2; }
+
+.deep-feature-section { padding: var(--sp-20) 0; border-bottom: 1px solid var(--border); }
+.deep-feature-content { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.deep-feature-text-col { position: relative; }
+.deep-feature-visual-sticky { position: sticky; top: 96px; }
+.deep-feature-visual { background: var(--surface); border: 1px solid var(--border-md); border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--shadow-md); }
+.deep-feature-visual-header { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.deep-feature-visual-body { padding: var(--sp-6); }
+
+.mobile-drawer { position: fixed; top: 64px; left: 0; right: 0; background: var(--surface); border-bottom: 1px solid var(--border-md); padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-2); z-index: calc(var(--z-sticky) - 1); box-shadow: var(--shadow-lg); }
+
+@keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+@media (max-width: 900px) {
+  .hiw-grid { grid-template-columns: 1fr; }
+  .hiw-connector { transform: rotate(90deg); }
+  .reviews-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .feature-card-span-2 { grid-column: span 2; }
+  .stats-bar-inner { grid-template-columns: repeat(2, 1fr); }
+  .deep-feature-content { grid-template-columns: 1fr; gap: var(--sp-10); }
+  .deep-feature-visual-sticky { position: relative; top: 0; }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card-span-2 { grid-column: span 1; }
+  .hero-title { font-size: clamp(2rem, 8vw, 3rem); }
+  .hero-sub { font-size: var(--fs-base); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   AUTH PAGES — MOBILE FIX
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Auth & Register shells: shrink vertical padding on mobile */
+@media (max-width: 640px) {
+  .auth-shell,
+  .reg-shell {
+    padding: 20px 16px 32px;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  /* Make auth-right / reg-right fill page naturally */
+  .auth-right,
+  .reg-right {
+    width: 100%;
+    min-height: unset;
+    padding-top: 56px; /* space for back link */
+  }
+
+  /* Card: full width, reduced padding, rounded less */
+  .auth-box,
+  .reg-form-card {
+    max-width: 100% !important;
+    padding: 28px 20px 24px !important;
+    border-radius: var(--r-xl) !important;
+  }
+
+  /* Back link: in-flow on mobile instead of absolute */
+  .reg-back-link,
+  .auth-back-link {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: inline-flex !important;
+    margin-bottom: 14px;
+  }
+
+  /* Medical monitor: simplify on mobile */
+  .medical-monitor-panel {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .monitor-ekg-svg {
+    display: none; /* hide ECG on very small screens */
+  }
+
+  /* Step tracker: reduce font */
+  .medical-step-tracker {
+    font-size: var(--fs-xs) !important;
+    gap: var(--sp-2) !important;
+  }
+
+  /* Auth title smaller on mobile */
+  .auth-title,
+  .reg-form-title {
+    font-size: var(--fs-xl) !important;
+  }
+
+  /* Two-column form rows → single column */
+  .reg-row-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Orbs: shrink so they don't cause overflow */
+  .auth-orb-purple { width: 220px !important; height: 220px !important; }
+  .auth-orb-mint   { width: 200px !important; height: 200px !important; }
+  .auth-orb-indigo { width: 240px !important; height: 240px !important; }
+
+  /* Trust badges: wrap nicely */
+  .reg-trust {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ALIGNMENT FIX — HIW GRID & AUTH MOBILE
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* HIW grid: stretch all cells to same height, center connectors */
+.hiw-grid {
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr auto 1fr !important;
+  gap: var(--sp-4) !important;
+  align-items: stretch !important;
+}
+.hiw-card {
+  height: 100%;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+}
+.hiw-connector {
+  align-self: center !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--border-str);
+}
+
+/* Reviews grid: equal-height cards */
+.reviews-grid {
+  align-items: stretch !important;
+}
+.review-card {
+  height: 100%;
+}
+
+/* Features grid: clean 2x2 */
+.features-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: var(--sp-6) !important;
+}
+.feature-card-span-2 {
+  grid-column: unset !important;
+}
+
+/* Auth mobile: remove misalignment from the earlier fix */
+@media (max-width: 640px) {
+  .auth-shell,
+  .reg-shell {
+    padding: 24px 16px 40px !important;
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+  }
+  .auth-right,
+  .reg-right {
+    padding-top: 48px !important;
+    width: 100% !important;
+  }
+  .auth-box,
+  .reg-form-card {
+    max-width: 100% !important;
+    padding: 28px 20px 24px !important;
+    border-radius: 20px !important;
+  }
+  .reg-back-link {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: inline-flex !important;
+    margin-bottom: 16px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PEAK GSAP — SCROLLSMOOTHER + PERFORMANCE + SPLITTEXT CSS
+   ═══════════════════════════════════════════════════════════════════ */
+/* ScrollSmoother required layout */
+#smooth-wrapper {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+#smooth-content {
+  overflow: visible;
+  width: 100%;
+}
+
+/* Performance: will-change hints for all animated card targets */
+/* Applied only on devices that support motion */
+@media (prefers-reduced-motion: no-preference) {
+  .feature-card,
+  .hiw-card,
+  .review-card,
+  .pricing-card,
+  .value-card,
+  .faq-item,
+  .stat-item {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  /* 3D tilt container — cards that react to mouse */
+  .tilt-card {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    will-change: transform;
+  }
+}
+
+/* SplitText line masks — lines act as the overflow boundary */
+.hero-title-line,
+.features-hero-title-line,
+.pricing-hero-title-line,
+.about-hero-title-line,
+.auth-title,
+.reg-form-title {
+  overflow: hidden;
+  display: block;
+}
+
+/* SplitText word layout — no overflow hidden here to prevent character clipping */
+.split-word,
+.word {
+  display: inline-block;
+  vertical-align: bottom;
+  background: inherit;
+  -webkit-background-clip: inherit;
+  background-clip: inherit;
+  -webkit-text-fill-color: inherit;
+}
+
+/* Scramble text transition */
+.scramble-target {
+  font-kerning: none;
+  text-rendering: optimizeSpeed;
+}
+
+/* Parallax data-speed elements don't create scroll jump */
+[data-speed],
+[data-lag] {
+  will-change: transform;
+}
+
+/* Reusable text gradient helper that works with SplitText */
+.text-gradient {
+  background: var(--grad-brand) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
+}
+
+/* Deactivate text-gradient block styling when SplitText wraps the text nodes */
+.text-gradient:has(.split-word),
+.text-gradient:has(.word) {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Apply gradient clipping onto the individual SplitText child wrappers directly */
+.text-gradient .split-word,
+.text-gradient .word {
+  background: var(--grad-brand) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
+}
+
+

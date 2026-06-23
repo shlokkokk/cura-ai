@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { useGSAP } from '@gsap/react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
@@ -102,6 +106,102 @@ export default function Register() {
 
   const { saveUser } = useAuth();
   const navigate     = useNavigate();
+  const shellRef     = useRef(null);
+
+  // Animate orbs on mount
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.to('.auth-orb-purple', { y: -30, x: 20, duration: 6, ease: 'sine.inOut', repeat: -1, yoyo: true });
+      gsap.to('.auth-orb-mint',   { y: 25, x: -15, duration: 7, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1 });
+      gsap.to('.auth-orb-indigo', { y: -20, x: 30, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2 });
+
+      // Card entrance
+      const tl = gsap.timeline();
+      tl
+        .from('.reg-form-card', { y: 50, autoAlpha: 0, scale: 0.97, duration: 0.7, ease: 'power3.out' })
+        .from('.reg-form-header .reg-logo-wrap', { scale: 0, rotation: -90, autoAlpha: 0, duration: 0.5, ease: 'back.out(2.5)' }, '-=0.4')
+        .from('.reg-form-header .reg-form-eyebrow', {
+          y: -16, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
+        }, '-=0.3')
+        .to('.reg-form-eyebrow-text', {
+          duration: 0.8,
+          scrambleText: {
+            text: 'Medical Practitioner Portal',
+            chars: '0101100110',
+            revealDelay: 0.1,
+            speed: 0.4,
+          },
+          ease: 'none',
+        }, '-=0.2')
+        .from('.reg-form-header .reg-form-title', {
+          y: 20, autoAlpha: 0, duration: 0.45, ease: 'power2.out',
+        }, '-=0.25');
+
+      // SplitText on reg-form-title
+      const split = new SplitText('.reg-form-title', {
+        type: 'words',
+        wordsClass: 'split-word',
+      });
+
+      tl
+        .from(split.words, {
+          yPercent: 110,
+          duration: 0.7,
+          stagger: 0.04,
+          ease: 'power3.out',
+        }, '-=0.25')
+        .from('.reg-form-header .reg-form-sub', {
+          y: 15, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
+        }, '-=0.3')
+        .from('.medical-monitor-panel', { y: 16, autoAlpha: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
+        .from('.medical-step-tracker', { y: 12, autoAlpha: 0, duration: 0.35, ease: 'power2.out' }, '-=0.15');
+
+      // 3D tilt on .reg-form-card
+      const card = shellRef.current.querySelector('.reg-form-card');
+      if (card) {
+        const rotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+        const rotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+        
+        card.style.transformPerspective = '1000px';
+        
+        const handleMouseMove = (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const cx = x / rect.width - 0.5;
+          const cy = y / rect.height - 0.5;
+          
+          rotX(-cy * 4); // subtle tilt for form
+          rotY(cx * 4);
+        };
+        
+        const handleMouseLeave = () => {
+          rotX(0);
+          rotY(0);
+        };
+        
+        card.addEventListener('mousemove', handleMouseMove);
+        card.addEventListener('mouseleave', handleMouseLeave);
+      }
+    });
+    return () => mm.revert();
+  }, { scope: shellRef });
+
+  // Step transition animation
+  const stepContainerRef = useRef(null);
+  useEffect(() => {
+    const el = stepContainerRef.current;
+    if (!el) return;
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo(el,
+        { x: step === 1 ? -30 : 30, autoAlpha: 0 },
+        { x: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' }
+      );
+    });
+    return () => mm.revert();
+  }, [step]);
 
   const set = (k) => (e) => {
     const v = e.target.value;
@@ -166,10 +266,9 @@ export default function Register() {
   const formComplete = form.name.trim() && form.email.trim() && form.password.length >= 6 && form.spec;
 
   return (
-    <div className="reg-shell">
+    <div ref={shellRef} className="reg-shell">
       {/* Mesh Grid Backdrop */}
       <div className="auth-grid-bg" />
-      <EkgMouseTrail />
 
       {/* Floating Ambient Glowing Blobs */}
       <div className="auth-bg-orb auth-orb-purple" />
@@ -189,10 +288,12 @@ export default function Register() {
 
           {/* Logo & Header */}
           <div className="reg-form-header" style={{ textAlign: 'center' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <div className="reg-logo-wrap" style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
               <Logo size={36} color="var(--purple)" />
             </div>
-            <div className="reg-form-eyebrow">Medical Practitioner Portal</div>
+            <div className="reg-form-eyebrow" style={{ opacity: 0 }}>
+              <span className="reg-form-eyebrow-text">Medical Practitioner Portal</span>
+            </div>
             <h1 className="reg-form-title">Practitioner Registration</h1>
             <p className="reg-form-sub">
               Set up your workstation profile to begin simulation cases.
@@ -258,8 +359,7 @@ export default function Register() {
 
           {/* Forms */}
           <form className="reg-form" onSubmit={step === 1 ? handleNextStep : handleSubmit} noValidate>
-
-            {/* PHASE 1: Personal Identification */}
+            <div ref={stepContainerRef}>
             {step === 1 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div className="reg-row-2">
@@ -474,6 +574,7 @@ export default function Register() {
                 </div>
               </div>
             )}
+            </div>
           </form>
 
           {/* Sign In Link */}

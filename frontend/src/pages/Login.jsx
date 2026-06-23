@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { useGSAP } from '@gsap/react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
@@ -80,6 +84,115 @@ export default function Login() {
   const { saveUser } = useAuth();
   const navigate     = useNavigate();
   const location     = useLocation();
+  const shellRef     = useRef(null);
+
+  // ── GSAP entrance ──────────────────────────────────────────────────────────
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // Floating orbs continuous animation
+      gsap.to('.auth-orb-purple', {
+        y: -30, x: 20, duration: 6, ease: 'sine.inOut', repeat: -1, yoyo: true,
+      });
+      gsap.to('.auth-orb-mint', {
+        y: 25, x: -15, duration: 7, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1,
+      });
+      gsap.to('.auth-orb-indigo', {
+        y: -20, x: 30, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2,
+      });
+
+      // Card entrance cascade
+      const tl = gsap.timeline();
+      tl
+        .from('.auth-box', {
+          y: 50, autoAlpha: 0, scale: 0.97, duration: 0.7, ease: 'power3.out',
+        })
+        .from('.auth-box .login-logo-wrap', {
+          scale: 0, rotation: -90, autoAlpha: 0, duration: 0.5, ease: 'back.out(2.5)',
+        }, '-=0.4')
+        .from('.auth-box .login-eyebrow', {
+          y: -16, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
+        }, '-=0.3')
+        .to('.login-eyebrow-text', {
+          duration: 0.8,
+          scrambleText: {
+            text: 'Clinical Console Link',
+            chars: '0101100110',
+            revealDelay: 0.1,
+            speed: 0.4,
+          },
+          ease: 'none',
+        }, '-=0.2')
+        .from('.auth-box .auth-title', {
+          y: 20, autoAlpha: 0, duration: 0.45, ease: 'power2.out',
+        }, '-=0.2');
+
+      // SplitText on auth-title
+      const split = new SplitText('.auth-title', {
+        type: 'words',
+        wordsClass: 'split-word',
+      });
+
+      tl
+        .from(split.words, {
+          yPercent: 110,
+          duration: 0.7,
+          stagger: 0.04,
+          ease: 'power3.out',
+        }, '-=0.2')
+        .from('.auth-box .auth-subtitle', {
+          y: 15, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
+        }, '-=0.3')
+        .from('.medical-monitor-panel', {
+          y: 16, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
+        }, '-=0.2')
+        .to('.monitor-vital-syslink', {
+          duration: 0.8,
+          scrambleText: {
+            text: 'SYS.LINK',
+            chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            speed: 0.5,
+          },
+          ease: 'none',
+        }, '-=0.25')
+        .from('.auth-form .reg-field', {
+          x: -20, autoAlpha: 0, stagger: 0.09, duration: 0.45, ease: 'power2.out',
+        }, '-=0.15')
+        .from('.reg-submit', {
+          y: 16, autoAlpha: 0, scale: 0.95, duration: 0.45, ease: 'back.out(1.7)',
+        }, '-=0.1');
+
+      // 3D tilt on .auth-box
+      const card = shellRef.current.querySelector('.auth-box');
+      if (card) {
+        const rotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+        const rotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+        
+        card.style.transformPerspective = '1000px';
+        
+        const handleMouseMove = (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const cx = x / rect.width - 0.5;
+          const cy = y / rect.height - 0.5;
+          
+          rotX(-cy * 4); // subtle tilt for form
+          rotY(cx * 4);
+        };
+        
+        const handleMouseLeave = () => {
+          rotX(0);
+          rotY(0);
+        };
+        
+        card.addEventListener('mousemove', handleMouseMove);
+        card.addEventListener('mouseleave', handleMouseLeave);
+      }
+    });
+    return () => mm.revert();
+  }, { scope: shellRef });
+  // ───────────────────────────────────────────────────────────────────────────
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,10 +215,9 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-shell">
+    <div ref={shellRef} className="auth-shell">
       {/* Mesh Grid Backdrop */}
       <div className="auth-grid-bg" />
-      <EkgMouseTrail />
 
       {/* Floating Ambient Glowing Blobs */}
       <div className="auth-bg-orb auth-orb-purple" />
@@ -139,18 +251,19 @@ export default function Login() {
 
           {/* Logo & Header */}
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <div className="login-logo-wrap" style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
               <Logo size={36} color="var(--purple)" />
             </div>
-            <div style={{
+            <div className="login-eyebrow" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '4px 12px', borderRadius: 999,
               background: 'var(--purple-dim)',
               border: '1px solid var(--border-md)',
               marginBottom: 12,
+              opacity: 0,
             }}>
               <div className="pulse-dot" style={{ width: 6, height: 6 }} />
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--purple)', textTransform: 'uppercase', fontFamily: 'var(--mono)' }}>
+              <span className="login-eyebrow-text" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--purple)', textTransform: 'uppercase', fontFamily: 'var(--mono)' }}>
                 Clinical Console Link
               </span>
             </div>
@@ -181,7 +294,7 @@ export default function Login() {
             </svg>
 
             <div className="monitor-vital-col" style={{ alignItems: 'flex-end' }}>
-              <div className="monitor-vital-val" style={{ color: 'var(--mint)' }}>
+              <div className="monitor-vital-val monitor-vital-syslink" style={{ color: 'var(--mint)' }}>
                 SYS.LINK
               </div>
               <div className="monitor-vital-lbl">Diagnostic Port</div>

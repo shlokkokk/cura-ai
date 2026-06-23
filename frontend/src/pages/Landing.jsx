@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { useGSAP } from '@gsap/react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Navbar from '../components/Navbar';
@@ -105,37 +110,34 @@ const DEMO_MSGS = [
   { role: 'patient', text: "Nine. Maybe a ten. It's the worst pain I've ever felt in my life." },
 ];
 
-function AnimatedCount({ to, suffix = '' }) {
+function AnimatedCount({ to }) {
   const [val, setVal] = useState(0);
   const ref = useRef(null);
-  const started = useRef(false);
 
-  useEffect(() => {
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !started.current) {
-        started.current = true;
-        const duration = 1400;
-        const start = performance.now();
-        const tick = (now) => {
-          const elapsed = now - start;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setVal(Math.round(eased * to));
-          if (progress < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      }
-    }, { threshold: 0.5 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [to]);
+  useGSAP(() => {
+    const obj = { value: 0 };
+    gsap.to(obj, {
+      value: to,
+      duration: 1.4,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: ref.current,
+        start: 'top 95%',
+        toggleActions: 'play none none none',
+      },
+      onUpdate: () => {
+        setVal(Math.round(obj.value));
+      },
+    });
+  }, { dependencies: [to], scope: ref });
 
-  return <span ref={ref}>{val}{suffix}</span>;
+  return <span ref={ref}>{val}</span>;
 }
 
 export default function Landing() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const pageRef = useRef(null);
 
   // Live demo chat animation
   const [visibleMsgs, setVisibleMsgs] = useState(1);
@@ -148,7 +150,6 @@ export default function Landing() {
     const t = setTimeout(() => setVisibleMsgs(n => n + 1), 2200);
     return () => clearTimeout(t);
   }, [visibleMsgs]);
-  // Auto-scroll chat preview
   useEffect(() => {
     if (previewRef.current) {
       previewRef.current.scrollTop = previewRef.current.scrollHeight;
@@ -164,10 +165,209 @@ export default function Landing() {
   const handleStart = () => navigate(user ? '/simulator' : '/register');
   const handleDemo  = () => navigate('/simulator?demo=cardiology');
 
+  // ─── GSAP Animations ────────────────────────────────────────────────────────
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+
+      // ── PRE-SET: All scroll-reveal targets start invisible + offset ───────────────
+      gsap.set(['.stat-item', '.feature-card', '.hiw-card', '.review-card'], {
+        autoAlpha: 0, y: 40,
+      });
+      gsap.set('.hiw-connector', { autoAlpha: 0, scale: 0.5 });
+      gsap.set('.review-trust-avatar', { autoAlpha: 0, scale: 0 });
+      gsap.set(
+        ['.specialties-section-header', '.features-section-header',
+         '.hiw-section-header', '.reviews-section-header'],
+        { autoAlpha: 0, y: 30 }
+      );
+
+      // ── Hero Entrance Timeline — SplitText word-mask reveal ────────────────────
+      const split = new SplitText('.hero-title-line', {
+        type: 'words',
+        wordsClass: 'split-word',
+      });
+
+      // Timeline with shared defaults
+      const heroTl = gsap.timeline({
+        delay: 0.12,
+        defaults: { ease: 'brandEase', duration: 0.65 },
+      });
+      heroTl
+        // ScrambleText on eyebrow label — chars scramble then land on final text
+        .set('.hero-eyebrow', { autoAlpha: 1 })
+        .to('.hero-eyebrow', {
+          duration: 0.8,
+          scrambleText: {
+            text: 'Clinical Training Platform',
+            chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            revealDelay: 0.2,
+            speed: 0.5,
+          },
+          ease: 'none',
+        })
+        .from(split.words, {
+          yPercent: 115,
+          duration: 0.88,
+          stagger: { each: 0.06 },
+          ease: 'power4.out',
+        }, '-=0.4')
+        .from('.hero-sub', { y: 32, autoAlpha: 0 }, '-=0.5')
+        .from('.hero-actions > *', {
+          y: 24, autoAlpha: 0, scale: 0.94,
+          stagger: 0.1, ease: 'snapEase',
+        }, '-=0.35')
+        .from('.hero-stat-item', {
+          y: 16, autoAlpha: 0, stagger: 0.1, duration: 0.45,
+        }, '-=0.3')
+        .from('.hero-preview', {
+          x: 72, autoAlpha: 0, rotationY: -10,
+          transformPerspective: 1400, duration: 1.0, ease: 'power3.out',
+        }, '<0.15');
+
+      // ── Hero background parallax — mapRange scrollY → background shift ────────
+      const mapParallax = gsap.utils.mapRange(0, window.innerHeight, 0, -50);
+      ScrollTrigger.create({
+        trigger: '.landing-hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.8,
+        onUpdate(self) {
+          gsap.set('.hero-grid-bg', {
+            y: mapParallax(self.progress * window.innerHeight),
+          });
+        },
+      });
+
+      // ── ECG Path Draw — DrawSVGPlugin ────────────────────────────────────────
+      const ecgPath = document.querySelector('.ecg-path-animated');
+      if (ecgPath) {
+        const length = ecgPath.getTotalLength?.() || 600;
+        gsap.set(ecgPath, { strokeDasharray: length, strokeDashoffset: length });
+        gsap.to(ecgPath, {
+          strokeDashoffset: 0, duration: 2.5, ease: 'power1.inOut', delay: 0.8,
+          scrollTrigger: { trigger: '.ecg-container', start: 'top 90%', toggleActions: 'play none none reset' },
+        });
+      }
+
+      // ── Stats Bar ─────────────────────────────────────────────────────────────
+      ScrollTrigger.batch('.stat-item', {
+        start: 'top 92%',
+        onEnter: batch => gsap.to(batch, {
+          autoAlpha: 1, y: 0, scale: 1,
+          stagger: 0.12, duration: 0.65, ease: 'back.out(1.4)', overwrite: true,
+        }),
+        once: true,
+      });
+
+      // ── Section headers ──────────────────────────────────────────────────
+      ['.specialties-section-header', '.features-section-header',
+       '.hiw-section-header', '.reviews-section-header'].forEach(sel => {
+        gsap.to(sel, {
+          autoAlpha: 1, y: 0, duration: 0.7,
+          scrollTrigger: { trigger: sel, start: 'top 88%' },
+        });
+      });
+
+      // ── Feature cards + 3D magnetic tilt on hover (gsap.quickTo) ────────────
+      ScrollTrigger.batch('.feature-card', {
+        start: 'top 90%',
+        onEnter: batch => gsap.to(batch, {
+          autoAlpha: 1, y: 0, scale: 1,
+          stagger: 0.11, duration: 0.75, ease: 'power3.out', overwrite: true,
+        }),
+        once: true,
+      });
+
+      // 3D tilt: quickTo for max-perf mouse follow on each feature card
+      document.querySelectorAll('.feature-card').forEach(card => {
+        const rotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+        const rotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+        const glowX = gsap.quickTo(card.querySelector('.card-glow') || card, 'backgroundPositionX', { duration: 0.4 });
+
+        card.style.transformPerspective = '800px';
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const cx = (e.clientX - rect.left) / rect.width  - 0.5; // -0.5 to 0.5
+          const cy = (e.clientY - rect.top)  / rect.height - 0.5;
+          rotX(-cy * 14);   // tilt up/down
+          rotY( cx * 14);   // tilt left/right
+        });
+        card.addEventListener('mouseleave', () => {
+          rotX(0); rotY(0);
+        });
+      });
+
+      // ── How It Works cards ───────────────────────────────────────────────
+      ScrollTrigger.batch('.hiw-card', {
+        start: 'top 90%',
+        onEnter: batch => gsap.to(batch, {
+          autoAlpha: 1, y: 0, scale: 1,
+          stagger: 0.15, duration: 0.8, ease: 'power3.out', overwrite: true,
+        }),
+        once: true,
+      });
+
+      // Connector arrows
+      gsap.to('.hiw-connector', {
+        autoAlpha: 1, scale: 1,
+        stagger: 0.3, duration: 0.4, ease: 'snapEase',
+        scrollTrigger: { trigger: '.hiw-grid', start: 'top 82%' },
+      });
+
+      // ── Review cards — distribute() center-out stagger ──────────────────────
+      ScrollTrigger.batch('.review-card', {
+        start: 'top 92%',
+        onEnter: batch => {
+          const total = batch.length;
+          gsap.to(batch, {
+            autoAlpha: 1, y: 0, scale: 1,
+            // distribute() — center card enters first, edges last
+            delay: gsap.utils.distribute({
+              base: 0,
+              amount: 0.3,
+              from: 'center',
+              ease: 'power1.inOut',
+            }),
+            duration: 0.75,
+            ease: 'power3.out',
+            overwrite: true,
+          });
+        },
+        once: true,
+      });
+
+      // Avatar stack
+      gsap.to('.review-trust-avatar', {
+        scale: 1, autoAlpha: 1,
+        stagger: { each: 0.08, from: 'start' }, ease: 'snapEase', duration: 0.4,
+        scrollTrigger: { trigger: '.review-trust-row', start: 'top 92%' },
+      });
+
+      // ── CTA section ────────────────────────────────────────────────────────
+      const ctaTl = gsap.timeline({
+        scrollTrigger: { trigger: '.cta-section', start: 'top 82%' },
+        defaults: { ease: 'brandEase', duration: 0.65 },
+      });
+      ctaTl
+        .from('.cta-section .hero-eyebrow', { y: -20, autoAlpha: 0, duration: 0.5 })
+        .from('.cta-title', { y: 50, autoAlpha: 0, duration: 0.7, ease: 'power3.out' }, '-=0.2')
+        .from('.cta-sub', { y: 24, autoAlpha: 0, duration: 0.5 }, '-=0.3')
+        .from('.cta-section .btn', {
+          y: 20, autoAlpha: 0, scale: 0.93,
+          stagger: 0.1, duration: 0.5, ease: 'snapEase',
+        }, '-=0.25');
+
+    });
+
+    return () => mm.revert();
+  }, { scope: pageRef });
+  // ─────────────────────────────────────────────────────────────────────────────
+
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
-      <EkgMouseTrail />
 
       <section className="landing-hero" id="hero">
         <div className="hero-grid-bg" aria-hidden="true" />
@@ -187,16 +387,11 @@ export default function Landing() {
               </div>
 
               <h1 className="hero-title">
-                <span>The simulator</span>
-                <span>medical students</span>
-                <span>
+                <span className="hero-title-line">The simulator</span>
+                <span className="hero-title-line">medical students</span>
+                <span className="hero-title-line">
                   actually{' '}
-                  <span style={{
-                    background: 'var(--grad-brand)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                  }}>
+                  <span className="text-gradient">
                     use.
                   </span>
                 </span>
@@ -218,14 +413,13 @@ export default function Landing() {
                 </button>
               </div>
 
-              {/* Inline trust signals — no emojis, just data */}
               <div style={{ display: 'flex', gap: 24, marginTop: 36, flexWrap: 'wrap' }}>
                 {[
                   { val: '10+', label: 'Specialties' },
                   { val: '50+', label: 'Case scenarios' },
                   { val: 'AI', label: 'Powered feedback' },
                 ].map(({ val, label }) => (
-                  <div key={label}>
+                  <div key={label} className="hero-stat-item">
                     <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 800, color: 'var(--text)', fontFamily: 'var(--mono)' }}>{val}</div>
                     <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', marginTop: 2 }}>{label}</div>
                   </div>
@@ -235,7 +429,6 @@ export default function Landing() {
 
             {/* Right: Live simulation preview */}
             <div style={{ position: 'relative' }}>
-              {/* Glow behind preview */}
               <div style={{
                 position: 'absolute', inset: -24,
                 background: 'radial-gradient(ellipse at center, rgba(138,124,255,0.10) 0%, transparent 70%)',
@@ -355,7 +548,13 @@ export default function Landing() {
         {/* ECG line at bottom */}
         <div className="ecg-container" aria-hidden="true">
           <svg className="ecg-line" viewBox="0 0 600 60" preserveAspectRatio="none" fill="none">
-            <path d={ECG_PATH} stroke="var(--purple)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+            <path
+              className="ecg-path-animated"
+              d={ECG_PATH}
+              stroke="var(--purple)"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+            />
           </svg>
         </div>
       </section>
@@ -382,7 +581,7 @@ export default function Landing() {
 
       <section className="section-sm" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="container">
-          <div className="section-label">Case Library</div>
+          <div className="specialties-section-header section-label" style={{ marginBottom: 8 }}>Case Library</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
             <h2 className="section-title" style={{ margin: 0 }}>
               Train across every specialty
@@ -394,7 +593,7 @@ export default function Landing() {
           </div>
 
           <div className="specialties-scroll-container">
-            {/* Desktop View: Single row containing all 10 specialties */}
+            {/* Desktop View */}
             <div className="specialties-desktop-only">
               <div className="specialties-scroll-track" role="list">
                 <div className="specialties-scroll-group">
@@ -434,19 +633,13 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Mobile View: Two rows scrolling in opposite directions */}
+            {/* Mobile View */}
             <div className="specialties-mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', overflow: 'hidden' }}>
-              {/* Row 1: First 5 specialties */}
               <div className="specialties-scroll-track" role="list">
                 <div className="specialties-scroll-group">
                   {SPECIALTIES.slice(0, 5).map(({ name, icon, desc }) => (
-                    <button
-                      key={name}
-                      role="listitem"
-                      className="specialty-chip"
-                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
-                      title={`Try a ${name} case`}
-                    >
+                    <button key={name} role="listitem" className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}>
                       <div className="specialty-chip-icon">{icon}</div>
                       <div>
                         <div className="specialty-chip-name">{name}</div>
@@ -457,13 +650,8 @@ export default function Landing() {
                 </div>
                 <div className="specialties-scroll-group" aria-hidden="true">
                   {SPECIALTIES.slice(0, 5).map(({ name, icon, desc }) => (
-                    <button
-                      key={`${name}-dup`}
-                      tabIndex="-1"
-                      className="specialty-chip"
-                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
-                      title={`Try a ${name} case`}
-                    >
+                    <button key={`${name}-dup`} tabIndex="-1" className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}>
                       <div className="specialty-chip-icon">{icon}</div>
                       <div>
                         <div className="specialty-chip-name">{name}</div>
@@ -473,18 +661,11 @@ export default function Landing() {
                   ))}
                 </div>
               </div>
-
-              {/* Row 2: Remaining 5 specialties (scrolls in reverse) */}
               <div className="specialties-scroll-track-2" role="list" style={{ marginTop: 4 }}>
                 <div className="specialties-scroll-group">
                   {SPECIALTIES.slice(5).map(({ name, icon, desc }) => (
-                    <button
-                      key={name}
-                      role="listitem"
-                      className="specialty-chip"
-                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
-                      title={`Try a ${name} case`}
-                    >
+                    <button key={name} role="listitem" className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}>
                       <div className="specialty-chip-icon">{icon}</div>
                       <div>
                         <div className="specialty-chip-name">{name}</div>
@@ -495,13 +676,8 @@ export default function Landing() {
                 </div>
                 <div className="specialties-scroll-group" aria-hidden="true">
                   {SPECIALTIES.slice(5).map(({ name, icon, desc }) => (
-                    <button
-                      key={`${name}-dup`}
-                      tabIndex="-1"
-                      className="specialty-chip"
-                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
-                      title={`Try a ${name} case`}
-                    >
+                    <button key={`${name}-dup`} tabIndex="-1" className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}>
                       <div className="specialty-chip-icon">{icon}</div>
                       <div>
                         <div className="specialty-chip-name">{name}</div>
@@ -518,7 +694,7 @@ export default function Landing() {
 
       <section className="section" id="features">
         <div className="container">
-          <div style={{ maxWidth: 600, marginBottom: 0 }}>
+          <div className="features-section-header" style={{ maxWidth: 600, marginBottom: 0 }}>
             <div className="section-label">Why CURA.AI</div>
             <h2 className="section-title">Built for how doctors actually learn</h2>
             <p className="section-sub">
@@ -557,16 +733,11 @@ export default function Landing() {
         </div>
 
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+          <div className="hiw-section-header" style={{ textAlign: 'center', marginBottom: 64 }}>
             <div className="section-label">Simple Process</div>
             <h2 className="section-title" style={{ marginBottom: 12 }}>
               How it{' '}
-              <span style={{
-                background: 'var(--grad-brand)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>works?</span>
+              <span className="text-gradient">works?</span>
             </h2>
             <p className="section-sub" style={{ maxWidth: 480, margin: '0 auto' }}>
               Three steps between you and your next clinical breakthrough.
@@ -654,7 +825,7 @@ export default function Landing() {
         </div>
 
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+          <div className="reviews-section-header" style={{ textAlign: 'center', marginBottom: 64 }}>
             <div className="section-label">Testimonials</div>
             <h2 className="section-title" style={{ marginBottom: 12 }}>Our Users Reviews</h2>
             <p className="section-sub" style={{ maxWidth: 420, margin: '0 auto' }}>
@@ -699,10 +870,7 @@ export default function Landing() {
               },
             ].map(({ quote, name, role, school, initial, color, bg, stars, specialty }) => (
               <div key={name} className="review-card">
-                {/* Floating quote mark */}
                 <div className="review-quote-mark" style={{ color }}>&ldquo;</div>
-
-                {/* Stars */}
                 <div className="review-stars">
                   {Array.from({ length: stars }).map((_, i) => (
                     <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" style={{ flexShrink: 0 }}>
@@ -710,38 +878,28 @@ export default function Landing() {
                     </svg>
                   ))}
                 </div>
-
-                {/* Quote text */}
                 <blockquote className="review-text">{quote}</blockquote>
-
-                {/* Specialty chip */}
                 <div className="review-specialty-chip" style={{ color, background: bg }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, flexShrink: 0 }} />
                   {specialty}
                 </div>
-
-                {/* Author row */}
                 <div className="review-author">
-                  <div className="review-avatar" style={{ color, background: bg }}>
-                    {initial}
-                  </div>
+                  <div className="review-avatar" style={{ color, background: bg }}>{initial}</div>
                   <div>
                     <div className="review-name">{name}</div>
                     <div className="review-role">{role} · {school}</div>
                   </div>
                 </div>
-
-                {/* Bottom gradient accent */}
                 <div className="review-card-glow" style={{ background: `radial-gradient(ellipse at 50% 100%, ${color.replace('var(--purple)', 'rgba(138,124,255,0.12)').replace('#A78BFF','rgba(167,139,255,0.10)').replace('#6EE7B7','rgba(110,231,183,0.08)')} 0%, transparent 70%)` }} />
               </div>
             ))}
           </div>
 
           {/* Bottom trust line */}
-          <div style={{ textAlign: 'center', marginTop: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+          <div className="review-trust-row" style={{ textAlign: 'center', marginTop: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: -8 }}>
               {['A','D','F','M','R'].map((l, i) => (
-                <div key={i} style={{
+                <div key={i} className="review-trust-avatar" style={{
                   width: 28, height: 28, borderRadius: '50%',
                   background: i % 2 === 0 ? 'var(--purple-dim)' : 'rgba(167,139,255,0.15)',
                   border: '2px solid var(--bg)',
@@ -771,7 +929,7 @@ export default function Landing() {
           </div>
           <h2 className="cta-title">
             Your next patient<br />
-            <span style={{ background: 'var(--grad-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <span className="text-gradient">
               is waiting.
             </span>
           </h2>

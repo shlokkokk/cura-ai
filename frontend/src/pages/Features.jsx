@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { SplitText } from 'gsap/SplitText';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { useGSAP } from '@gsap/react';
 import Navbar from '../components/Navbar';
 import EkgMouseTrail from '../components/EkgMouseTrail';
+import { usePageTransition } from '../utils/usePageTransition';
 
 const SPECIALTIES = [
   'Cardiology', 'Neurology', 'Emergency Medicine', 'Respiratory', 'Endocrinology',
@@ -187,13 +193,13 @@ const DEEP_FEATURES = [
   },
 ];
 
-// Single Feature Section component that handles local scroll syncing highlights
 function FeatureSection({ feature, index }) {
   const { icon, title, sub, desc, bullets, detailedBullets } = feature;
   const isEven = index % 2 === 0;
   const [activeIndex, setActiveIndex] = useState(0);
   const sectionRef = useRef(null);
 
+  // Scroll sync for active bullet (existing logic preserved)
   useEffect(() => {
     let animFrameId;
 
@@ -205,14 +211,11 @@ function FeatureSection({ feature, index }) {
       const sectionRect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // Stop tracking if the section is completely offscreen
-      if (sectionRect.bottom < 0 || sectionRect.top > windowHeight) {
-        return;
-      }
+      if (sectionRect.bottom < 0 || sectionRect.top > windowHeight) return;
 
       let closestIndex = 0;
       let minDistance = Infinity;
-      const viewportCenter = windowHeight * 0.45; // slightly above center feels more natural
+      const viewportCenter = windowHeight * 0.45;
 
       items.forEach((item, idx) => {
         const rect = item.getBoundingClientRect();
@@ -233,7 +236,6 @@ function FeatureSection({ feature, index }) {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    // Run once initially to capture starting state
     handleScroll();
 
     return () => {
@@ -241,6 +243,70 @@ function FeatureSection({ feature, index }) {
       cancelAnimationFrame(animFrameId);
     };
   }, []);
+
+  // GSAP entrance for this section
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+      });
+
+      tl
+        .from(sectionRef.current.querySelector('.deep-feature-text-col'), {
+          x: isEven ? -60 : 60,
+          autoAlpha: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+        })
+        .from(sectionRef.current.querySelector('.deep-feature-visual-sticky'), {
+          x: isEven ? 60 : -60,
+          autoAlpha: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+        }, '<0.15')
+        .from(sectionRef.current.querySelectorAll('.feature-detail-item-trigger'), {
+          y: 30,
+          autoAlpha: 0,
+          stagger: 0.12,
+          duration: 0.6,
+          ease: 'power2.out',
+        }, '-=0.5');
+
+      // 3D tilt on .deep-feature-visual
+      const card = sectionRef.current.querySelector('.deep-feature-visual');
+      if (card) {
+        const rotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+        const rotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+        
+        card.style.transformPerspective = '1000px';
+        
+        const handleMouseMove = (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const cx = x / rect.width - 0.5;
+          const cy = y / rect.height - 0.5;
+          
+          rotX(-cy * 8); // subtle tilt
+          rotY(cx * 8);
+        };
+        
+        const handleMouseLeave = () => {
+          rotX(0);
+          rotY(0);
+        };
+        
+        card.addEventListener('mousemove', handleMouseMove);
+        card.addEventListener('mouseleave', handleMouseLeave);
+      }
+    });
+    return () => mm.revert();
+  }, { scope: sectionRef });
 
   return (
     <section
@@ -277,7 +343,6 @@ function FeatureSection({ feature, index }) {
               {desc}
             </p>
 
-            {/* Detailed text items with visual highlights */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
               {detailedBullets.map((item, idx) => (
                 <div
@@ -310,7 +375,6 @@ function FeatureSection({ feature, index }) {
             }}
           >
             <div className="deep-feature-visual">
-              {/* Header bar */}
               <div className="deep-feature-visual-header">
                 <div style={{ display: 'flex', gap: 5 }}>
                   {['#EF4444','#F59E0B','#22C55E'].map(c => (
@@ -322,7 +386,6 @@ function FeatureSection({ feature, index }) {
                 </div>
               </div>
 
-              {/* Feature visual body */}
               <div className="deep-feature-visual-body">
                 <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 16 }}>
                   Live Preview
@@ -366,13 +429,58 @@ function FeatureSection({ feature, index }) {
 
 export default function Features() {
   const navigate = useNavigate();
+  const pageRef = usePageTransition();
+  const heroRef = useRef(null);
+
+  // Hero + badges entrance
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // SplitText word-mask on hero title lines
+      const split = new SplitText('.features-hero-title-line', {
+        type: 'words',
+        wordsClass: 'split-word',
+      });
+
+      const tl = gsap.timeline({ delay: 0.1, defaults: { ease: 'brandEase', duration: 0.65 } });
+      tl
+        .set('.features-hero-label', { autoAlpha: 1 })
+        .to('.features-hero-label', {
+          duration: 0.8,
+          scrambleText: {
+            text: 'Advanced Capabilities',
+            chars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            revealDelay: 0.2,
+            speed: 0.5,
+          },
+          ease: 'none',
+        })
+        .from(split.words, {
+          yPercent: 115,
+          duration: 0.88,
+          stagger: { each: 0.06 },
+          ease: 'power4.out',
+        }, '-=0.4')
+        .from('.features-hero-sub', { y: 30, autoAlpha: 0, duration: 0.6 }, '-=0.3')
+        .from('.features-hero-btns > *', {
+          y: 20, autoAlpha: 0, scale: 0.94, stagger: 0.1, duration: 0.5, ease: 'snapEase',
+        }, '-=0.3')
+        .from('.specialty-badge', {
+          scale: 0.7,
+          autoAlpha: 0,
+          stagger: { each: 0.05, from: 'random' },
+          duration: 0.4,
+          ease: 'snapEase',
+        }, '-=0.2');
+    });
+    return () => mm.revert();
+  }, { scope: heroRef });
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
-      <EkgMouseTrail />
 
-      <section style={{
+      <section ref={heroRef} style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
         textAlign: 'center', position: 'relative', overflow: 'hidden',
         borderBottom: '1px solid var(--border)',
@@ -382,25 +490,25 @@ export default function Features() {
           background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(138,124,255,0.08) 0%, transparent 70%)',
         }} />
         <div className="container" style={{ maxWidth: 760, position: 'relative' }}>
-          <div className="section-label">Advanced Capabilities</div>
-          <h1 style={{
+          <div className="features-hero-label section-label" style={{ opacity: 0 }}>Advanced Capabilities</div>
+          <h1 className="features-hero-title" style={{
             fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900,
             letterSpacing: '-0.04em', lineHeight: 1.1,
             margin: '16px 0 24px', color: 'var(--text)',
           }}>
-            Next-generation{' '}
-            <span style={{
-              background: 'var(--grad-brand)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-            }}>
-              clinical simulation
+            <span className="features-hero-title-line" style={{ display: 'block' }}>Next-generation</span>
+            <span className="features-hero-title-line" style={{ display: 'block' }}>
+              clinical{' '}
+              <span className="text-gradient">
+                simulation
+              </span>
             </span>
           </h1>
-          <p style={{ fontSize: 'var(--fs-lg)', color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 600, margin: '0 auto 32px' }}>
+          <p className="features-hero-sub" style={{ fontSize: 'var(--fs-lg)', color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 600, margin: '0 auto 32px' }}>
             CURA.AI bridges the gap between textbook theory and real-world clinical application
             with immersive, AI-powered patient simulations built for medical students and early-career doctors.
           </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="features-hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={() => navigate('/register')} className="btn btn-primary btn-lg">Get Started Free</button>
             <button onClick={() => navigate('/simulator?demo=cardiology')} className="btn btn-outline btn-lg">Try Cardiology Demo</button>
           </div>
@@ -416,7 +524,7 @@ export default function Features() {
         <div className="container">
           <div style={{ display: 'flex', gap: 'var(--sp-3)', overflow: 'hidden', flexWrap: 'wrap', justifyContent: 'center' }}>
             {SPECIALTIES.map(s => (
-              <div key={s} className="badge badge-purple" style={{ cursor: 'pointer' }}
+              <div key={s} className="badge badge-purple specialty-badge" style={{ cursor: 'pointer' }}
                 onClick={() => navigate(`/simulator?demo=${encodeURIComponent(s.toLowerCase())}`)}>
                 {s}
               </div>
@@ -433,7 +541,7 @@ export default function Features() {
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <h2 className="cta-title">
             Start training today.<br />
-            <span style={{ background: 'var(--grad-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            <span className="text-gradient">
               Zero risk. Real results.
             </span>
           </h2>

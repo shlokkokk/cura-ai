@@ -1,5 +1,9 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useRef, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Landing from './pages/Landing';
@@ -12,6 +16,7 @@ import About from './pages/About';
 import Profile from './pages/Profile';
 import PatientHistory from './pages/PatientHistory';
 import Pricing from './pages/Pricing';
+import EkgMouseTrail from './components/EkgMouseTrail';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -37,14 +42,65 @@ function AppRoutes() {
   );
 }
 
+// Smooth scroll wrapper — conditionally uses ScrollSmoother on all pages except Features
+function SmoothedApp() {
+  const wrapperRef = useRef(null);
+  const contentRef = useRef(null);
+  const { pathname } = useLocation();
+  const isFeaturesPage = pathname === '/features';
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const smoother = ScrollSmoother.get();
+    if (smoother) {
+      smoother.scrollTop(0);
+    }
+  }, [pathname]);
+
+  useGSAP(() => {
+    if (isFeaturesPage) return;
+
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const smoother = ScrollSmoother.create({
+        wrapper: wrapperRef.current,
+        content: contentRef.current,
+        smooth: 1.4,          // 1.4s lag — luxuriously smooth
+        effects: true,         // enable data-speed / data-lag parallax attrs
+        normalizeScroll: true, // neutralise browser scroll jank on mobile
+        ignoreMobileResize: true,
+      });
+
+      return () => smoother.kill();
+    });
+
+    return () => mm.revert();
+  }, [pathname]);
+
+  if (isFeaturesPage) {
+    return <AppRoutes />;
+  }
+
+  return (
+    <div id="smooth-wrapper" ref={wrapperRef}>
+      <div id="smooth-content" ref={contentRef}>
+        <AppRoutes />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <AppRoutes />
+          <EkgMouseTrail />
+          <SmoothedApp />
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   );
 }
+
