@@ -119,7 +119,7 @@ export default function Dashboard() {
     const breakdown = progress?.caseBreakdown || [];
     if (breakdown.length > 0) {
       const avgAll = breakdown.map(c => c.bestScore || 0);
-      const avg = n => Math.min(100, Math.round(avgAll.reduce((a, b) => a + b, 0) / Math.max(avgAll.length, 1)));
+      const avg = () => Math.min(100, Math.round(avgAll.reduce((a, b) => a + b, 0) / Math.max(avgAll.length, 1)));
       setRadarData([
         { subject: 'History', score: avg() },
         { subject: 'Diagnosis', score: Math.max(0, avg() - 5) },

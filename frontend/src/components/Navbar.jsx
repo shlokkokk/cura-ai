@@ -126,7 +126,7 @@ export default function Navbar() {
           </button>
 
           {user ? (
-            <>
+            <div className="navbar-actions-desktop" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Link to="/simulator" className="btn btn-primary btn-sm">
                 Open Lab
               </Link>
@@ -135,12 +135,12 @@ export default function Navbar() {
                 onClick={() => navigate('/dashboard')}
                 title={`${user.name} — Dashboard`}
               />
-            </>
+            </div>
           ) : (
-            <>
+            <div className="navbar-actions-desktop" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <Link to="/login" className="btn btn-ghost btn-sm">Sign In</Link>
               <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
-            </>
+            </div>
           )}
 
           {/* Mobile hamburger */}

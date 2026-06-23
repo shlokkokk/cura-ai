@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
 
@@ -118,8 +118,7 @@ function TestItem({ name, ordered, onToggle }) {
 
 /* ── Main Component ─────────────────────────────────────────────── */
 export default function Simulator() {
-  const { user, saveUser } = useAuth();
-  const { isDark }         = useTheme();
+  const { user } = useAuth();
   const navigate           = useNavigate();
   const location           = useLocation();
 
@@ -145,6 +144,7 @@ export default function Simulator() {
   const [orderedTests,  setOrderedTests]  = useState(new Set());
   const [listening,     setListening]     = useState(false);
   const [toastType,     setToastType]     = useState('info'); // 'info' | 'error' | 'success'
+  const [activeTab,     setActiveTab]     = useState('chat'); // 'chat' | 'tests' | 'profile'
 
   const chatLogRef = useRef(null);
   const inputRef   = useRef(null);
@@ -556,11 +556,33 @@ export default function Simulator() {
         </div>
       </header>
 
+      {/* Mobile Tab Switcher */}
+      <div className="sim-mobile-tabs">
+        <button 
+          className={`sim-mobile-tab ${activeTab === 'tests' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tests')}
+        >
+          Investigations
+        </button>
+        <button 
+          className={`sim-mobile-tab ${activeTab === 'chat' ? 'active' : ''}`}
+          onClick={() => setActiveTab('chat')}
+        >
+          Consultation
+        </button>
+        <button 
+          className={`sim-mobile-tab ${activeTab === 'profile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('profile')}
+        >
+          Patient Profile
+        </button>
+      </div>
+
       {/* ── 3-Panel Workspace ────────────────────────────────────── */}
       <div className="sim-workspace">
 
         {/* ── LEFT: Recommended Tests ───────────────────────────── */}
-        <div className="sim-panel sim-panel-left">
+        <div className={`sim-panel sim-panel-left ${activeTab === 'tests' ? 'mobile-active' : ''}`}>
           <div className="sim-panel-header">Recommended Tests</div>
 
           <div className="sim-panel-body">
@@ -628,7 +650,7 @@ export default function Simulator() {
         </div>
 
         {/* ── CENTER: Chat ───────────────────────────────────────── */}
-        <div className="sim-panel sim-panel-center" style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className={`sim-panel sim-panel-center ${activeTab === 'chat' ? 'mobile-active' : ''}`}>
           {/* Patient selector bar */}
           <div className="chat-patient-bar">
             {cases.length > 1 ? (
@@ -778,7 +800,7 @@ export default function Simulator() {
         </div>
 
         {/* ── RIGHT: Patient Data ────────────────────────────────── */}
-        <div className="sim-panel sim-panel-right">
+        <div className={`sim-panel sim-panel-right ${activeTab === 'profile' ? 'mobile-active' : ''}`}>
           <div className="sim-panel-header">Patient Profile</div>
 
           <div className="sim-panel-body">

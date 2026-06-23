@@ -209,7 +209,7 @@ export default function PatientHistory() {
                       </tr>
                     ))
                   ) : filtered.length > 0 ? (
-                    filtered.map((s, idx) => {
+                    filtered.map((s) => {
                       const c = cases[s.caseId] || {};
                       const score = s.lastEvaluation?.score;
                       const sessionNumber = history.length - history.indexOf(s);

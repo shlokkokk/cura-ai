@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 
 const SPECIALTIES = [
@@ -21,6 +22,7 @@ const ROLES = [
 
 export default function Profile() {
   const { user, saveUser } = useAuth();
+  const { isDark, toggle } = useTheme();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name:          user?.name || '',
@@ -217,6 +219,37 @@ export default function Profile() {
               ) : 'Save Profile'}
             </button>
           </form>
+
+          {/* Mobile-only app settings */}
+          <div className="mobile-only-settings" style={{ marginTop: 'var(--sp-6)', display: 'none' }}>
+            <div className="chart-card">
+              <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', marginBottom: 4 }}>App Settings</div>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--text-muted)', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+                Theme and session preferences for mobile view.
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <button
+                  type="button"
+                  onClick={toggle}
+                  className="btn btn-outline"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  {isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveUser(null);
+                    navigate('/');
+                  }}
+                  className="btn btn-danger"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Sign Out / Log Out
+                </button>
+              </div>
+            </div>
+          </div>
 
         </div>
       </main>

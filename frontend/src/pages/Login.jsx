@@ -184,6 +184,7 @@ export default function Login() {
         {/* Back link */}
         <Link
           to="/"
+          className="auth-back-link"
           style={{
             position: 'absolute', top: 24, left: 28,
             display: 'flex', alignItems: 'center', gap: 6,

@@ -2295,14 +2295,22 @@ p { font-family: var(--font-body); }
 .dash-grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: var(--sp-6); }
 .dash-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 .dash-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); }
+.dash-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); margin-bottom: var(--sp-6); }
+.dash-charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); margin-bottom: var(--sp-6); }
+.dash-bottom-row { display: grid; grid-template-columns: 2fr 1fr; gap: var(--sp-6); }
 @media (max-width: 1024px) {
   .dash-grid-2 { grid-template-columns: 1fr; }
   .dash-grid-4 { grid-template-columns: 1fr 1fr; }
+  .dash-stats-row { grid-template-columns: 1fr 1fr; }
+  .dash-charts-row { grid-template-columns: 1fr; }
+  .dash-bottom-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   .dash-grid-3 { grid-template-columns: 1fr 1fr; }
   .dash-grid-4 { grid-template-columns: 1fr 1fr; }
+  .dash-stats-row { grid-template-columns: 1fr; }
 }
+
 
 /* ── MOBILE NAV DRAWER ────────────────────────────────────────────── */
 .mobile-drawer {
@@ -3201,5 +3209,295 @@ p { font-family: var(--font-body); }
   z-index: 0;
   opacity: 0.5;
 }
+
+/* ── 33. MOBILE RESPONSIVENESS AND LAYOUT PATCHES ───────────────── */
+
+/* Default desktop styles for dashboard layouts */
+.dash-page {
+  display: flex;
+}
+.dash-content {
+  padding: var(--sp-8);
+  flex: 1;
+}
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-8);
+}
+.dash-greeting {
+  font-family: var(--font);
+  font-size: var(--fs-3xl);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+.dash-greeting span {
+  background: var(--grad-brand);
+  WebkitBackgroundClip: text;
+  WebkitTextFillColor: transparent;
+  background-clip: text;
+}
+
+/* Sidebar label display rules */
+.sidebar-label-desktop {
+  display: block;
+}
+.sidebar-label-mobile {
+  display: none;
+}
+
+/* Mobile responsive settings */
+.mobile-only-settings {
+  display: none;
+}
+
+/* Devise layout switches for Simulator */
+.sim-mobile-tabs {
+  display: none;
+}
+.sim-panel-center {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global Mobile Overrides (width <= 768px) */
+@media (max-width: 768px) {
+  /* Prevent button text overflow */
+  .btn {
+    white-space: normal !important;
+    text-align: center;
+    word-break: break-word;
+  }
+  .btn-lg {
+    padding: 10px 20px !important;
+    font-size: var(--fs-sm) !important;
+    border-radius: var(--r-lg) !important;
+  }
+  .btn-xl {
+    padding: 12px 24px !important;
+    font-size: var(--fs-base) !important;
+    border-radius: var(--r-xl) !important;
+  }
+
+  /* Navbar desktop hide and menu formatting */
+  .navbar-actions-desktop {
+    display: none !important;
+  }
+  .navbar {
+    padding: 0 var(--sp-4) !important;
+  }
+
+  /* Convert sidebar layout to fixed bottom tab navigation */
+  .sidebar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    height: 64px !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-height: 64px !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    background: var(--surface) !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border-md) !important;
+    padding: 0 var(--sp-2) !important;
+    z-index: var(--z-sticky) !important;
+    box-shadow: 0 -2px 12px rgba(13,11,26,0.15) !important;
+    overflow: hidden !important;
+  }
+  [data-theme="light"] .sidebar {
+    background: rgba(250,252,255,0.96) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 -2px 12px rgba(138,124,255,0.1) !important;
+  }
+  .sidebar-brand,
+  .sidebar-section-label,
+  .sidebar-footer {
+    display: none !important;
+  }
+  .sidebar-nav {
+    flex-direction: row !important;
+    width: 100% !important;
+    justify-content: space-around !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .sidebar-link {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    padding: 4px 10px !important;
+    font-size: 10px !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    transition: color var(--t);
+    flex: 1;
+    min-height: 52px;
+  }
+  .sidebar-link.active {
+    background: transparent !important;
+    color: var(--purple) !important;
+    border-color: transparent !important;
+    font-weight: 700 !important;
+  }
+  .sidebar-link svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .sidebar-label-desktop {
+    display: none !important;
+  }
+  .sidebar-label-mobile {
+    display: block !important;
+  }
+
+  /* Main content container push adjustment */
+  .app-main-with-sidebar {
+    margin-left: 0 !important;
+    padding-bottom: 80px !important; /* spacing for bottom navbar */
+  }
+  .dash-content {
+    padding: var(--sp-4) !important;
+  }
+  .dash-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: var(--sp-4) !important;
+    margin-bottom: var(--sp-6) !important;
+  }
+  .dash-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Profile mobile setting overrides */
+  .mobile-only-settings {
+    display: block !important;
+  }
+
+  /* Patient history table column modifications */
+  table th:nth-child(1), table td:nth-child(1), /* # */
+  table th:nth-child(4), table td:nth-child(4), /* Date */
+  table th:nth-child(5), table td:nth-child(5)  /* Time */ {
+    display: none !important;
+  }
+  table th, table td {
+    padding: 10px 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Simulation Lab mobile panel switcher */
+  .sim-mobile-tabs {
+    display: flex !important;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-md);
+    height: 48px;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 var(--sp-2);
+    position: sticky;
+    top: 56px;
+    z-index: var(--z-raised);
+  }
+  .sim-mobile-tab {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: all var(--t);
+  }
+  .sim-mobile-tab.active {
+    color: var(--purple);
+    background: var(--purple-dim);
+  }
+
+  .sim-workspace {
+    grid-template-columns: 1fr !important;
+    height: calc(100vh - 104px) !important; /* minus header (56px) + switcher (48px) */
+  }
+  .sim-panel-left,
+  .sim-panel-right,
+  .sim-panel-center {
+    display: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    height: 100% !important;
+  }
+  .sim-panel-left.mobile-active,
+  .sim-panel-right.mobile-active,
+  .sim-panel-center.mobile-active {
+    display: flex !important;
+  }
+
+  /* Features Grid column fix */
+  .features-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .feature-card-span-2 {
+    grid-column: auto !important;
+  }
+}
+
+/* Center alignment for the hamburger mobile toggle icon */
+#nav-mobile-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Document flow positioning for the back-to-home button on login/register cards */
+@media (max-width: 768px) {
+  .auth-right, .reg-right {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: var(--sp-12) var(--sp-4) var(--sp-4) !important;
+  }
+  .reg-back-link,
+  .auth-back-link {
+    position: static !important;
+    margin-bottom: var(--sp-4) !important;
+    align-self: flex-start !important;
+    margin-left: var(--sp-2) !important;
+    width: fit-content !important;
+  }
+  .auth-box, .reg-form-card {
+    margin-top: 0 !important;
+  }
+
+  /* Make specialties scroll cards narrower so more fit on mobile screens */
+  .specialty-chip {
+    padding: 8px 14px !important;
+    gap: var(--sp-2) !important;
+  }
+  .specialty-chip-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: var(--r-md) !important;
+  }
+  .specialty-chip-count {
+    display: none !important;
+  }
+}
+
+
 
 

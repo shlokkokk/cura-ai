@@ -48,10 +48,10 @@ const icons = {
 };
 
 const navItems = [
-  { to: '/dashboard', icon: icons.dashboard, label: 'Overview' },
-  { to: '/simulator', icon: icons.simulator, label: 'Simulation Lab' },
-  { to: '/history',   icon: icons.history,   label: 'Session History' },
-  { to: '/profile',   icon: icons.profile,   label: 'Profile' },
+  { to: '/dashboard', icon: icons.dashboard, label: 'Overview', shortLabel: 'Overview' },
+  { to: '/simulator', icon: icons.simulator, label: 'Simulation Lab', shortLabel: 'Lab' },
+  { to: '/history',   icon: icons.history,   label: 'Session History', shortLabel: 'History' },
+  { to: '/profile',   icon: icons.profile,   label: 'Profile', shortLabel: 'Profile' },
 ];
 
 export default function Sidebar() {
@@ -72,7 +72,7 @@ export default function Sidebar() {
 
       <div className="sidebar-section-label">Navigation</div>
       <nav className="sidebar-nav">
-        {navItems.map(({ to, icon, label }) => (
+        {navItems.map(({ to, icon, label, shortLabel }) => (
           <NavLink
             key={to}
             to={to}
@@ -80,7 +80,8 @@ export default function Sidebar() {
             className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
           >
             {icon}
-            {label}
+            <span className="sidebar-label-desktop">{label}</span>
+            <span className="sidebar-label-mobile">{shortLabel}</span>
           </NavLink>
         ))}
       </nav>
