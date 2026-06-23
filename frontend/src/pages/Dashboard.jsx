@@ -10,7 +10,6 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 
-/* ── Helpers ────────────────────────────────────────────────────── */
 const scoreClass = (s) => s >= 75 ? 'high' : s >= 50 ? 'mid' : 'low';
 
 function formatDate(iso) {
@@ -78,7 +77,6 @@ function ScoreRing({ score, size = 120 }) {
   );
 }
 
-/* ── Main component ─────────────────────────────────────────────── */
 export default function Dashboard() {
   const { user } = useAuth();
   const { isDark } = useTheme();
@@ -182,7 +180,6 @@ export default function Dashboard() {
       <main className="app-main-with-sidebar">
         <div className="dash-content">
 
-          {/* ── Header ───────────────────────────────────────────── */}
           <div className="dash-header">
             <div>
               <h1 className="dash-greeting">
@@ -210,7 +207,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* ── Stats Row ────────────────────────────────────────── */}
           <div className="dash-stats-row">
             {[
               {
@@ -274,7 +270,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* ── Charts Row ───────────────────────────────────────── */}
           <div className="dash-charts-row">
             {/* Line chart — score over time */}
             <div className="chart-card">
@@ -345,7 +340,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ── Bottom Row ───────────────────────────────────────── */}
           <div className="dash-bottom-row">
             {/* Recent sessions */}
             <div className="chart-card">
@@ -471,7 +465,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ── Case Progress (if data exists) ───────────────────── */}
           {!loading && stats?.caseBreakdown?.length > 0 && (
             <div className="chart-card" style={{ marginTop: 16 }}>
               <div className="chart-card-header">

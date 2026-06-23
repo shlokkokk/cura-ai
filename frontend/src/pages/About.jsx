@@ -42,7 +42,6 @@ export default function About() {
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
       <section style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
         position: 'relative', overflow: 'hidden',
@@ -83,7 +82,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── Origin Story ──────────────────────────────────────────── */}
       <section className="section-sm" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="container" style={{ maxWidth: 1100 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
@@ -156,7 +154,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── Core Values ───────────────────────────────────────────── */}
       <section className="section-sm" style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border-md)' }}>
         <div className="container" style={{ maxWidth: 1100 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -184,7 +181,6 @@ export default function About() {
       </section>
 
 
-      {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="cta-section">
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <h2 className="cta-title">
@@ -203,7 +199,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────────────── */}
       <footer className="footer">
         <div className="container">
           <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>

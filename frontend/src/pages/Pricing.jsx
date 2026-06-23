@@ -65,7 +65,6 @@ export default function Pricing() {
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
       <section style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
         textAlign: 'center',
@@ -98,7 +97,6 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* ── Plans ─────────────────────────────────────────────────── */}
       <section style={{ padding: 'var(--sp-20) 0', borderBottom: '1px solid var(--border)' }}>
         <div className="container" style={{ maxWidth: 900 }}>
           <div style={{
@@ -172,7 +170,6 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* ── FAQ ───────────────────────────────────────────────────── */}
       <section style={{ padding: 'var(--sp-20) 0', borderBottom: '1px solid var(--border)' }}>
         <div className="container" style={{ maxWidth: 720 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
@@ -230,7 +227,6 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="cta-section">
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <h2 className="cta-title">

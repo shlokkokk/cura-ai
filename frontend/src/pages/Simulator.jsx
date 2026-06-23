@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
 
-/* ── Icons ─────────────────────────────────────────────────────── */
 const SendIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -52,7 +51,6 @@ const DownloadIcon = () => (
   </svg>
 );
 
-/* ── Vitals parser — extracts values from vitals string ─────────── */
 function parseVitals(vitalsStr) {
   if (!vitalsStr) return [];
   const patterns = [
@@ -70,11 +68,9 @@ function parseVitals(vitalsStr) {
     .filter(Boolean);
 }
 
-/* ── Time formatter ─────────────────────────────────────────────── */
 const formatTime = (s) =>
   `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
-/* ── Score ring ─────────────────────────────────────────────────── */
 function ScoreRing({ score }) {
   const r = 54;
   const circ = 2 * Math.PI * r;
@@ -101,7 +97,6 @@ function ScoreRing({ score }) {
   );
 }
 
-/* ── Ordered test item ──────────────────────────────────────────── */
 function TestItem({ name, ordered, onToggle }) {
   return (
     <button
@@ -116,13 +111,11 @@ function TestItem({ name, ordered, onToggle }) {
   );
 }
 
-/* ── Main Component ─────────────────────────────────────────────── */
 export default function Simulator() {
   const { user } = useAuth();
   const navigate           = useNavigate();
   const location           = useLocation();
 
-  /* ── All original state preserved ─────────────────────────────── */
   const [cases,                setCases]                = useState([]);
   const [activeCase,           setActiveCase]           = useState(null);
   const [sessionId,            setSessionId]            = useState(null);
@@ -140,7 +133,6 @@ export default function Simulator() {
   const [timeLeft,             setTimeLeft]             = useState(600);
   const [lightboxImg,          setLightboxImg]          = useState(null);
 
-  /* ── New UI state ──────────────────────────────────────────────── */
   const [orderedTests,  setOrderedTests]  = useState(new Set());
   const [listening,     setListening]     = useState(false);
   const [toastType,     setToastType]     = useState('info'); // 'info' | 'error' | 'success'
@@ -150,7 +142,6 @@ export default function Simulator() {
   const inputRef   = useRef(null);
   const recognitionRef = useRef(null);
 
-  /* ── All original logic preserved exactly ──────────────────────── */
   const cardiologyReports = [
     { id: 'ecg-interpretation', title: 'ECG — 12 Lead Interpretation', image: '/reports/ecg-interpretation.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
     { id: 'ecg-pattern-comparison', title: 'ECG — Pattern Comparison', image: '/reports/ecg-pattern-comparison.png', type: 'Reference', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure', 'atrial fibrillation', 'irregular', 'palpitation', 'arrhythmia', 'afib', 'tachycardia', 'fast heart', 'anxiety', 'normal', 'baseline', 'stable'] }
@@ -234,7 +225,6 @@ export default function Simulator() {
     }
   };
 
-  /* ── Emergency timer ────────────────────────────────────────────── */
   useEffect(() => {
     let timer;
     if (isEmergencyMode && timeLeft > 0 && sessionId && !evaluation) {
@@ -248,13 +238,11 @@ export default function Simulator() {
     return () => clearInterval(timer);
   }, [isEmergencyMode, timeLeft, sessionId, evaluation]);
 
-  /* ── Demo user + URL params ─────────────────────────────────────── */
   const searchParams = new URLSearchParams(location.search);
   const demoSpecialty = searchParams.get('demo');
   const demoUserObj = React.useMemo(() => ({ id: null, name: 'Demo User', specialization: 'Cardiology' }), []);
   const effectiveUser = user || (demoSpecialty ? demoUserObj : null);
 
-  /* ── Load cases on mount ────────────────────────────────────────── */
   useEffect(() => {
     if (!effectiveUser) { navigate('/login'); return; }
 
@@ -287,14 +275,12 @@ export default function Simulator() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectiveUser, navigate, demoSpecialty]);
 
-  /* ── Auto-scroll chat ───────────────────────────────────────────── */
   useEffect(() => {
     if (chatLogRef.current) {
       chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
     }
   }, [messages, evaluation]);
 
-  /* ── Handlers ───────────────────────────────────────────────────── */
   function showToast(msg, type = 'info') {
     setToastMessage(msg);
     setToastType(type);
@@ -440,13 +426,9 @@ export default function Simulator() {
 
   if (!effectiveUser) return null;
 
-  /* ────────────────────────────────────────────────────────────────
-     RENDER
-  ─────────────────────────────────────────────────────────────── */
   return (
     <div className="sim-shell">
 
-      {/* ── AI Generating Overlay ─────────────────────────────────── */}
       {generatingAI && (
         <div className="page-loading">
           <div style={{
@@ -466,7 +448,6 @@ export default function Simulator() {
         </div>
       )}
 
-      {/* ── Top Header ───────────────────────────────────────────── */}
       <header className="sim-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <button
@@ -578,10 +559,8 @@ export default function Simulator() {
         </button>
       </div>
 
-      {/* ── 3-Panel Workspace ────────────────────────────────────── */}
       <div className="sim-workspace">
 
-        {/* ── LEFT: Recommended Tests ───────────────────────────── */}
         <div className={`sim-panel sim-panel-left ${activeTab === 'tests' ? 'mobile-active' : ''}`}>
           <div className="sim-panel-header">Recommended Tests</div>
 
@@ -649,7 +628,6 @@ export default function Simulator() {
           </div>
         </div>
 
-        {/* ── CENTER: Chat ───────────────────────────────────────── */}
         <div className={`sim-panel sim-panel-center ${activeTab === 'chat' ? 'mobile-active' : ''}`}>
           {/* Patient selector bar */}
           <div className="chat-patient-bar">
@@ -799,7 +777,6 @@ export default function Simulator() {
           )}
         </div>
 
-        {/* ── RIGHT: Patient Data ────────────────────────────────── */}
         <div className={`sim-panel sim-panel-right ${activeTab === 'profile' ? 'mobile-active' : ''}`}>
           <div className="sim-panel-header">Patient Profile</div>
 
@@ -940,7 +917,6 @@ export default function Simulator() {
         </div>
       </div>
 
-      {/* ── Assessment / Feedback Modal ─────────────────────────── */}
       {isAssessmentModalOpen && (
         <div className="modal-overlay">
           <div className="modal" style={{ maxWidth: 600 }}>
@@ -1124,7 +1100,6 @@ export default function Simulator() {
         </div>
       )}
 
-      {/* ── Image Lightbox ─────────────────────────────────────── */}
       {lightboxImg && (
         <div className="lightbox" onClick={() => setLightboxImg(null)}>
           <div className="lightbox-inner" onClick={e => e.stopPropagation()}>
@@ -1146,7 +1121,6 @@ export default function Simulator() {
         </div>
       )}
 
-      {/* ── Toast ─────────────────────────────────────────────── */}
       {toastMessage && (
         <div style={{
           position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',

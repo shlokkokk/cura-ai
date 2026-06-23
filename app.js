@@ -23,7 +23,6 @@
     user: JSON.parse(localStorage.getItem("vps_user") || "null")
   };
 
-  /* ── DOM refs ── */
   const $ = (id) => document.getElementById(id);
   const el = {
     landingPage: $("landingPage"),
@@ -58,7 +57,6 @@
     navSimulation: $("navSimulation")
   };
 
-  /* ── Page Navigation ── */
   function showSimulator() {
     if (!state.user) {
       showToast("Please sign in to access the Simulation Lab.", "warning");
@@ -80,7 +78,6 @@
   el.backToLanding?.addEventListener("click", showLanding);
   el.navSimulation?.addEventListener("click", (e) => { e.preventDefault(); showSimulator(); });
 
-  /* ── Toast ── */
   function showToast(message, type = "error") {
     let c = $("toastContainer");
     if (!c) { c = document.createElement("div"); c.id = "toastContainer"; c.className = "toast-container"; document.body.appendChild(c); }
@@ -92,7 +89,6 @@
     setTimeout(() => { t.classList.remove("toast--visible"); setTimeout(() => t.remove(), 400); }, 4500);
   }
 
-  /* ── API Helper ── */
   async function api(path, options = {}) {
     const res = await fetch(`${API}${path}`, { headers: { "Content-Type": "application/json", ...options.headers }, ...options });
     const data = await res.json();
@@ -107,7 +103,6 @@
     el.evaluateBtn.disabled = v;
   }
 
-  /* ── User Management ── */
   function saveUser(user) { state.user = user; localStorage.setItem("vps_user", JSON.stringify(user)); renderUserBar(); }
   function clearUser() { state.user = null; localStorage.removeItem("vps_user"); renderUserBar(); }
 
@@ -135,7 +130,6 @@
 
   function closeAuthModal() { if (el.authModal) { el.authModal.classList.remove("is-visible"); el.authModal.innerHTML = ""; } }
 
-  /* ── History ── */
   async function showHistory() {
     if (!state.user || !el.historyPanel) return;
     el.historyPanel.classList.add("is-visible");
@@ -166,7 +160,6 @@
 
   function closeHistory() { if (el.historyPanel) { el.historyPanel.classList.remove("is-visible"); el.historyPanel.innerHTML = ""; } }
 
-  /* ── Progress ── */
   async function showProgress() {
     if (!state.user || !el.historyPanel) return;
     el.historyPanel.classList.add("is-visible");
@@ -194,7 +187,6 @@
     } catch (err) { showToast("Failed to load progress: " + err.message); closeHistory(); }
   }
 
-  /* ── Rendering ── */
   function renderCases() {
     el.caseList.innerHTML = state.cases.map(p => `
       <article class="case-card ${p.id === state.activeCaseId ? "is-active" : ""}" data-case-id="${p.id}">
@@ -242,13 +234,11 @@
   }
   function hideTyping() { const e = $("typingIndicator"); if (e) e.remove(); }
 
-  /* ── Fetch Cases ── */
   async function fetchCases() {
     try { const data = await api("/api/cases"); state.cases = data.cases || []; renderCases(); }
     catch (err) { showToast("Could not load patient cases \u2014 is the backend running?"); console.error("fetchCases:", err); }
   }
 
-  /* ── Load Case ── */
   async function loadCase(caseId) {
     if (!state.user) {
       showToast("Please sign in to practice.", "warning");
@@ -285,7 +275,6 @@
     finally { setLoading(false); }
   }
 
-  /* ── Send Message ── */
   async function sendMessage(text) {
     if (!state.sessionId || state.loading) return;
     addMessage("user", text); el.userQuestion.value = ""; showTyping();
@@ -298,7 +287,6 @@
     finally { setLoading(false); }
   }
 
-  /* ── Evaluate ── */
   async function evaluateCase() {
     if (!state.sessionId) { showToast("Start a patient session first.", "warning"); return; }
     const diagnosis = el.diagnosisInput.value.trim();
@@ -335,7 +323,6 @@
     return `<article class="feedback-item${cls}"><h4>${title}</h4><ul>${items.map(i => `<li>${i}</li>`).join("")}</ul></article>`;
   }
 
-  /* ── Events ── */
   el.chatForm?.addEventListener("submit", e => { e.preventDefault(); const q = el.userQuestion.value.trim(); if (q) sendMessage(q); });
   el.userQuestion?.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const q = el.userQuestion.value.trim(); if (q) sendMessage(q); } });
   el.evaluateBtn?.addEventListener("click", evaluateCase);
@@ -355,7 +342,6 @@
     el.userQuestion.value = p.hints[asked % p.hints.length]; el.userQuestion.focus();
   });
 
-  /* ── Smooth scroll for nav links ── */
   document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
     link.addEventListener("click", e => {
       const target = document.querySelector(link.getAttribute("href"));
@@ -363,7 +349,6 @@
     });
   });
 
-  /* ── Init ── */
   renderUserBar();
   if (el.integrationGrid) renderIntegrations();
   if (el.caseList) fetchCases();

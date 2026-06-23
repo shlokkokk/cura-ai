@@ -370,7 +370,6 @@ export default function Features() {
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* ── Hero ─────────────────────────────────────────────────── */}
       <section style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
         textAlign: 'center', position: 'relative', overflow: 'hidden',
@@ -406,7 +405,6 @@ export default function Features() {
         </div>
       </section>
 
-      {/* ── Specialties stripe ────────────────────────────────────── */}
       <section style={{
         background: 'var(--surface)',
         borderBottom: '1px solid var(--border)',
@@ -425,12 +423,10 @@ export default function Features() {
         </div>
       </section>
 
-      {/* ── Feature detail sections — alternating ─────────────────── */}
       {DEEP_FEATURES.map((feature, i) => (
         <FeatureSection key={feature.title} feature={feature} index={i} />
       ))}
 
-      {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="cta-section">
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <h2 className="cta-title">
@@ -447,7 +443,6 @@ export default function Features() {
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────────────── */}
       <footer className="footer">
         <div className="container">
           <div className="footer-bottom" style={{ borderTop: 'none', paddingTop: 0 }}>

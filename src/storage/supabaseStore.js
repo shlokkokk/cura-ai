@@ -36,7 +36,6 @@ async function parseResponse(response) {
   return JSON.parse(text);
 }
 
-/* ─── Users ─── */
 
 function mapUserRow(row) {
   return {
@@ -213,7 +212,6 @@ async function getUserProgress(userId) {
   };
 }
 
-/* ─── Sessions ─── */
 
 function mapEvaluationRow(row) {
   return {

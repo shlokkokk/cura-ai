@@ -3,7 +3,6 @@ const { randomUUID } = require("crypto");
 const sessions = new Map();
 const users = new Map();
 
-/* ─── Users ─── */
 
 function buildUserRecord({ name, email, institution, role, yearOfStudy, specialization }) {
   const now = new Date().toISOString();
@@ -111,7 +110,6 @@ async function getUserProgress(userId) {
   };
 }
 
-/* ─── Sessions ─── */
 
 function buildSessionRecord({ caseId, learnerName, userId }) {
   const now = new Date().toISOString();

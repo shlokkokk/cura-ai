@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Logo from './Logo';
 
-/* ── Icons ─────────────────────────────────────────────────────────── */
 const MoonIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -30,7 +29,6 @@ const XIcon = () => (
   </svg>
 );
 
-/* ── User initial avatar — Figma style gradient circle ─────────────── */
 function UserAvatar({ name, onClick, title }) {
   const initial = name?.charAt(0).toUpperCase() || '?';
   return (
@@ -62,7 +60,6 @@ function UserAvatar({ name, onClick, title }) {
   );
 }
 
-/* ── Main Navbar ───────────────────────────────────────────────────── */
 export default function Navbar() {
   const { user, saveUser } = useAuth();
   const { isDark, toggle } = useTheme();

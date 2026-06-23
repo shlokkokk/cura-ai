@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
 
-/* ── Icons ─────────────────────────────────────────────────────── */
 const EyeIcon = ({ open }) => open ? (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
@@ -30,7 +29,6 @@ const BackIcon = () => (
   </svg>
 );
 
-/* ── ECG SVG path (decorative) — Purple brand ──────────────────── */
 const ECGPath = () => (
   <svg viewBox="0 0 900 120" preserveAspectRatio="none" style={{ width: '100%', height: 80, opacity: 0.22 }}>
     <polyline
@@ -50,7 +48,6 @@ const ECGPath = () => (
   </svg>
 );
 
-/* ── Static data ─────────────────────────────────────────────────── */
 const ROLES = [
   { value: 'student',    label: 'Medical Student' },
   { value: 'resident',   label: 'Resident / Intern' },
@@ -91,12 +88,12 @@ const PERKS = [
     ), title: 'Emergency timed scenarios', desc: 'Train under real clinical pressure' },
 ];
 
-/* ── Component ───────────────────────────────────────────────────── */
 export default function Register() {
   const [form, setForm] = useState({
     name: '', email: '', password: '',
     institution: '', role: 'student', year: '', spec: '',
   });
+  const [step, setStep] = useState(1);
   const [showPwd, setShowPwd]   = useState(false);
   const [pwdStrength, setPwdStrength] = useState(0);
   const [loading, setLoading]   = useState(false);
@@ -121,10 +118,26 @@ export default function Register() {
   const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'];
   const strengthColor = ['', 'var(--danger)', 'var(--warning)', 'var(--indigo)', 'var(--success)'];
 
+  const validateStep1 = () => {
+    if (!form.name.trim()) { setError('Please enter your full name.'); return false; }
+    if (!form.email.trim()) { setError('Please enter your email address.'); return false; }
+    if (!form.password) { setError('Please create a password.'); return false; }
+    if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return false; }
+    setError('');
+    return true;
+  };
+
+  const handleNextStep = (e) => {
+    e.preventDefault();
+    if (validateStep1()) {
+      setStep(2);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateStep1()) { setStep(1); return; }
     if (!form.spec) { setError('Please select a specialization.'); return; }
-    if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setLoading(true);
     setError('');
     try {
@@ -149,323 +162,346 @@ export default function Register() {
     }
   };
 
-  const formComplete = form.name.trim() && form.email.trim() && form.password && form.spec;
+  const formComplete = form.name.trim() && form.email.trim() && form.password.length >= 6 && form.spec;
 
   return (
     <div className="reg-shell">
-      {/* ── LEFT PANEL ──────────────────────────────────────────── */}
-      <aside className="reg-left" aria-hidden="true">
+      {/* Mesh Grid Backdrop */}
+      <div className="auth-grid-bg" />
 
-        {/* Ambient layers */}
-        <div className="reg-left-ambient" />
-        <div className="reg-left-grid" />
+      {/* Floating Ambient Glowing Blobs */}
+      <div className="auth-bg-orb auth-orb-purple" />
+      <div className="auth-bg-orb auth-orb-mint" />
+      <div className="auth-bg-orb auth-orb-indigo" />
 
-        {/* Floating orbs */}
-        <div className="reg-orb reg-orb-1" />
-        <div className="reg-orb reg-orb-2" />
-
-        {/* Logo */}
-        <div className="reg-left-logo">
-          <Logo size={28} color="#fff" />
-        </div>
-
-        {/* Main copy */}
-        <div className="reg-left-body">
-          {/* Badge */}
-          <div className="reg-left-badge">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-            Clinical Simulation Platform
-          </div>
-
-          <h2 className="reg-left-headline">
-            Train like a<br />
-            <span className="reg-left-accent">real doctor.</span>
-          </h2>
-          <p className="reg-left-sub">
-            AI-generated patients. Real clinical reasoning.
-            Instant feedback. Join thousands of med students and residents.
-          </p>
-
-          {/* ECG divider */}
-          <div className="reg-ecg-wrap">
-            <ECGPath />
-          </div>
-
-          {/* Perks list */}
-          <div className="reg-perks">
-            {PERKS.map(({ icon, title, desc }) => (
-              <div key={title} className="reg-perk">
-                <div className="reg-perk-icon">{icon}</div>
-                <div>
-                  <div className="reg-perk-title">{title}</div>
-                  <div className="reg-perk-desc">{desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Social proof */}
-          <div className="reg-social-proof">
-            <div className="reg-proof-avatars">
-              {['S','M','R','A','K'].map((l, i) => (
-                <div key={i} className="reg-proof-avatar" style={{ background: i % 2 === 0 ? 'rgba(138,124,255,0.35)' : 'rgba(166,154,255,0.25)' }}>{l}</div>
-              ))}
-            </div>
-            <div className="reg-proof-text">
-              <strong>2,400+</strong> medical learners already training
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="reg-left-footer">
-          © {new Date().getFullYear()} CURA.AI — Synapse Team
-        </div>
-      </aside>
-
-      {/* ── RIGHT PANEL ─────────────────────────────────────────── */}
+      {/* Centered Workspace Card */}
       <main className="reg-right">
 
-        {/* Back link */}
-        <Link to="/" className="reg-back-link">
-          <BackIcon />
-          Back to home
-        </Link>
+        <div className="reg-form-card card-tech-corners">
+          <div className="card-scanline" />
 
-        {/* Form card */}
-        <div className="reg-form-card">
+          {/* Back link */}
+          <Link to="/" className="reg-back-link">
+            <BackIcon />
+            Back to home
+          </Link>
 
-          {/* Header */}
-          <div className="reg-form-header">
-            <div className="reg-form-eyebrow">Free forever</div>
-            <h1 className="reg-form-title">Create your account</h1>
+          {/* Logo & Header */}
+          <div className="reg-form-header" style={{ textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <Logo size={36} color="var(--purple)" />
+            </div>
+            <div className="reg-form-eyebrow">Medical Practitioner Portal</div>
+            <h1 className="reg-form-title">Practitioner Registration</h1>
             <p className="reg-form-sub">
-              Join and start practicing clinical cases in minutes.
+              Set up your workstation profile to begin simulation cases.
             </p>
           </div>
 
-          {/* Error */}
+          {/* Medical Monitor Vital Signs Readout */}
+          <div className="medical-monitor-panel">
+            <div className="monitor-vital-col">
+              <div className="monitor-vital-val">
+                <div className="pulse-dot" />
+                72 <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>BPM</span>
+              </div>
+              <div className="monitor-vital-lbl">Practitioner HR</div>
+            </div>
+
+            <svg className="monitor-ekg-svg" viewBox="0 0 100 30" preserveAspectRatio="none">
+              <path
+                d="M0 15 L20 15 L25 10 L30 20 L35 0 L40 30 L45 12 L50 15 L70 15 L75 10 L80 20 L85 0 L90 30 L95 12 L100 15"
+                fill="none"
+                stroke="var(--mint)"
+                strokeWidth="1.5"
+                strokeDasharray="200"
+                strokeDashoffset="200"
+                style={{ animation: 'drawEcg 4s linear infinite' }}
+              />
+            </svg>
+
+            <div className="monitor-vital-col" style={{ alignItems: 'flex-end' }}>
+              <div className="monitor-vital-val" style={{ color: 'var(--purple)' }}>
+                SYS 120
+              </div>
+              <div className="monitor-vital-lbl">Link Status: Online</div>
+            </div>
+          </div>
+
+          {/* Medical Progress Tab Tracker */}
+          <div className="medical-step-tracker">
+            <div
+              className={`med-step-tab ${step === 1 ? 'active' : ''}`}
+              onClick={() => step === 2 && setStep(1)}
+            >
+              <span className="step-num">01</span> Identification
+            </div>
+            <div className="med-step-arrow">→</div>
+            <div
+              className={`med-step-tab ${step === 2 ? 'active' : ''}`}
+              onClick={() => step === 1 && validateStep1() && setStep(2)}
+            >
+              <span className="step-num">02</span> Specialization
+            </div>
+          </div>
+
+          {/* Errors */}
           {error && (
             <div className="reg-error">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
               {error}
             </div>
           )}
 
-          {/* Form */}
-          <form className="reg-form" onSubmit={handleSubmit} noValidate>
+          {/* Forms */}
+          <form className="reg-form" onSubmit={step === 1 ? handleNextStep : handleSubmit} noValidate>
 
-            {/* Row 1: Name + Email */}
-            <div className="reg-row-2">
-              <div className="reg-field">
-                <label className="reg-label" htmlFor="reg-name">Full Name <span className="req">*</span></label>
-                <div className="reg-input-wrap">
-                  <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                  </svg>
-                  <input
-                    id="reg-name" type="text"
-                    className="reg-input"
-                    placeholder="Dr. Sarah Johnson"
-                    value={form.name} onChange={set('name')}
-                    autoComplete="name" required disabled={loading}
-                  />
-                </div>
-              </div>
-
-              <div className="reg-field">
-                <label className="reg-label" htmlFor="reg-email">Email Address <span className="req">*</span></label>
-                <div className="reg-input-wrap">
-                  <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-                  </svg>
-                  <input
-                    id="reg-email" type="email"
-                    className="reg-input"
-                    placeholder="sarah@hospital.org"
-                    value={form.email} onChange={set('email')}
-                    autoComplete="email" required disabled={loading}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="reg-field">
-              <label className="reg-label" htmlFor="reg-password">Password <span className="req">*</span></label>
-              <div className="reg-input-wrap">
-                <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                <input
-                  id="reg-password"
-                  type={showPwd ? 'text' : 'password'}
-                  className="reg-input reg-input-pwd"
-                  placeholder="Create a strong password"
-                  value={form.password} onChange={set('password')}
-                  autoComplete="new-password" required disabled={loading} minLength={6}
-                />
-                <button
-                  type="button"
-                  className="reg-eye-btn"
-                  onClick={() => setShowPwd(v => !v)}
-                  aria-label="Toggle password visibility"
-                >
-                  <EyeIcon open={showPwd} />
-                </button>
-              </div>
-
-              {/* Strength meter */}
-              {form.password.length > 0 && (
-                <div className="reg-strength">
-                  <div className="reg-strength-bars">
-                    {[1,2,3,4].map(i => (
-                      <div
-                        key={i}
-                        className="reg-strength-bar"
-                        style={{ background: i <= pwdStrength ? strengthColor[pwdStrength] : 'var(--border-str)' }}
+            {/* PHASE 1: Personal Identification */}
+            {step === 1 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div className="reg-row-2">
+                  <div className="reg-field">
+                    <label className="reg-label" htmlFor="reg-name">Full Name <span className="req">*</span></label>
+                    <div className="reg-input-wrap">
+                      <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                      </svg>
+                      <input
+                        id="reg-name" type="text"
+                        className="reg-input"
+                        placeholder="Dr. Sarah Johnson"
+                        value={form.name} onChange={set('name')}
+                        autoComplete="name" required disabled={loading}
                       />
-                    ))}
+                    </div>
                   </div>
-                  <span className="reg-strength-label" style={{ color: strengthColor[pwdStrength] }}>
-                    {strengthLabel[pwdStrength]}
-                  </span>
+
+                  <div className="reg-field">
+                    <label className="reg-label" htmlFor="reg-email">Email Address <span className="req">*</span></label>
+                    <div className="reg-input-wrap">
+                      <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                      </svg>
+                      <input
+                        id="reg-email" type="email"
+                        className="reg-input"
+                        placeholder="sarah@hospital.org"
+                        value={form.email} onChange={set('email')}
+                        autoComplete="email" required disabled={loading}
+                      />
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
 
-            {/* Institution */}
-            <div className="reg-field">
-              <label className="reg-label" htmlFor="reg-institution">Institution <span className="reg-optional">optional</span></label>
-              <div className="reg-input-wrap">
-                <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-                <input
-                  id="reg-institution" type="text"
-                  className="reg-input"
-                  placeholder="University Medical Center"
-                  value={form.institution} onChange={set('institution')}
-                  autoComplete="organization" disabled={loading}
-                />
-              </div>
-            </div>
+                <div className="reg-field">
+                  <label className="reg-label" htmlFor="reg-password">Password <span className="req">*</span></label>
+                  <div className="reg-input-wrap">
+                    <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <input
+                      id="reg-password"
+                      type={showPwd ? 'text' : 'password'}
+                      className="reg-input reg-input-pwd"
+                      placeholder="Create a strong password"
+                      value={form.password} onChange={set('password')}
+                      autoComplete="new-password" required disabled={loading} minLength={6}
+                    />
+                    <button
+                      type="button"
+                      className="reg-eye-btn"
+                      onClick={() => setShowPwd(v => !v)}
+                      aria-label="Toggle password visibility"
+                    >
+                      <EyeIcon open={showPwd} />
+                    </button>
+                  </div>
 
-            {/* Role + Year */}
-            <div className="reg-row-2">
-              <div className="reg-field">
-                <label className="reg-label" htmlFor="reg-role">Role <span className="req">*</span></label>
-                <div className="reg-select-wrap">
-                  <select id="reg-role" className="reg-select" value={form.role} onChange={set('role')} disabled={loading} required>
-                    {ROLES.map(({ value, label }) => (
-                      <option key={value} value={value}>{label}</option>
-                    ))}
-                  </select>
-                  <svg className="reg-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
+                  {/* Password Strength Indicators */}
+                  {form.password.length > 0 && (
+                    <div className="reg-strength">
+                      <div className="reg-strength-bars">
+                        {[1,2,3,4].map(i => (
+                          <div
+                            key={i}
+                            className="reg-strength-bar"
+                            style={{ background: i <= pwdStrength ? strengthColor[pwdStrength] : 'var(--border-str)' }}
+                          />
+                        ))}
+                      </div>
+                      <span className="reg-strength-label" style={{ color: strengthColor[pwdStrength] }}>
+                        {strengthLabel[pwdStrength]}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </div>
 
-              <div className="reg-field">
-                <label className="reg-label" htmlFor="reg-year">Year / Level</label>
-                <div className="reg-select-wrap">
-                  <select id="reg-year" className="reg-select" value={form.year} onChange={set('year')} disabled={loading}>
-                    <option value="">Select year...</option>
-                    {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                  </select>
-                  <svg className="reg-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
+                <div className="reg-field">
+                  <label className="reg-label" htmlFor="reg-institution">Institution <span className="reg-optional">optional</span></label>
+                  <div className="reg-input-wrap">
+                    <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    <input
+                      id="reg-institution" type="text"
+                      className="reg-input"
+                      placeholder="University Medical Center"
+                      value={form.institution} onChange={set('institution')}
+                      autoComplete="organization" disabled={loading}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Specialization */}
-            <div className="reg-field">
-              <label className="reg-label" htmlFor="reg-spec">Primary Specialization <span className="req">*</span></label>
-              <div className="reg-select-wrap">
-                <select id="reg-spec" className="reg-select" value={form.spec} onChange={set('spec')} required disabled={loading}>
-                  <option value="">Select your specialty...</option>
-                  {SPECIALTIES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <svg className="reg-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6 9 12 15 18 9"/>
-                </svg>
-              </div>
-            </div>
-
-            {/* Progress indicator */}
-            <div className="reg-progress-row">
-              {[
-                !!form.name.trim(),
-                !!form.email.trim(),
-                form.password.length >= 6,
-                !!form.spec,
-              ].map((done, i) => (
-                <div key={i} className={`reg-progress-step ${done ? 'done' : ''}`}>
-                  {done ? <CheckIcon /> : i + 1}
-                </div>
-              ))}
-              <div className="reg-progress-text">
-                {[!!form.name.trim(), !!form.email.trim(), form.password.length >= 6, !!form.spec].filter(Boolean).length} of 4 required fields completed
-              </div>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              className="reg-submit"
-              disabled={loading || !formComplete}
-              id="reg-submit-btn"
-            >
-              {loading ? (
-                <>
-                  <div className="reg-spinner" />
-                  Creating your account...
-                </>
-              ) : (
-                <>
-                  Create Account — It's Free
+                <button
+                  type="submit"
+                  className="reg-submit"
+                  disabled={loading || !form.name.trim() || !form.email.trim() || form.password.length < 6}
+                >
+                  Continue to Specialty Selection
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                   </svg>
-                </>
-              )}
-            </button>
+                </button>
+              </div>
+            )}
+
+            {/* PHASE 2: Specialization & Scope of Practice */}
+            {step === 2 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div className="reg-row-2">
+                  <div className="reg-field">
+                    <label className="reg-label" htmlFor="reg-role">Role <span className="req">*</span></label>
+                    <div className="reg-select-wrap">
+                      <select id="reg-role" className="reg-select" value={form.role} onChange={set('role')} disabled={loading} required>
+                        {ROLES.map(({ value, label }) => (
+                          <option key={value} value={value}>{label}</option>
+                        ))}
+                      </select>
+                      <svg className="reg-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div className="reg-field">
+                    <label className="reg-label" htmlFor="reg-year">Year / Level</label>
+                    <div className="reg-select-wrap">
+                      <select id="reg-year" className="reg-select" value={form.year} onChange={set('year')} disabled={loading}>
+                        <option value="">Select year...</option>
+                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                      <svg className="reg-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="reg-field">
+                  <label className="reg-label" htmlFor="reg-spec">Primary Specialization <span className="req">*</span></label>
+                  <div className="reg-select-wrap">
+                    <select id="reg-spec" className="reg-select" value={form.spec} onChange={set('spec')} required disabled={loading}>
+                      <option value="">Select your specialty...</option>
+                      {SPECIALTIES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <svg className="reg-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Progress Indicators */}
+                <div className="reg-progress-row">
+                  {[
+                    !!form.name.trim(),
+                    !!form.email.trim(),
+                    form.password.length >= 6,
+                    !!form.spec,
+                  ].map((done, i) => (
+                    <div key={i} className={`reg-progress-step ${done ? 'done' : ''}`}>
+                      {done ? <CheckIcon /> : i + 1}
+                    </div>
+                  ))}
+                  <div className="reg-progress-text">
+                    {[!!form.name.trim(), !!form.email.trim(), form.password.length >= 6, !!form.spec].filter(Boolean).length} of 4 required fields completed
+                  </div>
+                </div>
+
+                {/* Submit Action Buttons */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <button
+                    type="submit"
+                    className="reg-submit"
+                    disabled={loading || !formComplete}
+                    id="reg-submit-btn"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="reg-spinner" />
+                        Initializing Workstation...
+                      </>
+                    ) : (
+                      <>
+                        Complete Setup — Access Console
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="reg-submit"
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--border-str)',
+                      color: 'var(--text-muted)',
+                      boxShadow: 'none',
+                      padding: '10px 24px',
+                      fontSize: 'var(--fs-sm)',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                    onClick={() => setStep(1)}
+                    disabled={loading}
+                  >
+                    ← Back to Identification
+                  </button>
+                </div>
+              </div>
+            )}
           </form>
 
-          {/* Footer link */}
+          {/* Sign In Link */}
           <p className="reg-signin-link">
-            Already have an account?{' '}
+            Already registered?{' '}
             <Link to="/login">Sign In</Link>
           </p>
 
-          {/* Trust badges */}
+          {/* Secure Trust Badges */}
           <div className="reg-trust">
             <div className="reg-trust-item">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
-              Secure & encrypted
+              Secure Link
             </div>
             <div className="reg-trust-sep" />
             <div className="reg-trust-item">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
-              No credit card needed
+              No payment req.
             </div>
             <div className="reg-trust-sep" />
             <div className="reg-trust-item">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
-              HIPAA-aware design
+              HIPAA Compliant
             </div>
           </div>
         </div>

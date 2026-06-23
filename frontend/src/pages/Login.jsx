@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
 
-/* ── Icons ─────────────────────────────────────────────────────────── */
 const EyeIcon = ({ open }) => open ? (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
@@ -17,7 +16,6 @@ const EyeIcon = ({ open }) => open ? (
   </svg>
 );
 
-/* ── Left panel feature bullets ─────────────────────────────────────── */
 const BENEFITS = [
   {
     icon: (
@@ -50,7 +48,6 @@ const BENEFITS = [
   },
 ];
 
-/* ── ECG decoration ─────────────────────────────────────────────────── */
 function EcgDecoration() {
   return (
     <svg viewBox="0 0 900 80" preserveAspectRatio="none" style={{ width: '100%', height: 56, opacity: 0.20 }}>
@@ -72,7 +69,6 @@ function EcgDecoration() {
   );
 }
 
-/* ── Main Login ─────────────────────────────────────────────────────── */
 export default function Login() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
@@ -106,87 +102,22 @@ export default function Login() {
 
   return (
     <div className="auth-shell">
-      {/* ── Left panel — Figma purple gradient ──────────────────────── */}
-      <div className="auth-left" aria-hidden="true">
-        <div className="auth-left-glow" />
-        <div className="auth-left-pattern" />
+      {/* Mesh Grid Backdrop */}
+      <div className="auth-grid-bg" />
 
-        {/* Logo */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <Logo size={32} color="#fff" />
-        </div>
+      {/* Floating Ambient Glowing Blobs */}
+      <div className="auth-bg-orb auth-orb-purple" />
+      <div className="auth-bg-orb auth-orb-mint" />
+      <div className="auth-bg-orb auth-orb-indigo" />
 
-        {/* Headline */}
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 380 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '5px 14px', borderRadius: 999,
-            background: 'rgba(255,255,255,0.12)',
-            border: '1px solid rgba(255,255,255,0.20)',
-            marginBottom: 20,
-          }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#6EE7B7', boxShadow: '0 0 8px #6EE7B7' }} />
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.10em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', fontFamily: 'var(--font-body)' }}>
-              Clinical Training Platform
-            </span>
-          </div>
-
-          <h2 style={{
-            fontFamily: 'var(--font)',
-            fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
-            fontWeight: 800, letterSpacing: '-0.04em',
-            color: '#fff', marginBottom: 14, lineHeight: 1.2,
-          }}>
-            Master clinical<br />decision-making.
-          </h2>
-          <p style={{ fontSize: 'var(--fs-sm)', color: 'rgba(255,255,255,0.60)', lineHeight: 1.75, marginBottom: 36, fontFamily: 'var(--font-body)' }}>
-            Practice patient consultations, sharpen diagnostic reasoning,
-            and build real confidence — in a zero-risk environment.
-          </p>
-
-          {/* Feature bullets */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {BENEFITS.map(({ icon, title, desc }) => (
-              <div key={title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                <div style={{
-                  width: 36, height: 36, borderRadius: 10,
-                  background: 'rgba(255,255,255,0.12)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'rgba(255,255,255,0.9)', flexShrink: 0,
-                }}>
-                  {icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: 'rgba(255,255,255,0.95)', marginBottom: 2, fontFamily: 'var(--font-body)' }}>
-                    {title}
-                  </div>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, fontFamily: 'var(--font-body)' }}>
-                    {desc}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ECG decoration */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <EcgDecoration />
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--mono)', marginTop: 8 }}>
-            © {new Date().getFullYear()} CURA.AI — Synapse Team
-          </div>
-        </div>
-      </div>
-
-      {/* ── Right panel: form ────────────────────────────────────────── */}
+      {/* Centered Workspace Card */}
       <div className="auth-right">
         {/* Back link */}
         <Link
           to="/"
           className="auth-back-link"
           style={{
-            position: 'absolute', top: 24, left: 28,
+            position: 'absolute', top: -48, left: 0,
             display: 'flex', alignItems: 'center', gap: 6,
             fontSize: 'var(--fs-sm)', color: 'var(--text-muted)',
             fontFamily: 'var(--font-body)',
@@ -201,17 +132,64 @@ export default function Login() {
           Back to home
         </Link>
 
-        <div className="auth-box">
-          {/* Heading */}
-          <div style={{ marginBottom: 28 }}>
-            <h1 className="auth-title">Welcome back</h1>
-            <p className="auth-subtitle">Sign in to continue your clinical training.</p>
+        <div className="auth-box card-tech-corners">
+          <div className="card-scanline" />
+
+          {/* Logo & Header */}
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <Logo size={36} color="var(--purple)" />
+            </div>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '4px 12px', borderRadius: 999,
+              background: 'var(--purple-dim)',
+              border: '1px solid var(--border-md)',
+              marginBottom: 12,
+            }}>
+              <div className="pulse-dot" style={{ width: 6, height: 6 }} />
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--purple)', textTransform: 'uppercase', fontFamily: 'var(--mono)' }}>
+                Clinical Console Link
+              </span>
+            </div>
+            <h1 className="auth-title">Welcome back, Practitioner</h1>
+            <p className="auth-subtitle">Establish connection to load patient profiles.</p>
+          </div>
+
+          {/* Medical Monitor Vital Signs Readout */}
+          <div className="medical-monitor-panel">
+            <div className="monitor-vital-col">
+              <div className="monitor-vital-val" style={{ color: 'var(--success)' }}>
+                <div className="pulse-dot" style={{ backgroundColor: 'var(--success)' }} />
+                SECURE
+              </div>
+              <div className="monitor-vital-lbl">Station Status</div>
+            </div>
+
+            <svg className="monitor-ekg-svg" viewBox="0 0 100 30" preserveAspectRatio="none">
+              <path
+                d="M0 15 L20 15 L25 10 L30 20 L35 0 L40 30 L45 12 L50 15 L70 15 L75 10 L80 20 L85 0 L90 30 L95 12 L100 15"
+                fill="none"
+                stroke="var(--purple)"
+                strokeWidth="1.5"
+                strokeDasharray="200"
+                strokeDashoffset="200"
+                style={{ animation: 'drawEcg 4s linear infinite' }}
+              />
+            </svg>
+
+            <div className="monitor-vital-col" style={{ alignItems: 'flex-end' }}>
+              <div className="monitor-vital-val" style={{ color: 'var(--mint)' }}>
+                SYS.LINK
+              </div>
+              <div className="monitor-vital-lbl">Diagnostic Port</div>
+            </div>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="alert alert-danger" style={{ marginBottom: 20 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
+            <div className="reg-error" style={{ marginBottom: 20 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
               {error}
@@ -220,23 +198,30 @@ export default function Login() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="auth-form" noValidate>
-            <div className="field">
-              <label htmlFor="login-email">Email address</label>
-              <input
-                id="login-email"
-                type="email"
-                placeholder="doctor@hospital.org"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-                disabled={loading}
-              />
+            <div className="reg-field">
+              <label className="reg-label" htmlFor="login-email">Email Address</label>
+              <div className="reg-input-wrap">
+                <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ left: 14 }}>
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <input
+                  id="login-email"
+                  type="email"
+                  className="reg-input"
+                  placeholder="doctor@hospital.org"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  autoComplete="email"
+                  required
+                  disabled={loading}
+                  style={{ paddingLeft: 40 }}
+                />
+              </div>
             </div>
 
-            <div className="field">
+            <div className="reg-field">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <label htmlFor="login-password">Password</label>
+                <label className="reg-label" htmlFor="login-password">Password</label>
                 <Link
                   to="#"
                   onClick={(e) => {
@@ -248,20 +233,25 @@ export default function Login() {
                   Forgot password?
                 </Link>
               </div>
-              <div className="input-group">
+              <div className="reg-input-wrap">
+                <svg className="reg-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ left: 14 }}>
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
                 <input
                   id="login-password"
                   type={showPwd ? 'text' : 'password'}
+                  className="reg-input reg-input-pwd"
                   placeholder="••••••••••"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   autoComplete="current-password"
                   required
                   disabled={loading}
+                  style={{ paddingLeft: 40 }}
                 />
                 <button
                   type="button"
-                  className="input-action"
+                  className="reg-eye-btn"
                   onClick={() => setShowPwd(v => !v)}
                   aria-label={showPwd ? 'Hide password' : 'Show password'}
                 >
@@ -272,16 +262,16 @@ export default function Login() {
 
             <button
               type="submit"
-              className="btn btn-primary btn-lg w-full"
+              className="reg-submit w-full"
               disabled={loading || !email.trim() || !password.trim()}
-              style={{ marginTop: 4, justifyContent: 'center' }}
+              style={{ marginTop: 8 }}
             >
               {loading ? (
                 <>
-                  <div className="spinner" />
-                  Signing in...
+                  <div className="reg-spinner" />
+                  Establishing Diagnostic Link...
                 </>
-              ) : 'Sign In'}
+              ) : 'Access Clinical Console'}
             </button>
           </form>
 
@@ -289,16 +279,26 @@ export default function Login() {
 
           <Link
             to="/simulator?demo=cardiology"
-            className="btn btn-outline btn-lg w-full"
-            style={{ textAlign: 'center', justifyContent: 'center' }}
+            className="reg-submit w-full"
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border-str)',
+              color: 'var(--text)',
+              boxShadow: 'none',
+              textAlign: 'center',
+              justifyContent: 'center',
+              marginTop: 0,
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--purple)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-str)'}
           >
-            Try Demo — No Account Required
+            Load Demo Session — Offline Access
           </Link>
 
-          <p className="auth-footer-link">
+          <p className="reg-signin-link">
             New to CURA.AI?{' '}
             <Link to="/register" style={{ color: 'var(--purple)', fontWeight: 600 }}>
-              Create a free account
+              Create practitioner account
             </Link>
           </p>
         </div>

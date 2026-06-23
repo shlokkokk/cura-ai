@@ -5,7 +5,6 @@ import { api } from '../utils/api';
 import Navbar from '../components/Navbar';
 import Logo from '../components/Logo';
 
-/* ── SVG Icons ──────────────────────────────────────────────────── */
 const icons = {
   brain: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -54,7 +53,6 @@ const icons = {
   ),
 };
 
-/* ── Specialty definitions (SVG icons, no emojis) ───────────────── */
 const SPECIALTIES = [
   { name: 'Cardiology',        icon: icons.pulse,  desc: 'ECGs, ACS, Heart Failure' },
   { name: 'Neurology',         icon: icons.brain,  desc: 'Stroke, Seizures, Headache' },
@@ -91,13 +89,11 @@ const FEATURES = [
   },
 ];
 
-/* ── ECG SVG path (one full heartbeat cycle repeated) ───────────── */
 const ECG_PATH = `M0,30 L60,30 L70,30 L80,5 L90,55 L100,30 L115,30 L120,30 L130,30 L140,30 L150,30 
   L210,30 L220,30 L230,5 L240,55 L250,30 L265,30 L270,30 L280,30 L290,30 L300,30 
   L360,30 L370,30 L380,5 L390,55 L400,30 L415,30 L420,30 L430,30 L440,30 L450,30
   L510,30 L520,30 L530,5 L540,55 L550,30 L565,30 L570,30 L580,30 L590,30 L600,30`;
 
-/* ── Live chat preview messages ─────────────────────────────────── */
 const DEMO_MSGS = [
   { role: 'patient', text: "Hello doctor. I'm Marcus Webb. I've had crushing chest pain for the past 2 hours. It started suddenly at rest." },
   { role: 'doctor',  text: "Is the pain radiating anywhere — your jaw, left arm, or back?" },
@@ -108,7 +104,6 @@ const DEMO_MSGS = [
   { role: 'patient', text: "Nine. Maybe a ten. It's the worst pain I've ever felt in my life." },
 ];
 
-/* ── Animated stat counter ──────────────────────────────────────── */
 function AnimatedCount({ to, suffix = '' }) {
   const [val, setVal] = useState(0);
   const ref = useRef(null);
@@ -137,7 +132,6 @@ function AnimatedCount({ to, suffix = '' }) {
   return <span ref={ref}>{val}{suffix}</span>;
 }
 
-/* ── Main component ─────────────────────────────────────────────── */
 export default function Landing() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -170,7 +164,6 @@ export default function Landing() {
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
 
-      {/* ── HERO ─────────────────────────────────────────────────── */}
       <section className="landing-hero" id="hero">
         <div className="hero-grid-bg" aria-hidden="true" />
         <div className="hero-glow" aria-hidden="true" />
@@ -363,7 +356,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── STATS BAR ────────────────────────────────────────────── */}
       <section className="stats-bar">
         <div className="container">
           <div className="stats-bar-inner">
@@ -384,7 +376,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── SPECIALTIES ──────────────────────────────────────────── */}
       <section className="section-sm" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="container">
           <div className="section-label">Case Library</div>
@@ -399,47 +390,128 @@ export default function Landing() {
           </div>
 
           <div className="specialties-scroll-container">
-            <div className="specialties-scroll-track" role="list">
-              <div className="specialties-scroll-group">
-                {SPECIALTIES.map(({ name, icon, desc }) => (
-                  <button
-                    key={name}
-                    role="listitem"
-                    className="specialty-chip"
-                    onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
-                    title={`Try a ${name} case`}
-                  >
-                    <div className="specialty-chip-icon">{icon}</div>
-                    <div>
-                      <div className="specialty-chip-name">{name}</div>
-                      <div className="specialty-chip-count">{desc}</div>
-                    </div>
-                  </button>
-                ))}
+            {/* Desktop View: Single row containing all 10 specialties */}
+            <div className="specialties-desktop-only">
+              <div className="specialties-scroll-track" role="list">
+                <div className="specialties-scroll-group">
+                  {SPECIALTIES.map(({ name, icon, desc }) => (
+                    <button
+                      key={name}
+                      role="listitem"
+                      className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
+                      title={`Try a ${name} case`}
+                    >
+                      <div className="specialty-chip-icon">{icon}</div>
+                      <div>
+                        <div className="specialty-chip-name">{name}</div>
+                        <div className="specialty-chip-count">{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="specialties-scroll-group" aria-hidden="true">
+                  {SPECIALTIES.map(({ name, icon, desc }) => (
+                    <button
+                      key={`${name}-dup`}
+                      tabIndex="-1"
+                      className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
+                      title={`Try a ${name} case`}
+                    >
+                      <div className="specialty-chip-icon">{icon}</div>
+                      <div>
+                        <div className="specialty-chip-name">{name}</div>
+                        <div className="specialty-chip-count">{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="specialties-scroll-group" aria-hidden="true">
-                {SPECIALTIES.map(({ name, icon, desc }) => (
-                  <button
-                    key={`${name}-dup`}
-                    tabIndex="-1"
-                    className="specialty-chip"
-                    onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
-                    title={`Try a ${name} case`}
-                  >
-                    <div className="specialty-chip-icon">{icon}</div>
-                    <div>
-                      <div className="specialty-chip-name">{name}</div>
-                      <div className="specialty-chip-count">{desc}</div>
-                    </div>
-                  </button>
-                ))}
+            </div>
+
+            {/* Mobile View: Two rows scrolling in opposite directions */}
+            <div className="specialties-mobile-only" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', overflow: 'hidden' }}>
+              {/* Row 1: First 5 specialties */}
+              <div className="specialties-scroll-track" role="list">
+                <div className="specialties-scroll-group">
+                  {SPECIALTIES.slice(0, 5).map(({ name, icon, desc }) => (
+                    <button
+                      key={name}
+                      role="listitem"
+                      className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
+                      title={`Try a ${name} case`}
+                    >
+                      <div className="specialty-chip-icon">{icon}</div>
+                      <div>
+                        <div className="specialty-chip-name">{name}</div>
+                        <div className="specialty-chip-count">{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="specialties-scroll-group" aria-hidden="true">
+                  {SPECIALTIES.slice(0, 5).map(({ name, icon, desc }) => (
+                    <button
+                      key={`${name}-dup`}
+                      tabIndex="-1"
+                      className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
+                      title={`Try a ${name} case`}
+                    >
+                      <div className="specialty-chip-icon">{icon}</div>
+                      <div>
+                        <div className="specialty-chip-name">{name}</div>
+                        <div className="specialty-chip-count">{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 2: Remaining 5 specialties (scrolls in reverse) */}
+              <div className="specialties-scroll-track-2" role="list" style={{ marginTop: 4 }}>
+                <div className="specialties-scroll-group">
+                  {SPECIALTIES.slice(5).map(({ name, icon, desc }) => (
+                    <button
+                      key={name}
+                      role="listitem"
+                      className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
+                      title={`Try a ${name} case`}
+                    >
+                      <div className="specialty-chip-icon">{icon}</div>
+                      <div>
+                        <div className="specialty-chip-name">{name}</div>
+                        <div className="specialty-chip-count">{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="specialties-scroll-group" aria-hidden="true">
+                  {SPECIALTIES.slice(5).map(({ name, icon, desc }) => (
+                    <button
+                      key={`${name}-dup`}
+                      tabIndex="-1"
+                      className="specialty-chip"
+                      onClick={() => navigate(`/simulator?demo=${encodeURIComponent(name.toLowerCase())}`)}
+                      title={`Try a ${name} case`}
+                    >
+                      <div className="specialty-chip-icon">{icon}</div>
+                      <div>
+                        <div className="specialty-chip-name">{name}</div>
+                        <div className="specialty-chip-count">{desc}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ─────────────────────────────────────────────── */}
       <section className="section" id="features">
         <div className="container">
           <div style={{ maxWidth: 600, marginBottom: 0 }}>
@@ -468,7 +540,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
       <section className="hiw-section" id="how-it-works">
         {/* Ambient blobs */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }} aria-hidden="true">
@@ -561,7 +632,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── REVIEWS ───────────────────────────────────────────────── */}
       <section className="reviews-section" id="reviews">
         {/* Background glow */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }} aria-hidden="true">
@@ -687,7 +757,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────── */}
       <section className="cta-section">
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div
@@ -718,7 +787,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────── */}
       <footer className="footer" role="contentinfo">
         <div className="container">
           <div className="footer-grid">

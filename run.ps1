@@ -21,17 +21,17 @@ function Clear-Port ($port) {
     $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
     if ($connections) {
         $pids = $connections.OwningProcess | Select-Object -Unique
-        foreach ($pid in $pids) {
+        foreach ($p in $pids) {
             try {
-                $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
+                $proc = Get-Process -Id $p -ErrorAction SilentlyContinue
                 if ($proc) {
-                    Write-Host "[!] Found process '$($proc.Name)' (PID: $pid) on port $port. Terminating..." -ForegroundColor Yellow
-                    Stop-Process -Id $pid -Force
-                    Write-Host "[+] Process $pid terminated." -ForegroundColor Green
+                    Write-Host "[!] Found process '$($proc.Name)' (PID: $p) on port $port. Terminating..." -ForegroundColor Yellow
+                    Stop-Process -Id $p -Force
+                    Write-Host "[+] Process $p terminated." -ForegroundColor Green
                 }
             } catch {
-                Write-Host "[!] Failed to stop PID $pid. Attempting taskkill..." -ForegroundColor Red
-                taskkill /F /PID $pid 2>$null
+                Write-Host "[!] Failed to stop PID $p. Attempting taskkill..." -ForegroundColor Red
+                taskkill /F /PID $p 2>$null
             }
         }
     } else {

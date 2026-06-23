@@ -306,7 +306,6 @@ function shouldRateLimit(pathname) {
   );
 }
 
-/* ─── Static file serving ─── */
 
 const STATIC_ROOT = path.resolve(__dirname);
 const STATIC_MIME = {
@@ -376,7 +375,6 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
-    /* ─── AI Provider Status ─── */
     if (request.method === "GET" && pathname === "/api/ai-status") {
       const ollamaReady = await isOllamaAvailable();
       const geminiReady = isGeminiConfigured();
@@ -579,7 +577,6 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       return;
     }
 
-    /* ─── User API ─── */
 
     if (pathname === "/api/users/register") {
       if (request.method !== "POST") { methodNotAllowed(response, context); return; }
@@ -684,7 +681,6 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       return;
     }
 
-    /* ─── Sessions ─── */
 
     if (pathname === "/api/sessions") {
       if (request.method !== "POST") {
@@ -1010,7 +1006,6 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       return;
     }
 
-    /* ─── Report Generation ─── */
     const reportParams = routeMatches(pathname, "/api/sessions/:sessionId/report");
     if (reportParams) {
       if (request.method !== "GET") {
