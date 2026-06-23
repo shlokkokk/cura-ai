@@ -1489,6 +1489,8 @@ p { font-family: var(--font-body); }
 .specialties-scroll-container {
   overflow: hidden;
   position: relative;
+  padding: 10px 0;
+  margin: -10px 0;
 }
 .specialties-scroll-track {
   display: flex;
@@ -1501,6 +1503,10 @@ p { font-family: var(--font-body); }
   gap: var(--sp-3);
   animation: scrollTrack 28s linear infinite reverse;
   width: max-content;
+}
+.specialties-scroll-container:hover .specialties-scroll-track,
+.specialties-scroll-container:hover .specialties-scroll-track-2 {
+  animation-play-state: paused;
 }
 .specialty-chip {
   display: flex;
