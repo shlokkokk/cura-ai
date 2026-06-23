@@ -2,59 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
-// Small wrapper component to scroll-translate the mock visual cards relative to the text
-function ScrollParallax({ children, order }) {
-  const [offset, setOffset] = useState(0);
-  const elementRef = useRef(null);
-
-  useEffect(() => {
-    let animFrameId;
-
-    const handleScroll = () => {
-      if (!elementRef.current) return;
-      const rect = elementRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      const elementCenter = rect.top + rect.height / 2;
-      const viewportCenter = windowHeight / 2;
-      const distanceFromCenter = elementCenter - viewportCenter;
-
-      const translateVal = distanceFromCenter * 0.06;
-      const clampedVal = Math.max(-40, Math.min(40, translateVal));
-
-      setOffset(clampedVal);
-    };
-
-    const onScroll = () => {
-      cancelAnimationFrame(animFrameId);
-      animFrameId = requestAnimationFrame(handleScroll);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(animFrameId);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={elementRef}
-      style={{
-        order,
-        transform: `translateY(${offset}px)`,
-        transition: 'transform 0.12s cubic-bezier(0.25, 1, 0.5, 1)',
-        willChange: 'transform',
-        width: '100%',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 const SPECIALTIES = [
   'Cardiology', 'Neurology', 'Emergency Medicine', 'Respiratory', 'Endocrinology',
   'Psychiatry', 'Pediatrics', 'Gastroenterology', 'Oncology', 'General Medicine',
@@ -76,6 +23,20 @@ const DEEP_FEATURES = [
       'Medically accurate multi-system presentations',
       'Unique history, personality, and urgency per case',
     ],
+    detailedBullets: [
+      {
+        title: 'Dynamic emotional responses',
+        desc: 'Patients express real-time emotion like anxiety, fear, or frustration. They might hold back critical history until you show empathy and build trust.'
+      },
+      {
+        title: 'Multi-system presentations',
+        desc: 'Symptoms are not isolated. AI patients present complex multi-system complaints, requiring comprehensive and logical clinical evaluation.'
+      },
+      {
+        title: 'Calibrated urgency & profiles',
+        desc: 'Cases range from standard outpatient reviews to high-urgency emergency triages. No two consultation sessions are the same.'
+      }
+    ]
   },
   {
     icon: (
@@ -91,6 +52,20 @@ const DEEP_FEATURES = [
       'Missed red flag identification',
       'Communication and empathy grading',
     ],
+    detailedBullets: [
+      {
+        title: 'Diagnostic accuracy scoring',
+        desc: 'Receive a structured performance score from 0 to 100 based on standard medical guidelines and a robust differentials checklist.'
+      },
+      {
+        title: 'Red flag tracking',
+        desc: 'The AI checks if you missed critical warning signs (like chest pain radiating to the jaw) and details why they are vital to follow.'
+      },
+      {
+        title: 'Empathy & communication',
+        desc: 'Evaluate how well you structured questions, handled patient anxiety, and explained instructions in plain, clear language.'
+      }
+    ]
   },
   {
     icon: (
@@ -106,6 +81,20 @@ const DEEP_FEATURES = [
       'Automatic assessment at time-out',
       'High-urgency patient presentations',
     ],
+    detailedBullets: [
+      {
+        title: 'Configurable countdown timer',
+        desc: 'Simulate high-pressure situations with a custom timer. Every second counts when managing unstable emergency cases.'
+      },
+      {
+        title: 'Automatic triage assessment',
+        desc: 'If the timer runs out, the case automatically submits for assessment, scoring your performance up to that exact moment.'
+      },
+      {
+        title: 'ACLS and critical triaging',
+        desc: 'Experience trauma, stroke, and sepsis scenarios that demand rapid decision making and instant treatment directives.'
+      }
+    ]
   },
   {
     icon: (
@@ -121,6 +110,20 @@ const DEEP_FEATURES = [
       'Lab values and vital sign parsing',
       'Downloadable session PDF report',
     ],
+    detailedBullets: [
+      {
+        title: 'ECG lightbox with zoom',
+        desc: 'Examine high-quality 12-lead ECG strips in a fullscreen lightbox with panning, zooming, and clinical grid marks.'
+      },
+      {
+        title: 'Lab values & vitals integration',
+        desc: 'Request and analyze complete blood counts, metabolic panels, and live vital signs directly in the simulator panel.'
+      },
+      {
+        title: 'Downloadable PDF reports',
+        desc: 'Export your consultation transcripts, rubric evaluations, and detailed diagnostic logs as a clean clinical PDF report.'
+      }
+    ]
   },
   {
     icon: (
@@ -137,6 +140,20 @@ const DEEP_FEATURES = [
       'Clinical skills radar (5 domains)',
       'Specialty distribution insights',
     ],
+    detailedBullets: [
+      {
+        title: 'Score trajectory tracking',
+        desc: 'Monitor your diagnostic scoring trends over time with clean visual charts showing your path to clinical mastery.'
+      },
+      {
+        title: '5-Domain clinical radar',
+        desc: 'View a breakdown of your strengths across diagnostic reasoning, communication, history taking, safety, and management.'
+      },
+      {
+        title: 'Specialty insights',
+        desc: 'Analyze your case distribution to ensure you are well-rounded across cardiology, neurology, pediatrics, and more.'
+      }
+    ]
   },
   {
     icon: (
@@ -146,14 +163,205 @@ const DEEP_FEATURES = [
     ),
     title: 'Zero-Risk Environment',
     sub: 'Safe to fail, designed to learn',
-    desc: 'Make clinical mistakes, miss diagnoses, overlook red flags — and learn from every one of them. No real patients are harmed. No grades are affected. Just pure deliberate practice with full safety.',
+    desc: 'Make clinical mistakes, miss diagnoses, overlook red flags — and learn from every one of them. No real patients are harmed. No grades are affected. Just deliberate practice with full safety.',
     bullets: [
       'No consequences for wrong answers',
       'Immediate corrective feedback per error',
       'Retry any case instantly for comparison',
     ],
+    detailedBullets: [
+      {
+        title: 'Practice with zero risk',
+        desc: 'Experience the safety of a simulation environment where wrong diagnoses or missed flags are turned into learning opportunities.'
+      },
+      {
+        title: 'Immediate corrective feedback',
+        desc: 'Receive point-by-point feedback immediately following case submission, detailing exactly what you got wrong and why.'
+      },
+      {
+        title: 'Instant repeat and comparison',
+        desc: 'Restart any case to test if you can apply feedback successfully, allowing you to compare your scores side-by-side.'
+      }
+    ]
   },
 ];
+
+// Single Feature Section component that handles local scroll syncing highlights
+function FeatureSection({ feature, index }) {
+  const { icon, title, sub, desc, bullets, detailedBullets } = feature;
+  const isEven = index % 2 === 0;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    let animFrameId;
+
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const items = sectionRef.current.querySelectorAll('.feature-detail-item-trigger');
+      if (!items.length) return;
+
+      const sectionRect = sectionRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Stop tracking if the section is completely offscreen
+      if (sectionRect.bottom < 0 || sectionRect.top > windowHeight) {
+        return;
+      }
+
+      let closestIndex = 0;
+      let minDistance = Infinity;
+      const viewportCenter = windowHeight * 0.45; // slightly above center feels more natural
+
+      items.forEach((item, idx) => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(itemCenter - viewportCenter);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = idx;
+        }
+      });
+
+      setActiveIndex(closestIndex);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = requestAnimationFrame(handleScroll);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Run once initially to capture starting state
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(animFrameId);
+    };
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="deep-feature-section"
+      style={{
+        background: isEven ? 'var(--bg)' : 'var(--surface)',
+      }}
+    >
+      <div className="container" style={{ maxWidth: 1100 }}>
+        <div className="deep-feature-content">
+          {/* Text block */}
+          <div 
+            className="deep-feature-text-col"
+            style={{ 
+              order: isEven ? 1 : 2,
+              paddingBottom: '40px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+              <div className="feature-icon" style={{ marginBottom: 0, width: 52, height: 52, borderRadius: 'var(--r-md)' }}>
+                {icon}
+              </div>
+              <div>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: 'var(--fs-xs)', color: 'var(--purple)', fontWeight: 700 }}>
+                  {sub}
+                </div>
+              </div>
+            </div>
+            <h2 style={{ fontSize: 'clamp(1.8rem, 2.5vw, 2.25rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, lineHeight: 1.2 }}>
+              {title}
+            </h2>
+            <p style={{ color: 'var(--text-2)', lineHeight: 1.75, marginBottom: 40, fontSize: 'var(--fs-base)' }}>
+              {desc}
+            </p>
+
+            {/* Detailed text items with visual highlights */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
+              {detailedBullets.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="feature-detail-item-trigger"
+                  style={{
+                    opacity: activeIndex === idx ? 1 : 0.45,
+                    transform: activeIndex === idx ? 'translateX(8px)' : 'none',
+                    transition: 'all 0.4s var(--ease)',
+                    borderLeft: `3px solid ${activeIndex === idx ? 'var(--purple)' : 'var(--border)'}`,
+                    paddingLeft: 18,
+                  }}
+                >
+                  <h4 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>
+                    {item.title}
+                  </h4>
+                  <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sticky Visual card */}
+          <div
+            className="deep-feature-visual-sticky"
+            style={{
+              order: isEven ? 2 : 1,
+            }}
+          >
+            <div className="deep-feature-visual">
+              {/* Header bar */}
+              <div className="deep-feature-visual-header">
+                <div style={{ display: 'flex', gap: 5 }}>
+                  {['#EF4444','#F59E0B','#22C55E'].map(c => (
+                    <div key={c} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />
+                  ))}
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginLeft: 4 }}>
+                  CURA.AI — {title}
+                </div>
+              </div>
+
+              {/* Feature visual body */}
+              <div className="deep-feature-visual-body">
+                <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 16 }}>
+                  Live Preview
+                </div>
+                {bullets.map((b, bi) => (
+                  <div key={b} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: 'var(--sp-3) var(--sp-4)',
+                    borderRadius: 'var(--r-md)',
+                    background: activeIndex === bi ? 'var(--purple-dim)' : 'var(--surface-2)',
+                    border: '1px solid ' + (activeIndex === bi ? 'var(--border-md)' : 'var(--border)'),
+                    marginBottom: 8,
+                    transform: activeIndex === bi ? 'scale(1.02)' : 'scale(1)',
+                    boxShadow: activeIndex === bi ? '0 4px 12px rgba(138,124,255,0.06)' : 'none',
+                    transition: 'all 0.3s var(--ease)',
+                  }}>
+                    <div style={{
+                      width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                      background: activeIndex === bi ? 'var(--purple)' : 'var(--border-str)',
+                      boxShadow: activeIndex === bi ? '0 0 8px var(--purple)' : 'none',
+                      transition: 'all 0.3s var(--ease)',
+                    }} />
+                    <div style={{ fontSize: 'var(--fs-sm)', color: activeIndex === bi ? 'var(--purple)' : 'var(--text-2)', fontWeight: activeIndex === bi ? 600 : 400 }}>
+                      {b}
+                    </div>
+                    {activeIndex === bi && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2.5" style={{ marginLeft: 'auto', animation: 'scaleIn 0.2s var(--ease)' }}>
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Features() {
   const navigate = useNavigate();
@@ -218,117 +426,9 @@ export default function Features() {
       </section>
 
       {/* ── Feature detail sections — alternating ─────────────────── */}
-      {DEEP_FEATURES.map(({ icon, title, sub, desc, bullets }, i) => {
-        const isEven = i % 2 === 0;
-        return (
-          <section
-            key={title}
-            style={{
-              padding: 'var(--sp-20) 0',
-              borderBottom: '1px solid var(--border)',
-              background: isEven ? 'var(--bg)' : 'var(--surface)',
-            }}
-          >
-            <div className="container" style={{ maxWidth: 1100 }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 64,
-                alignItems: 'center',
-              }}>
-                {/* Text block */}
-                <div style={{ order: isEven ? 1 : 2 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-                    <div className="feature-icon" style={{ marginBottom: 0, width: 52, height: 52, borderRadius: 'var(--r-md)' }}>
-                      {icon}
-                    </div>
-                    <div>
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: 'var(--fs-xs)', color: 'var(--purple)', fontWeight: 700 }}>
-                        {sub}
-                      </div>
-                    </div>
-                  </div>
-                  <h2 style={{ fontSize: 'clamp(1.8rem, 2.5vw, 2.25rem)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 16, lineHeight: 1.2 }}>
-                    {title}
-                  </h2>
-                  <p style={{ color: 'var(--text-2)', lineHeight: 1.75, marginBottom: 24, fontSize: 'var(--fs-base)' }}>
-                    {desc}
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {bullets.map(b => (
-                      <div key={b} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 'var(--fs-sm)', color: 'var(--text-2)' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2.5">
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        {b}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Visual card */}
-                <ScrollParallax order={isEven ? 2 : 1}>
-                  <div style={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border-md)',
-                    borderRadius: 'var(--r-xl)',
-                    overflow: 'hidden',
-                    boxShadow: 'var(--shadow-lg)',
-                  }}>
-                    {/* Header bar */}
-                    <div style={{
-                      background: 'var(--surface-2)',
-                      padding: 'var(--sp-3) var(--sp-4)',
-                      borderBottom: '1px solid var(--border)',
-                      display: 'flex', alignItems: 'center', gap: 8,
-                    }}>
-                      <div style={{ display: 'flex', gap: 5 }}>
-                        {['#EF4444','#F59E0B','#22C55E'].map(c => (
-                          <div key={c} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />
-                        ))}
-                      </div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginLeft: 4 }}>
-                        CURA.AI — {title}
-                      </div>
-                    </div>
-
-                    {/* Feature visual */}
-                    <div style={{ padding: 'var(--sp-6)' }}>
-                      <div style={{ fontSize: 'var(--fs-xs)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 16 }}>
-                        Feature Preview
-                      </div>
-                      {bullets.map((b, bi) => (
-                        <div key={b} style={{
-                          display: 'flex', alignItems: 'center', gap: 12,
-                          padding: 'var(--sp-3) var(--sp-4)',
-                          borderRadius: 'var(--r-md)',
-                          background: bi === 0 ? 'var(--purple-dim)' : 'var(--surface-2)',
-                          border: '1px solid ' + (bi === 0 ? 'var(--border-md)' : 'var(--border)'),
-                          marginBottom: 8,
-                          transition: 'all var(--t)',
-                        }}>
-                          <div style={{
-                            width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
-                            background: bi === 0 ? 'var(--purple)' : 'var(--border-str)',
-                          }} />
-                          <div style={{ fontSize: 'var(--fs-sm)', color: bi === 0 ? 'var(--purple)' : 'var(--text-2)', fontWeight: bi === 0 ? 600 : 400 }}>
-                            {b}
-                          </div>
-                          {bi === 0 && (
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" strokeWidth="2.5" style={{ marginLeft: 'auto' }}>
-                              <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </ScrollParallax>
-              </div>
-            </div>
-          </section>
-        );
-      })}
+      {DEEP_FEATURES.map((feature, i) => (
+        <FeatureSection key={feature.title} feature={feature} index={i} />
+      ))}
 
       {/* ── CTA ───────────────────────────────────────────────────── */}
       <section className="cta-section">

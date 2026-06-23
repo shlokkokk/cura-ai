@@ -1818,10 +1818,22 @@ p { font-family: var(--font-body); }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 64px;
-  align-items: center;
+  align-items: start;
 }
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .deep-feature-content { grid-template-columns: 1fr; gap: 40px; }
+}
+.deep-feature-visual-sticky {
+  position: sticky;
+  top: 120px;
+  align-self: start;
+  width: 100%;
+  z-index: 2;
+}
+@media (max-width: 900px) {
+  .deep-feature-visual-sticky {
+    position: static;
+  }
 }
 .deep-feature-visual {
   background: var(--surface);
