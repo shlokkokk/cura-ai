@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Logo from '../components/Logo';
+import EkgMouseTrail from '../components/EkgMouseTrail';
 
 const EyeIcon = ({ open }) => open ? (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -168,6 +169,7 @@ export default function Register() {
     <div className="reg-shell">
       {/* Mesh Grid Backdrop */}
       <div className="auth-grid-bg" />
+      <EkgMouseTrail />
 
       {/* Floating Ambient Glowing Blobs */}
       <div className="auth-bg-orb auth-orb-purple" />

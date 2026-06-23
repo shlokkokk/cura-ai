@@ -852,16 +852,19 @@ p { font-family: var(--font-body); }
   font-size: var(--fs-xs);
   font-weight: 700;
   font-family: var(--font-body);
+  transition: all var(--t);
 }
 .chat-avatar-patient {
-  /* Figma: --Background-2 style */
-  background: var(--surface-2);
-  border: 1.5px solid var(--border-md);
-  color: var(--purple);
+  background: rgba(110, 231, 212, 0.08);
+  border: 1.5px solid var(--mint);
+  color: var(--mint);
+  box-shadow: 0 0 12px rgba(110, 231, 212, 0.35);
 }
 .chat-avatar-doctor {
-  background: var(--grad-brand-v);
-  color: #fff;
+  background: rgba(138, 124, 255, 0.08);
+  border: 1.5px solid var(--purple);
+  color: var(--purple);
+  box-shadow: 0 0 12px rgba(138, 124, 255, 0.35);
 }
 
 .chat-bubble {

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 import Navbar from '../components/Navbar';
 import Logo from '../components/Logo';
+import EkgMouseTrail from '../components/EkgMouseTrail';
 
 const icons = {
   brain: (
@@ -140,7 +141,10 @@ export default function Landing() {
   const [visibleMsgs, setVisibleMsgs] = useState(1);
   const previewRef = useRef(null);
   useEffect(() => {
-    if (visibleMsgs >= DEMO_MSGS.length) return;
+    if (visibleMsgs >= DEMO_MSGS.length) {
+      const t = setTimeout(() => setVisibleMsgs(1), 5000);
+      return () => clearTimeout(t);
+    }
     const t = setTimeout(() => setVisibleMsgs(n => n + 1), 2200);
     return () => clearTimeout(t);
   }, [visibleMsgs]);
@@ -163,6 +167,7 @@ export default function Landing() {
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
+      <EkgMouseTrail />
 
       <section className="landing-hero" id="hero">
         <div className="hero-grid-bg" aria-hidden="true" />
@@ -294,15 +299,14 @@ export default function Landing() {
                           style={{ width: 28, height: 28 }}
                         >
                           {isDoc ? (
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M3 12a9 9 0 0 1 15 0" />
-                              <path d="M21 7.5a1.5 1.5 0 1 1-3 0V3h3v4.5z" />
-                              <path d="M6 3v4.5a1.5 1.5 0 1 1-3 0V3h3z" />
-                              <path d="M12 12v6a3 3 0 0 0 6 0" />
-                              <circle cx="18" cy="18" r="2" />
+                            <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M25.8947 23H34.4211V41H25.8947V23Z" fill="currentColor"></path>
+                              <path d="M14.5263 23H21.1579V29.6316H14.5263V23Z" fill="currentColor"></path>
+                              <path fillRule="evenodd" clipRule="evenodd" d="M26.2102 10.7896H37.3173L37.3161 10.7902L36.2105 11.343V12.579V39.0001H11.7895V12.579V11.343L10.6839 10.7902L10.6827 10.7896H13.053C13.1426 10.0821 13.3437 9.40935 13.6381 8.78955H8H6V10.6843L6.21053 10.7896L9.78947 12.579V37.0001V39.0001H8H7.78947H6V41.0001H8H9.78947H11.7895H36.2105H38.2105H40H42V39.0001H40.2105H40H38.2105V37.0001V12.579L41.7895 10.7896L42 10.6843V8.78955H40H25.625C25.9194 9.40935 26.1206 10.0821 26.2102 10.7896Z" fill="currentColor"></path>
+                              <path fillRule="evenodd" clipRule="evenodd" d="M26.2632 11.6316C26.2632 15.2941 23.2941 18.2632 19.6316 18.2632C15.9691 18.2632 13 15.2941 13 11.6316C13 7.96906 15.9691 5 19.6316 5C23.2941 5 26.2632 7.96906 26.2632 11.6316ZM18.6527 8H20.9264V10.6526H23.5789V12.9263H20.9264V15.579H18.6527V12.9263H16L16 10.6526H18.6527V8Z" fill="currentColor"></path>
                             </svg>
                           ) : (
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                               <circle cx="12" cy="7" r="4" />
                             </svg>
@@ -317,7 +321,7 @@ export default function Landing() {
                   {visibleMsgs < DEMO_MSGS.length && (
                     <div className="preview-msg" style={{ alignSelf: 'flex-start' }}>
                       <div className="chat-avatar chat-avatar-patient" style={{ width: 28, height: 28 }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                           <circle cx="12" cy="7" r="4" />
                         </svg>
