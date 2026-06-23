@@ -111,49 +111,51 @@
 
 /* Light Theme */
 [data-theme="light"] {
-  --bg:          #F2F6FB;
-  --bg-alt:      #EAF0F8;
-  --surface:     #FFFFFF;
-  --surface-2:   #F8FAFC;
-  --surface-3:   #F1F5F9;
-  --surface-hov: #E8F0FA;
+  --bg:          #EEF3FA;
+  --bg-alt:      #E5EDF6;
+  --surface:     #F7FAFD;
+  --surface-2:   #EEF3FA;
+  --surface-3:   #E5EDF6;
+  --surface-hov: #DDE8F4;
 
-  --border:      rgba(15,23,42,0.07);
-  --border-md:   rgba(15,23,42,0.12);
-  --border-str:  rgba(15,23,42,0.20);
+  --border:      rgba(15,23,42,0.09);
+  --border-md:   rgba(15,23,42,0.14);
+  --border-str:  rgba(15,23,42,0.22);
   --border-acc:  rgba(0,151,167,0.40);
 
   --text:        #0F172A;
-  --text-2:      #374151;
-  --text-muted:  #6B7280;
-  --text-faint:  #9CA3AF;
+  --text-2:      #334155;
+  --text-muted:  #64748B;
+  --text-faint:  #94A3B8;
 
-  --teal:        #0097A7;
-  --teal-2:      #00838F;
-  --teal-dim:    rgba(0,151,167,0.08);
-  --teal-glow:   0 0 24px rgba(0,151,167,0.18);
-  --teal-ring:   0 0 0 3px rgba(0,151,167,0.20);
+  --teal:        #0088A8;
+  --teal-2:      #006B85;
+  --teal-dim:    rgba(0,136,168,0.10);
+  --teal-glow:   0 0 24px rgba(0,136,168,0.20);
+  --teal-ring:   0 0 0 3px rgba(0,136,168,0.22);
 
-  --indigo:      #4F46E5;
-  --indigo-dim:  rgba(79,70,229,0.08);
+  --indigo:      #4338CA;
+  --indigo-dim:  rgba(67,56,202,0.09);
 
   --danger:      #DC2626;
-  --danger-dim:  rgba(220,38,38,0.08);
-  --warning:     #D97706;
-  --warning-dim: rgba(217,119,6,0.08);
-  --success:     #059669;
-  --success-dim: rgba(5,150,105,0.08);
+  --danger-dim:  rgba(220,38,38,0.09);
+  --warning:     #C2410C;
+  --warning-dim: rgba(194,65,12,0.09);
+  --success:     #047857;
+  --success-dim: rgba(4,120,87,0.09);
 
-  --grad-brand:   linear-gradient(135deg, #0097A7 0%, #4F46E5 100%);
-  --grad-teal:    linear-gradient(135deg, #0097A7 0%, #00838F 100%);
-  --grad-surface: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-  --grad-hero:    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,151,167,0.06) 0%, transparent 70%);
+  --grad-brand:   linear-gradient(135deg, #0088A8 0%, #4338CA 100%);
+  --grad-teal:    linear-gradient(135deg, #0088A8 0%, #006B85 100%);
+  --grad-surface: linear-gradient(180deg, #F7FAFD 0%, #EEF3FA 100%);
+  --grad-hero:    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,136,168,0.07) 0%, transparent 70%);
+  --grad-glow:    radial-gradient(circle at 50% 50%, rgba(0,136,168,0.05) 0%, transparent 60%);
 
-  --shadow-xs:  0 1px 2px rgba(0,0,0,0.06);
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.08);
-  --shadow-md:  0 4px 20px rgba(0,0,0,0.10);
-  --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
+  --shadow-xs:  0 1px 3px rgba(0,0,0,0.07);
+  --shadow-sm:  0 2px 10px rgba(0,0,0,0.08);
+  --shadow-md:  0 4px 24px rgba(0,0,0,0.10);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.13);
   --shadow-xl:  0 20px 64px rgba(0,0,0,0.16);
+  --shadow-teal: var(--teal-glow);
 }
 
 /* ── 2. BASE RESET ────────────────────────────────────────────── */
@@ -365,7 +367,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border-md);
 }
 [data-theme="light"] .card-glass {
-  background: rgba(255,255,255,0.75);
+  background: rgba(247,250,253,0.82);
+  border-color: var(--border-md);
 }
 
 /* ── 7. COMPONENT: BADGES ──────────────────────────────────────── */
@@ -1179,9 +1182,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Stats bar */
 .stats-bar {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border-md);
+  border-bottom: 1px solid var(--border-md);
   padding: var(--sp-6) 0;
 }
 .stats-bar-inner {
@@ -1194,7 +1197,7 @@ h1, h2, h3, h4, h5, h6 {
 .stat-item-num {
   font-size: var(--fs-3xl);
   font-weight: 800;
-  color: var(--text);
+  color: var(--teal);
   font-family: var(--mono);
   letter-spacing: -0.04em;
   line-height: 1;
@@ -1236,14 +1239,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 .feature-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-md);
   border-radius: var(--r-xl);
   padding: var(--sp-6);
   transition: border-color var(--t), box-shadow var(--t), transform var(--t);
 }
 .feature-card:hover {
-  border-color: var(--border-acc);
-  box-shadow: var(--shadow-md);
+  border-color: var(--teal);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--border-acc);
   transform: translateY(-3px);
 }
 .feature-icon {
@@ -1321,7 +1324,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-5);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-md);
   border-radius: var(--r-xl);
   white-space: nowrap;
   cursor: pointer;
@@ -1329,12 +1332,14 @@ h1, h2, h3, h4, h5, h6 {
   transition: all var(--t);
   text-decoration: none !important;
   color: var(--text-2);
+  box-shadow: var(--shadow-xs);
 }
 .specialty-chip:hover {
   border-color: var(--teal);
   background: var(--teal-dim);
   color: var(--teal);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 .specialty-chip-icon {
   width: 36px;
@@ -1396,9 +1401,9 @@ h1, h2, h3, h4, h5, h6 {
 
 /* CTA section */
 .cta-section {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border-md);
+  border-bottom: 1px solid var(--border-md);
   padding: var(--sp-20) 0;
   text-align: center;
   position: relative;
@@ -1421,8 +1426,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Footer */
 .footer {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  border-top: 1px solid var(--border-md);
   padding: var(--sp-12) 0 var(--sp-8);
 }
 .footer-grid {
@@ -1438,7 +1443,7 @@ h1, h2, h3, h4, h5, h6 {
 .footer-link:hover { color: var(--teal); text-decoration: none; }
 .footer-bottom {
   padding-top: var(--sp-6);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-md);
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -442,7 +442,7 @@ export default function Landing() {
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
-      <section className="section-sm" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+      <section className="section-sm" style={{ background: 'var(--surface-2)', borderTop: '1px solid var(--border-md)', borderBottom: '1px solid var(--border-md)' }}>
         <div className="container">
           <div className="section-label" style={{ textAlign: 'center' }}>Process</div>
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: 'var(--sp-3)' }}>
@@ -526,6 +526,7 @@ export default function Landing() {
               <div className="footer-col-title">Product</div>
               <div className="footer-links">
                 <Link to="/features" className="footer-link">Features</Link>
+                <Link to="/pricing" className="footer-link">Pricing</Link>
                 <Link to="/simulator" className="footer-link">Simulation Lab</Link>
                 <Link to="/register" className="footer-link">Get Started</Link>
               </div>
@@ -549,6 +550,7 @@ export default function Landing() {
               <div className="footer-col-title">Company</div>
               <div className="footer-links">
                 <Link to="/about" className="footer-link">About</Link>
+                <Link to="/pricing" className="footer-link">Pricing</Link>
               </div>
             </div>
           </div>

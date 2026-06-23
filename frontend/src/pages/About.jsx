@@ -157,7 +157,7 @@ export default function About() {
       </section>
 
       {/* ── Core Values ───────────────────────────────────────────── */}
-      <section className="section-sm" style={{ background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+      <section className="section-sm" style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border-md)' }}>
         <div className="container" style={{ maxWidth: 1100 }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div className="section-label">What We Stand For</div>
