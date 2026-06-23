@@ -144,7 +144,8 @@ export default function Navbar() {
 
   const navLinks = [
     { to: '/',         label: 'Home'     },
-    { to: '/features', label: 'Features' },
+    // TODO: Add Features link back to navbar once Features page scrolling / sticky visual card is fully fixed
+    // { to: '/features', label: 'Features' },
     { to: '/about',    label: 'About'    },
     { to: '/pricing',  label: 'Pricing'  },
   ];
