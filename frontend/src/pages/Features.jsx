@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import EkgMouseTrail from '../components/EkgMouseTrail';
 
 const SPECIALTIES = [
   'Cardiology', 'Neurology', 'Emergency Medicine', 'Respiratory', 'Endocrinology',
@@ -369,6 +370,7 @@ export default function Features() {
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
+      <EkgMouseTrail />
 
       <section style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,

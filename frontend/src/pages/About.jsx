@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import EkgMouseTrail from '../components/EkgMouseTrail';
 
 
 const VALUES = [
@@ -41,6 +42,7 @@ export default function About() {
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
+      <EkgMouseTrail />
 
       <section style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,

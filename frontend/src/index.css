@@ -1628,14 +1628,16 @@ p { font-family: var(--font-body); }
   text-align: center;
   position: relative;
   overflow: hidden;
-  background: var(--grad-cta);
+  /* Glassmorphism: dark, translucent purple surface letting telemetry show through */
+  background: rgba(23, 20, 40, 0.45);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-md);
+  box-shadow: var(--shadow-xl), 0 0 50px rgba(138, 124, 255, 0.08);
 }
-.cta-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--grad-glow);
-  pointer-events: none;
+[data-theme="light"] .cta-section {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: var(--border-md);
 }
 .cta-title {
   font-family: var(--font);
