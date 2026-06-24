@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -67,7 +68,9 @@ export default function Navbar() {
   const { isDark, toggle } = useTheme();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const lastScrollY = useRef(0);
 
   const navRef = useRef(null);
   const drawerRef = useRef(null);
@@ -76,6 +79,7 @@ export default function Navbar() {
   useGSAP(() => {
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // 1. Entrance timeline
       const tl = gsap.timeline();
       tl.from(navRef.current, {
         y: -80,
@@ -96,10 +100,9 @@ export default function Navbar() {
         duration: 0.35,
         ease: 'power2.out',
       }, '-=0.25')
-      .from('.nav-actions-anim > *', {
+      .from('.nav-actions-anim', {
         scale: 0.85,
         autoAlpha: 0,
-        stagger: 0.07,
         duration: 0.35,
         ease: 'back.out(1.7)',
       }, '-=0.2');
@@ -131,10 +134,40 @@ export default function Navbar() {
   }, { scope: drawerRef, dependencies: [menuOpen] });
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Add border/shadow if scrolled past 20px
+      setScrolled(currentScrollY > 20);
+
+      // Slide up/down direction logic
+      if (currentScrollY < 64) {
+        // Keep navbar visible near the top
+        setNavVisible(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        // Scrolling down -> hide
+        setNavVisible(false);
+      } else {
+        // Scrolling up -> show
+        setNavVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Update navbar translation when visibility state changes
+  useEffect(() => {
+    gsap.to(navRef.current, {
+      yPercent: navVisible ? 0 : -110,
+      duration: 0.3,
+      ease: 'power2.out',
+      overwrite: 'auto',
+    });
+  }, [navVisible]);
 
   const handleLogout = () => {
     saveUser(null);
