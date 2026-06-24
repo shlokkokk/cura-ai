@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import PatientHistory from './pages/PatientHistory';
 import Pricing from './pages/Pricing';
 import EkgMouseTrail from './components/EkgMouseTrail';
+import Navbar from './components/Navbar';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -90,12 +91,18 @@ function SmoothedApp() {
     return () => mm.revert();
   }, []); // Run once on mount!
 
+  const showNavbarPaths = ['/', '/features', '/about', '/pricing'];
+  const shouldShowNavbar = showNavbarPaths.includes(pathname);
+
   return (
-    <div id="smooth-wrapper" ref={wrapperRef}>
-      <div id="smooth-content" ref={contentRef}>
-        {ready && <AppRoutes />}
+    <>
+      {shouldShowNavbar && <Navbar />}
+      <div id="smooth-wrapper" ref={wrapperRef}>
+        <div id="smooth-content" ref={contentRef}>
+          {ready && <AppRoutes />}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

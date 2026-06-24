@@ -205,14 +205,17 @@ function FeatureSection({ feature, index }) {
 
     // 1. Desktop-only pinning
     mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+      const pinContainer = sectionRef.current?.querySelector('.deep-feature-visual-pin-container');
       const card = sectionRef.current?.querySelector('.deep-feature-visual');
-      if (card) {
+      if (pinContainer && card) {
         ScrollTrigger.create({
           trigger: sectionRef.current.querySelector('.deep-feature-visual-sticky'),
-          pin: card,
+          pin: pinContainer,
           start: 'top 96px',
           end: () => `bottom top+=${96 + card.offsetHeight}px`,
           pinSpacing: false,
+          pinType: 'transform',
+          anticipatePin: 1,
         });
       }
     });
@@ -367,7 +370,8 @@ function FeatureSection({ feature, index }) {
               order: isEven ? 2 : 1,
             }}
           >
-            <div className="deep-feature-visual">
+            <div className="deep-feature-visual-pin-container" style={{ width: '100%' }}>
+              <div className="deep-feature-visual">
               <div className="deep-feature-visual-header">
                 <div style={{ display: 'flex', gap: 5 }}>
                   {['#EF4444','#F59E0B','#22C55E'].map(c => (
@@ -414,6 +418,7 @@ function FeatureSection({ feature, index }) {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>
@@ -473,7 +478,6 @@ export default function Features() {
 
   return (
     <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
-      <Navbar />
 
       <div ref={heroRef}>
         <section style={{

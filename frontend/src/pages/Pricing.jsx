@@ -269,7 +269,6 @@ export default function Pricing() {
 
   return (
     <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
-      <Navbar />
 
       <section ref={heroRef} style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,

@@ -68,12 +68,16 @@ export default function Navbar() {
   const { isDark, toggle } = useTheme();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
-  const [navVisible, setNavVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
-  const lastScrollY = useRef(0);
+  const menuOpenRef = useRef(menuOpen);
 
   const navRef = useRef(null);
   const drawerRef = useRef(null);
+
+  // Sync menuOpen state to ref for access in ScrollTrigger callback without recreation
+  useEffect(() => {
+    menuOpenRef.current = menuOpen;
+  }, [menuOpen]);
 
   // Entrance animation — slides in from top on first mount
   useGSAP(() => {
@@ -133,41 +137,49 @@ export default function Navbar() {
     return () => mm.revert();
   }, { scope: drawerRef, dependencies: [menuOpen] });
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+  // High-performance ScrollTrigger for auto-hiding the navbar
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger);
 
-      // Add border/shadow if scrolled past 20px
-      setScrolled(currentScrollY > 20);
+    let lastScroll = window.scrollY;
 
-      // Slide up/down direction logic
-      if (currentScrollY < 64) {
-        // Keep navbar visible near the top
-        setNavVisible(true);
-      } else if (currentScrollY > lastScrollY.current) {
-        // Scrolling down -> hide
-        setNavVisible(false);
-      } else {
-        // Scrolling up -> show
-        setNavVisible(true);
+    const trigger = ScrollTrigger.create({
+      start: 0,
+      end: "max",
+      onUpdate: (self) => {
+        // If mobile drawer is open, force navbar to stay visible
+        if (menuOpenRef.current) {
+          gsap.to(navRef.current, { yPercent: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+          return;
+        }
+
+        const currentScroll = self.scroll();
+        const delta = currentScroll - lastScroll;
+
+        // Scrolled background trigger
+        setScrolled(currentScroll > 20);
+
+        if (currentScroll < 64) {
+          // Force visible near top of page
+          gsap.to(navRef.current, { yPercent: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+          lastScroll = currentScroll;
+        } else if (Math.abs(delta) > 15) {
+          if (delta > 0) {
+            // Scrolling down -> hide navbar
+            gsap.to(navRef.current, { yPercent: -110, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+          } else {
+            // Scrolling up -> show navbar
+            gsap.to(navRef.current, { yPercent: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+          }
+          lastScroll = currentScroll;
+        }
       }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Update navbar translation when visibility state changes
-  useEffect(() => {
-    gsap.to(navRef.current, {
-      yPercent: navVisible ? 0 : -110,
-      duration: 0.3,
-      ease: 'power2.out',
-      overwrite: 'auto',
     });
-  }, [navVisible]);
+
+    return () => {
+      trigger.kill();
+    };
+  }, { scope: navRef });
 
   const handleLogout = () => {
     saveUser(null);

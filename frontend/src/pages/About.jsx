@@ -195,7 +195,6 @@ export default function About() {
 
   return (
     <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
-      <Navbar />
 
       <section ref={heroRef} style={{
         paddingTop: 'calc(64px + 80px)', paddingBottom: 80,

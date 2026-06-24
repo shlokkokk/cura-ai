@@ -10,6 +10,7 @@ import { api } from '../utils/api';
 import Navbar from '../components/Navbar';
 import Logo from '../components/Logo';
 import EkgMouseTrail from '../components/EkgMouseTrail';
+import { usePageTransition } from '../utils/usePageTransition';
 
 const icons = {
   brain: (
@@ -137,7 +138,7 @@ function AnimatedCount({ to }) {
 export default function Landing() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const pageRef = useRef(null);
+  const pageRef = usePageTransition();
 
   // Live demo chat animation
   const [visibleMsgs, setVisibleMsgs] = useState(1);
@@ -222,7 +223,7 @@ export default function Landing() {
           y: 16, autoAlpha: 0, stagger: 0.1, duration: 0.45,
         }, '-=0.3')
         .from('.hero-preview', {
-          x: 72, autoAlpha: 0, rotationY: -10,
+          x: 72, autoAlpha: 0, rotationY: -4,
           transformPerspective: 1400, duration: 1.0, ease: 'power3.out',
         }, '<0.15');
 
@@ -367,7 +368,6 @@ export default function Landing() {
 
   return (
     <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
-      <Navbar />
 
       <section className="landing-hero" id="hero">
         <div className="hero-grid-bg" aria-hidden="true" />
