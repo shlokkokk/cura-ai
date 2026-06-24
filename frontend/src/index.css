@@ -1688,15 +1688,14 @@ p { font-family: var(--font-body); }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 64px;
-  align-items: start;
+  align-items: stretch;
 }
 @media (max-width: 900px) {
   .deep-feature-content { grid-template-columns: 1fr; gap: 40px; }
 }
 .deep-feature-visual-sticky {
-  position: sticky;
-  top: 120px;
-  align-self: start;
+  position: relative;
+  align-self: stretch;
   width: 100%;
   z-index: 2;
 }
@@ -1711,10 +1710,9 @@ p { font-family: var(--font-body); }
   border-radius: var(--r-2xl);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  transition: transform var(--t), box-shadow var(--t);
+  transition: border-color var(--t), box-shadow var(--t);
 }
 .deep-feature-visual:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-xl), var(--purple-glow);
 }
 .deep-feature-visual-header {
@@ -3597,10 +3595,10 @@ select:autofill:active {
 .feature-card-span-2 { grid-column: span 2; }
 
 .deep-feature-section { padding: var(--sp-20) 0; border-bottom: 1px solid var(--border); }
-.deep-feature-content { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.deep-feature-content { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: stretch; }
 .deep-feature-text-col { position: relative; }
-.deep-feature-visual-sticky { position: sticky; top: 96px; }
-.deep-feature-visual { background: var(--surface); border: 1px solid var(--border-md); border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--shadow-md); }
+.deep-feature-visual-sticky { position: relative; align-self: stretch; width: 100%; }
+.deep-feature-visual { background: var(--surface); border: 1px solid var(--border-md); border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--shadow-md); transition: border-color var(--t), box-shadow var(--t); }
 .deep-feature-visual-header { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5); background: var(--surface-2); border-bottom: 1px solid var(--border); }
 .deep-feature-visual-body { padding: var(--sp-6); }
 

@@ -42,25 +42,29 @@ function AppRoutes() {
   );
 }
 
-// Smooth scroll wrapper — conditionally uses ScrollSmoother on all pages except Features
+// Smooth scroll wrapper — uses ScrollSmoother on all pages
 function SmoothedApp() {
   const wrapperRef = useRef(null);
   const contentRef = useRef(null);
   const { pathname } = useLocation();
-  const isFeaturesPage = pathname === '/features';
+  const [ready, setReady] = React.useState(false);
 
-  // Scroll to top on route change
+  // Scroll to top and refresh ScrollTrigger on route change
   useEffect(() => {
+    if (!ready) return;
     window.scrollTo(0, 0);
     const smoother = ScrollSmoother.get();
     if (smoother) {
       smoother.scrollTop(0);
     }
-  }, [pathname]);
+    // Let the new page render completely before recalculating ScrollTrigger positions
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [pathname, ready]);
 
   useGSAP(() => {
-    if (isFeaturesPage) return;
-
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const smoother = ScrollSmoother.create({
@@ -68,24 +72,28 @@ function SmoothedApp() {
         content: contentRef.current,
         smooth: 1.4,          // 1.4s lag — luxuriously smooth
         effects: true,         // enable data-speed / data-lag parallax attrs
-        normalizeScroll: true, // neutralise browser scroll jank on mobile
         ignoreMobileResize: true,
       });
+      setReady(true);
 
-      return () => smoother.kill();
+      return () => {
+        smoother.kill();
+        setReady(false);
+      };
+    });
+
+    mm.add('(prefers-reduced-motion: reduce)', () => {
+      setReady(true);
+      return () => setReady(false);
     });
 
     return () => mm.revert();
-  }, [pathname]);
-
-  if (isFeaturesPage) {
-    return <AppRoutes />;
-  }
+  }, []); // Run once on mount!
 
   return (
     <div id="smooth-wrapper" ref={wrapperRef}>
       <div id="smooth-content" ref={contentRef}>
-        <AppRoutes />
+        {ready && <AppRoutes />}
       </div>
     </div>
   );

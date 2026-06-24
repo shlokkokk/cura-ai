@@ -199,55 +199,29 @@ function FeatureSection({ feature, index }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const sectionRef = useRef(null);
 
-  // Scroll sync for active bullet (existing logic preserved)
-  useEffect(() => {
-    let animFrameId;
-
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const items = sectionRef.current.querySelectorAll('.feature-detail-item-trigger');
-      if (!items.length) return;
-
-      const sectionRect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      if (sectionRect.bottom < 0 || sectionRect.top > windowHeight) return;
-
-      let closestIndex = 0;
-      let minDistance = Infinity;
-      const viewportCenter = windowHeight * 0.45;
-
-      items.forEach((item, idx) => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(itemCenter - viewportCenter);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestIndex = idx;
-        }
-      });
-
-      setActiveIndex(closestIndex);
-    };
-
-    const onScroll = () => {
-      cancelAnimationFrame(animFrameId);
-      animFrameId = requestAnimationFrame(handleScroll);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      cancelAnimationFrame(animFrameId);
-    };
-  }, []);
-
-  // GSAP entrance for this section
+  // GSAP entrance, pinning, scroll sync, and hover animations for this section
   useGSAP(() => {
     const mm = gsap.matchMedia();
+
+    // 1. Desktop-only pinning
+    mm.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+      const card = sectionRef.current?.querySelector('.deep-feature-visual');
+      if (card) {
+        ScrollTrigger.create({
+          trigger: sectionRef.current.querySelector('.deep-feature-visual-sticky'),
+          pin: card,
+          start: 'top 96px',
+          end: () => `bottom top+=${96 + card.offsetHeight}px`,
+          pinSpacing: false,
+        });
+      }
+    });
+
+    // 2. Entrance, scroll-sync, and mouse animations (all screens)
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const card = sectionRef.current?.querySelector('.deep-feature-visual');
+
+      // Entrance timeline
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -277,8 +251,19 @@ function FeatureSection({ feature, index }) {
           ease: 'power2.out',
         }, '-=0.5');
 
-      // 3D tilt on .deep-feature-visual
-      const card = sectionRef.current.querySelector('.deep-feature-visual');
+      // Scroll sync for active bullet trigger
+      const items = sectionRef.current.querySelectorAll('.feature-detail-item-trigger');
+      items.forEach((item, idx) => {
+        ScrollTrigger.create({
+          trigger: item,
+          start: 'top 50%',
+          end: 'bottom 50%',
+          onEnter: () => setActiveIndex(idx),
+          onEnterBack: () => setActiveIndex(idx),
+        });
+      });
+
+      // 4. 3D tilt and GSAP hover effect on .deep-feature-visual
       if (card) {
         const rotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
         const rotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
@@ -294,15 +279,23 @@ function FeatureSection({ feature, index }) {
           
           rotX(-cy * 8); // subtle tilt
           rotY(cx * 8);
+          // GSAP-only hover lift-up to avoid conflicts with CSS transitions
+          gsap.to(card, { y: -8, z: 12, duration: 0.45, ease: 'power2.out', overwrite: 'auto' });
         };
         
         const handleMouseLeave = () => {
           rotX(0);
           rotY(0);
+          gsap.to(card, { y: 0, z: 0, duration: 0.45, ease: 'power2.out', overwrite: 'auto' });
         };
         
         card.addEventListener('mousemove', handleMouseMove);
         card.addEventListener('mouseleave', handleMouseLeave);
+
+        return () => {
+          card.removeEventListener('mousemove', handleMouseMove);
+          card.removeEventListener('mouseleave', handleMouseLeave);
+        };
       }
     });
     return () => mm.revert();
@@ -343,17 +336,17 @@ function FeatureSection({ feature, index }) {
               {desc}
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 60, paddingBottom: 40 }}>
               {detailedBullets.map((item, idx) => (
                 <div
                   key={idx}
                   className="feature-detail-item-trigger"
                   style={{
-                    opacity: activeIndex === idx ? 1 : 0.45,
-                    transform: activeIndex === idx ? 'translateX(8px)' : 'none',
-                    transition: 'all 0.4s var(--ease)',
-                    borderLeft: `3px solid ${activeIndex === idx ? 'var(--purple)' : 'var(--border)'}`,
-                    paddingLeft: 18,
+                    opacity: activeIndex === idx ? 1 : 0.35,
+                    transform: activeIndex === idx ? 'translateX(10px)' : 'none',
+                    transition: 'all 0.5s var(--ease)',
+                    borderLeft: `4px solid ${activeIndex === idx ? 'var(--purple)' : 'var(--border)'}`,
+                    paddingLeft: 20,
                   }}
                 >
                   <h4 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>
@@ -434,10 +427,12 @@ export default function Features() {
 
   // Hero + badges entrance
   useGSAP(() => {
+    if (!heroRef.current) return;
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      // SplitText word-mask on hero title lines
-      const split = new SplitText('.features-hero-title-line', {
+      // Scoped DOM elements query for SplitText
+      const splitTargets = heroRef.current.querySelectorAll('.features-hero-title-line');
+      const split = new SplitText(splitTargets, {
         type: 'words',
         wordsClass: 'split-word',
       });
@@ -480,58 +475,60 @@ export default function Features() {
     <div ref={pageRef} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Navbar />
 
-      <section ref={heroRef} style={{
-        paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
-        textAlign: 'center', position: 'relative', overflow: 'hidden',
-        borderBottom: '1px solid var(--border)',
-      }}>
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(138,124,255,0.08) 0%, transparent 70%)',
-        }} />
-        <div className="container" style={{ maxWidth: 760, position: 'relative' }}>
-          <div className="features-hero-label section-label" style={{ opacity: 0 }}>Advanced Capabilities</div>
-          <h1 className="features-hero-title" style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900,
-            letterSpacing: '-0.04em', lineHeight: 1.1,
-            margin: '16px 0 24px', color: 'var(--text)',
-          }}>
-            <span className="features-hero-title-line" style={{ display: 'block' }}>Next-generation</span>
-            <span className="features-hero-title-line" style={{ display: 'block' }}>
-              clinical{' '}
-              <span className="text-gradient">
-                simulation
+      <div ref={heroRef}>
+        <section style={{
+          paddingTop: 'calc(64px + 80px)', paddingBottom: 80,
+          textAlign: 'center', position: 'relative', overflow: 'hidden',
+          borderBottom: '1px solid var(--border)',
+        }}>
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(138,124,255,0.08) 0%, transparent 70%)',
+          }} />
+          <div className="container" style={{ maxWidth: 760, position: 'relative' }}>
+            <div className="features-hero-label section-label" style={{ opacity: 0 }}>Advanced Capabilities</div>
+            <h1 className="features-hero-title" style={{
+              fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900,
+              letterSpacing: '-0.04em', lineHeight: 1.1,
+              margin: '16px 0 24px', color: 'var(--text)',
+            }}>
+              <span className="features-hero-title-line" style={{ display: 'block' }}>Next-generation</span>
+              <span className="features-hero-title-line" style={{ display: 'block' }}>
+                clinical{' '}
+                <span className="text-gradient">
+                  simulation
+                </span>
               </span>
-            </span>
-          </h1>
-          <p className="features-hero-sub" style={{ fontSize: 'var(--fs-lg)', color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 600, margin: '0 auto 32px' }}>
-            CURA.AI bridges the gap between textbook theory and real-world clinical application
-            with immersive, AI-powered patient simulations built for medical students and early-career doctors.
-          </p>
-          <div className="features-hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => navigate('/register')} className="btn btn-primary btn-lg">Get Started Free</button>
-            <button onClick={() => navigate('/simulator?demo=cardiology')} className="btn btn-outline btn-lg">Try Cardiology Demo</button>
+            </h1>
+            <p className="features-hero-sub" style={{ fontSize: 'var(--fs-lg)', color: 'var(--text-2)', lineHeight: 1.7, maxWidth: 600, margin: '0 auto 32px' }}>
+              CURA.AI bridges the gap between textbook theory and real-world clinical application
+              with immersive, AI-powered patient simulations built for medical students and early-career doctors.
+            </p>
+            <div className="features-hero-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => navigate('/register')} className="btn btn-primary btn-lg">Get Started Free</button>
+              <button onClick={() => navigate('/simulator?demo=cardiology')} className="btn btn-outline btn-lg">Try Cardiology Demo</button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section style={{
-        background: 'var(--surface)',
-        borderBottom: '1px solid var(--border)',
-        padding: 'var(--sp-5) 0',
-        overflow: 'hidden',
-      }}>
-        <div className="container">
-          <div style={{ display: 'flex', gap: 'var(--sp-3)', overflow: 'hidden', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {SPECIALTIES.map(s => (
-              <div key={s} className="badge badge-purple specialty-badge" style={{ cursor: 'pointer' }}
-                onClick={() => navigate(`/simulator?demo=${encodeURIComponent(s.toLowerCase())}`)}>
-                {s}
-              </div>
-            ))}
+        <section style={{
+          background: 'var(--surface)',
+          borderBottom: '1px solid var(--border)',
+          padding: 'var(--sp-5) 0',
+          overflow: 'hidden',
+        }}>
+          <div className="container">
+            <div style={{ display: 'flex', gap: 'var(--sp-3)', overflow: 'hidden', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {SPECIALTIES.map(s => (
+                <div key={s} className="badge badge-purple specialty-badge" style={{ cursor: 'pointer' }}
+                  onClick={() => navigate(`/simulator?demo=${encodeURIComponent(s.toLowerCase())}`)}>
+                  {s}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {DEEP_FEATURES.map((feature, i) => (
         <FeatureSection key={feature.title} feature={feature} index={i} />
