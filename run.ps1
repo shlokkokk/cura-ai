@@ -1,3 +1,8 @@
+# To run this script, execute the following command in PowerShell:
+# powershell -ExecutionPolicy Bypass -File .\run.ps1
+# Or if your script execution policy is already set:
+# .\run.ps1
+
 # run.ps1 - Flawless launcher script for CURA.AI development environment
 
 # Set console title
