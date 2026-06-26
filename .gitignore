@@ -6,3 +6,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 scratch/
+ 
+# Legacy and AI Agent folders
+legacy/
+.agents/
+.agent/
+
+
