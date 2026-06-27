@@ -182,6 +182,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Prevent rubber-band bounce fighting with ScrollSmoother on desktop */
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -192,6 +194,22 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   transition: background var(--t-slow), color var(--t-slow);
+}
+
+/* Smooth-wrapper and content: let GSAP own the scroll on desktop */
+#smooth-wrapper {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+#smooth-content {
+  overflow: visible;
+  width: 100%;
 }
 
 /* Theme transitions */
@@ -4242,6 +4260,33 @@ select:autofill:active {
     overflow-x: hidden;
   }
 
+  /* On mobile ScrollSmoother is OFF — undo fixed wrapper, restore native scroll */
+  html {
+    scroll-behavior: auto !important; /* smooth conflicts with touch inertia */
+    overscroll-behavior-y: auto !important;
+  }
+
+  body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
+    overscroll-behavior-y: contain;    /* no chained bounce to parent */
+  }
+
+  #root {
+    touch-action: pan-y !important;   /* tell browser this scrolls vertically */
+  }
+
+  /* Undo the fixed ScrollSmoother wrapper so native scroll works */
+  #smooth-wrapper {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  #smooth-content {
+    overflow: visible !important;
+  }
+
   body {
     background:
       radial-gradient(circle at 18% 0%, rgba(138,124,255,0.12), transparent 38%),
@@ -4323,98 +4368,145 @@ select:autofill:active {
   }
 
   .mobile-drawer {
-    top: 62px !important;
-    left: 10px !important;
-    right: 10px !important;
-    padding: 14px !important;
-    gap: 12px !important;
+    position: fixed !important;
+    top: 72px !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    max-height: calc(100dvh - 92px) !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    gap: 16px !important;
     border: 1px solid var(--border-md) !important;
-    border-radius: 18px !important;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.035), transparent 42%),
-      var(--surface) !important;
-    box-shadow: 0 18px 50px rgba(0,0,0,0.36), var(--shadow-purple) !important;
+    border-radius: 24px !important;
+    background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), var(--purple-glow) !important;
+    z-index: calc(var(--z-sticky) + 2) !important;
   }
 
-  .mobile-drawer-top,
-  .mobile-drawer-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+  .mobile-drawer-top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid var(--border) !important;
   }
 
-  .mobile-drawer-kicker,
-  .mobile-drawer-section {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--purple);
+  .mobile-drawer-kicker {
+    font-family: var(--mono) !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--purple) !important;
+    margin-bottom: 4px !important;
   }
 
   .mobile-drawer-title {
-    margin-top: 2px;
-    font-family: var(--font);
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.02em;
+    font-family: var(--font) !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    color: var(--text) !important;
+    letter-spacing: -0.02em !important;
   }
 
   .mobile-drawer-links {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 7px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
   }
 
   .mobile-drawer-link {
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    color: var(--text-2);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    font-size: 12px;
-    font-weight: 700;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 14px !important;
+    background: var(--surface-2) !important;
+    border: 1px solid var(--border) !important;
     text-decoration: none !important;
+    transition: background var(--t), border-color var(--t) !important;
+  }
+  .mobile-drawer-link:active {
+    background: var(--surface-hov) !important;
+  }
+
+  .mobile-drawer-link span {
+    color: var(--text) !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+  .mobile-drawer-section {
+    margin-top: 4px !important;
+    font-family: var(--mono) !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--purple) !important;
   }
 
   .mobile-drawer-quick {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
   }
 
   .mobile-drawer-card {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 14px;
-    background: rgba(138,124,255,0.08);
-    border: 1px solid var(--border-md);
+    min-height: 64px !important;
+    padding: 12px 16px !important;
+    border-radius: 16px !important;
+    background: var(--surface-2) !important;
+    border: 1px solid var(--border-md) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
     text-decoration: none !important;
+    transition: background var(--t), border-color var(--t) !important;
+  }
+  .mobile-drawer-card:active {
+    background: var(--surface-hov) !important;
+    border-color: var(--border-str) !important;
   }
 
   .mobile-drawer-card span {
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 800;
+    color: var(--text) !important;
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
   }
 
   .mobile-drawer-card small {
-    color: var(--text-muted);
-    font-size: 11px;
-    text-align: right;
+    display: block !important;
+    color: var(--text-muted) !important;
+    font-size: 0.76rem !important;
+    line-height: 1.3 !important;
   }
 
   .mobile-drawer-actions {
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding-top: 16px !important;
+    border-top: 1px solid var(--border) !important;
+  }
+
+  .mobile-drawer-actions .btn {
+    width: 100% !important;
+    min-height: 46px !important;
+    border-radius: 14px !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .landing-hero {
@@ -5161,7 +5253,7 @@ select:autofill:active {
   }
 
   .history-score-pill.low {
-    background: var(--danger-dim);
+    background: rgba(248,113,113,0.12);
     color: var(--danger);
     border-color: rgba(248,113,113,0.24);
   }
@@ -6028,107 +6120,7 @@ select:autofill:active {
   }
 }
 
-/* Clean mobile navigation drawer */
-@media (max-width: 768px) {
-  .mobile-drawer {
-    position: fixed !important;
-    top: 74px !important;
-    left: 12px !important;
-    right: 12px !important;
-    bottom: auto !important;
-    max-height: calc(100dvh - 96px) !important;
-    overflow-y: auto !important;
-    padding: 16px !important;
-    gap: 14px !important;
-    border: 1px solid rgba(138, 124, 255, 0.24) !important;
-    border-radius: 22px !important;
-    background: color-mix(in srgb, var(--surface) 94%, #000 6%) !important;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42) !important;
-    z-index: calc(var(--z-sticky) + 2) !important;
-  }
 
-  .mobile-drawer-top {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    padding: 0 0 12px !important;
-    border-bottom: 1px solid rgba(138, 124, 255, 0.16) !important;
-  }
-
-  .mobile-drawer-kicker {
-    font-size: 10px !important;
-    letter-spacing: 0.12em !important;
-    color: var(--purple) !important;
-    margin-bottom: 4px !important;
-  }
-
-  .mobile-drawer-title {
-    font-size: 1.08rem !important;
-    line-height: 1.2 !important;
-    color: var(--text) !important;
-  }
-
-  .mobile-drawer-links,
-  .mobile-drawer-quick {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
-  }
-
-  .mobile-drawer-link,
-  .mobile-drawer-card {
-    min-height: 52px !important;
-    padding: 12px !important;
-    border: 1px solid rgba(138, 124, 255, 0.16) !important;
-    border-radius: 14px !important;
-    background: rgba(255, 255, 255, 0.026) !important;
-    color: var(--text) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-  }
-
-  .mobile-drawer-link span,
-  .mobile-drawer-card span {
-    color: var(--text) !important;
-    font-size: 0.92rem !important;
-    font-weight: 800 !important;
-    line-height: 1.2 !important;
-  }
-
-  .mobile-drawer-card small {
-    display: block !important;
-    color: var(--text-muted) !important;
-    font-size: 0.72rem !important;
-    line-height: 1.3 !important;
-    margin-top: 4px !important;
-  }
-
-  .mobile-drawer-section {
-    margin-top: 2px !important;
-    color: var(--purple) !important;
-    font-size: 10px !important;
-    letter-spacing: 0.12em !important;
-    text-transform: uppercase !important;
-  }
-
-  .mobile-drawer-actions {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding-top: 14px !important;
-    border-top: 1px solid rgba(138, 124, 255, 0.16) !important;
-  }
-
-  .mobile-drawer-actions .btn {
-    width: 100% !important;
-    min-height: 44px !important;
-    border-radius: 14px !important;
-    white-space: nowrap !important;
-  }
-}
 
 /* Draggable mobile sheet states */
 @media (max-width: 768px) {

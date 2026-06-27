@@ -67,21 +67,35 @@ function SmoothedApp() {
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
-      const smoother = ScrollSmoother.create({
-        wrapper: wrapperRef.current,
-        content: contentRef.current,
-        smooth: 1.4,          // 1.4s lag — luxuriously smooth
-        effects: true,         // enable data-speed / data-lag parallax attrs
-        ignoreMobileResize: true,
-      });
-      setReady(true);
 
-      return () => {
-        smoother.kill();
-        setReady(false);
-      };
-    });
+    // Desktop only — ScrollSmoother causes sticky/bouncy touch behavior on mobile
+    mm.add(
+      '(min-width: 769px) and (prefers-reduced-motion: no-preference)',
+      () => {
+        const smoother = ScrollSmoother.create({
+          wrapper: wrapperRef.current,
+          content: contentRef.current,
+          smooth: 1.4,          // 1.4s lag — luxuriously smooth on desktop
+          effects: true,         // enable data-speed / data-lag parallax attrs
+          ignoreMobileResize: true,
+        });
+        setReady(true);
+
+        return () => {
+          smoother.kill();
+          setReady(false);
+        };
+      }
+    );
+
+    // Mobile + reduced-motion: skip ScrollSmoother, use native scroll
+    mm.add(
+      '(max-width: 768px)',
+      () => {
+        setReady(true);
+        return () => setReady(false);
+      }
+    );
 
     mm.add('(prefers-reduced-motion: reduce)', () => {
       setReady(true);

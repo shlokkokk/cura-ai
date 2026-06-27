@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { useGSAP } from '@gsap/react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -77,6 +78,47 @@ export default function Navbar() {
   // Sync menuOpen state to ref for access in ScrollTrigger callback without recreation
   useEffect(() => {
     menuOpenRef.current = menuOpen;
+  }, [menuOpen]);
+
+  // Mobile body scroll lock and ScrollSmoother pause
+  useEffect(() => {
+    let smoother;
+    try {
+      smoother = ScrollSmoother.get();
+    } catch (e) {
+      console.warn("ScrollSmoother not ready:", e);
+    }
+
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+      if (smoother) {
+        try {
+          smoother.paused(true);
+        } catch (e) {
+          console.error("Error pausing ScrollSmoother:", e);
+        }
+      }
+    } else {
+      document.body.style.overflow = '';
+      if (smoother) {
+        try {
+          smoother.paused(false);
+        } catch (e) {
+          console.error("Error resuming ScrollSmoother:", e);
+        }
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      if (smoother) {
+        try {
+          smoother.paused(false);
+        } catch (e) {
+          // Ignore
+        }
+      }
+    };
   }, [menuOpen]);
 
   // Entrance animation — slides in from top on first mount
