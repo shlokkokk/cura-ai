@@ -91,6 +91,61 @@ const formatTime = (s) =>
 const isMobileViewport = () =>
   typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
 
+const getLanguageFlag = (langCode) => {
+  const code = langCode.split('-')[0].toLowerCase();
+  const flags = {
+    en: '🇬🇧',
+    us: '🇺🇸',
+    ar: '🇪🇬',
+    ur: '🇵🇰',
+    hi: '🇮🇳',
+    es: '🇪🇸',
+    fr: '🇫🇷',
+    de: '🇩🇪',
+    it: '🇮🇹',
+    ja: '🇯🇵',
+    ko: '🇰🇷',
+    zh: '🇨🇳',
+    ru: '🇷🇺',
+    pt: '🇵🇹',
+    nl: '🇳🇱',
+    tr: '🇹🇷',
+    pl: '🇵🇱',
+    vi: '🇻🇳',
+    id: '🇮🇩',
+    th: '🇹🇭',
+  };
+  const subCode = langCode.split('-')[1]?.toLowerCase();
+  if (subCode && flags[subCode]) return flags[subCode];
+  return flags[code] || '🌐';
+};
+
+const getLanguageName = (langCode) => {
+  const code = langCode.split('-')[0].toLowerCase();
+  const names = {
+    en: 'English',
+    ar: 'Arabic',
+    ur: 'Urdu',
+    hi: 'Hindi',
+    es: 'Spanish',
+    fr: 'French',
+    de: 'German',
+    it: 'Italian',
+    ja: 'Japanese',
+    ko: 'Korean',
+    zh: 'Chinese',
+    ru: 'Russian',
+    pt: 'Portuguese',
+    nl: 'Dutch',
+    tr: 'Turkish',
+    pl: 'Polish',
+    vi: 'Vietnamese',
+    id: 'Indonesian',
+    th: 'Thai',
+  };
+  return names[code] || langCode.toUpperCase();
+};
+
 function ScoreRing({ score }) {
   const r = 54;
   const circ = 2 * Math.PI * r;
@@ -147,6 +202,8 @@ export default function Simulator() {
   const [reasoning,            setReasoning]            = useState('');
   const [evaluation,           setEvaluation]           = useState(null);
   const [isAssessmentModalOpen,setIsAssessmentModalOpen]= useState(false);
+  const [isVoiceModalOpen,     setIsVoiceModalOpen]     = useState(false);
+  const [voiceSearch,          setVoiceSearch]          = useState('');
   const [reportLoading,        setReportLoading]        = useState(false);
   const [toastMessage,         setToastMessage]         = useState(null);
   const [isEmergencyMode,      setIsEmergencyMode]      = useState(false);
@@ -870,6 +927,16 @@ export default function Simulator() {
           <div className="page-loading-label">
             Creating a unique case for {effectiveUser.specialization || 'your specialty'}...
           </div>
+          <div style={{ 
+            fontSize: '11px', 
+            color: 'var(--text-muted)', 
+            marginTop: '8px', 
+            fontFamily: 'var(--mono)',
+            letterSpacing: '0.02em',
+            animation: 'fadeIn 300ms ease'
+          }}>
+            This may take up to 60 seconds for premium clinical accuracy.
+          </div>
           </div>
         </div>
       )}
@@ -926,32 +993,82 @@ export default function Simulator() {
               {formatTime(timeLeft)}
             </div>
           )}
-          {/* Patient auto-voice toggle - Desktop */}
-          <button
-            onClick={() => {
-              const next = !ttsEnabled;
-              setTtsEnabled(next);
-              localStorage.setItem('cura-tts', next ? 'true' : 'false');
-              if (!next) cancelSpeech();
-            }}
-            className="btn btn-sm desktop-voice-btn"
-            title="Toggle Patient Auto-Voice"
+          {/* Patient auto-voice toggle - Desktop split pill */}
+          <div
+            className="desktop-voice-btn"
             style={{
-              gap: 6,
-              borderColor: ttsEnabled ? 'var(--purple)' : 'var(--border-md)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              borderRadius: 'var(--r-full)',
+              border: ttsEnabled ? '1px solid var(--purple)' : '1px solid var(--border-md)',
               background: ttsEnabled ? 'rgba(138, 124, 255, 0.12)' : 'transparent',
               color: ttsEnabled ? 'var(--purple)' : 'var(--text-muted)',
-              display: 'inline-flex',
-              alignItems: 'center'
+              overflow: 'hidden',
+              height: '32px',
+              transition: 'all 200ms ease'
             }}
           >
-            <VolumeIcon active={ttsEnabled} />
-            <span className="tts-btn-text">{ttsEnabled ? 'Voice ON' : 'Voice OFF'}</span>
-          </button>
+            <button
+              onClick={() => {
+                const next = !ttsEnabled;
+                setTtsEnabled(next);
+                localStorage.setItem('cura-tts', next ? 'true' : 'false');
+                if (!next) cancelSpeech();
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'inherit',
+                padding: '0 12px 0 16px',
+                height: '100%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 500,
+                fontSize: 'var(--fs-sm)',
+                outline: 'none',
+              }}
+              title="Toggle Patient Auto-Voice"
+            >
+              <VolumeIcon active={ttsEnabled} />
+              <span className="tts-btn-text">{ttsEnabled ? 'Voice ON' : 'Voice OFF'}</span>
+            </button>
+            
+            <div style={{
+              width: '1px',
+              height: '16px',
+              background: ttsEnabled ? 'rgba(138, 124, 255, 0.3)' : 'var(--border-md)',
+            }} />
+            
+            <button
+              onClick={() => setIsVoiceModalOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'inherit',
+                padding: '0 16px 0 12px',
+                height: '100%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                outline: 'none',
+                opacity: 0.85
+              }}
+              title="Voice Accent Settings"
+              disabled={voices.length === 0}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
+          </div>
 
           {/* Patient auto-voice toggle - Mobile */}
           <button
-            onClick={() => openMobileSheet('voice')}
+            onClick={() => setIsVoiceModalOpen(true)}
             className="btn btn-sm mobile-voice-btn"
             title="Voice Settings"
             style={{
@@ -965,48 +1082,6 @@ export default function Simulator() {
           >
             <VolumeIcon active={ttsEnabled} />
           </button>
-
-          {!isMobileViewport() && ttsEnabled && voices.length > 0 && (
-            <select
-              value={selectedVoiceName}
-              onChange={(e) => {
-                setSelectedVoiceName(e.target.value);
-                localStorage.setItem('cura-selected-voice', e.target.value);
-              }}
-              style={{
-                fontSize: 'var(--fs-xs)',
-                padding: '0 8px',
-                height: '32px',
-                borderRadius: 'var(--r-sm)',
-                background: 'var(--bg-card)',
-                color: 'var(--text)',
-                border: '1px solid var(--border-md)',
-                maxWidth: 150,
-                outline: 'none',
-                cursor: 'pointer',
-                fontFamily: 'var(--mono)',
-                animation: 'fadeIn 200ms ease'
-              }}
-            >
-              <option value="">Auto (Gender)</option>
-              {Object.entries(
-                voices.reduce((groups, voice) => {
-                  const lang = voice.lang.split('-')[0].toUpperCase();
-                  if (!groups[lang]) groups[lang] = [];
-                  groups[lang].push(voice);
-                  return groups;
-                }, {})
-              ).map(([lang, langVoices]) => (
-                <optgroup key={lang} label={lang}>
-                  {langVoices.map((v) => (
-                    <option key={v.name} value={v.name}>
-                      {v.name.replace(/microsoft|google|desktop/gi, '').trim()}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          )}
 
 
           <button
@@ -1235,83 +1310,7 @@ export default function Simulator() {
           </div>
         </div>
 
-        {/* Mobile Voice Settings Panel */}
-        <div
-          className={`sim-panel sim-panel-left mobile-voice-settings-panel ${activeTab === 'voice' ? 'mobile-active' : ''} ${sheetExpanded ? 'sheet-expanded' : ''} ${sheetDragY ? 'sheet-dragging' : ''}`}
-          style={{ '--sheet-drag-y': `${sheetDragY}px` }}
-        >
-          <div
-            className="sim-panel-header sim-sheet-header"
-            onPointerDown={handleSheetPointerDown}
-            onPointerMove={handleSheetPointerMove}
-            onPointerUp={handleSheetPointerUp}
-            onPointerCancel={handleSheetPointerUp}
-          >
-            <span>Voice Settings</span>
-            <button type="button" className="sim-sheet-close" onClick={closeMobileSheet} aria-label="Close voice settings">
-              <XIcon />
-            </button>
-          </div>
 
-          <div className="sim-panel-body" style={{ padding: '20px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>Patient Voice Synthesis</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>Speak incoming patient replies aloud</div>
-              </div>
-              <label className="switch-toggle">
-                <input
-                  type="checkbox"
-                  checked={ttsEnabled}
-                  onChange={(e) => {
-                    const next = e.target.checked;
-                    setTtsEnabled(next);
-                    localStorage.setItem('cura-tts', next ? 'true' : 'false');
-                    if (!next) cancelSpeech();
-                  }}
-                />
-                <span className="slider-round" />
-              </label>
-            </div>
-
-            {ttsEnabled && voices.length > 0 && (
-              <div style={{ animation: 'fadeIn 200ms ease' }}>
-                <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)', marginBottom: 8 }}>
-                  Accent / Language
-                </div>
-                <select
-                  value={selectedVoiceName}
-                  onChange={(e) => {
-                    setSelectedVoiceName(e.target.value);
-                    localStorage.setItem('cura-selected-voice', e.target.value);
-                  }}
-                  className="mobile-voice-selector"
-                >
-                  <option value="">Auto (Gender Matched)</option>
-                  {Object.entries(
-                    voices.reduce((groups, voice) => {
-                      const lang = voice.lang.split('-')[0].toUpperCase();
-                      if (!groups[lang]) groups[lang] = [];
-                      groups[lang].push(voice);
-                      return groups;
-                    }, {})
-                  ).map(([lang, langVoices]) => (
-                    <optgroup key={lang} label={lang}>
-                      {langVoices.map((v) => (
-                        <option key={v.name} value={v.name}>
-                          {v.name.replace(/microsoft|google|desktop/gi, '').trim()}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.5 }}>
-                  Choose a locale/accent. Cura automatically pitch-shifts mismatched voice genders to sound male or female as needed!
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
 
         <div className={`sim-panel sim-panel-center ${activeTab === 'chat' ? 'mobile-active' : ''}`}>
           {/* Patient selector bar */}
@@ -1834,6 +1833,180 @@ export default function Simulator() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {isVoiceModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsVoiceModalOpen(false)}>
+          <div className="modal" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header" style={{ paddingBottom: 12, borderBottom: '1px solid var(--border)' }}>
+              <div>
+                <h2 style={{ fontSize: 'var(--fs-base)', fontWeight: 700 }}>Voice settings</h2>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Select accent/language for patient speech</p>
+              </div>
+              <button className="btn-icon" onClick={() => setIsVoiceModalOpen(false)} aria-label="Close">
+                <XIcon />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '16px 0 0' }}>
+              {/* Patient voice synthesis toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px 16px', borderBottom: '1px solid var(--border)' }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 'var(--fs-sm)', color: 'var(--text)' }}>Patient Voice Synthesis</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Speak patient replies aloud</div>
+                </div>
+                <label className="switch-toggle">
+                  <input
+                    type="checkbox"
+                    checked={ttsEnabled}
+                    onChange={(e) => {
+                      const next = e.target.checked;
+                      setTtsEnabled(next);
+                      localStorage.setItem('cura-tts', next ? 'true' : 'false');
+                      if (!next) cancelSpeech();
+                    }}
+                  />
+                  <span className="slider-round" />
+                </label>
+              </div>
+
+              {ttsEnabled && (
+                <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {/* Search box */}
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type="text" 
+                      placeholder="Search accent or language..." 
+                      value={voiceSearch} 
+                      onChange={e => setVoiceSearch(e.target.value)} 
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px 8px 32px',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid var(--border-md)',
+                        borderRadius: 'var(--r-md)',
+                        color: 'var(--text)',
+                        fontSize: 'var(--fs-sm)',
+                        outline: 'none',
+                      }}
+                    />
+                    <span style={{ position: 'absolute', left: 10, top: 10, color: 'var(--text-muted)' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                      </svg>
+                    </span>
+                    {voiceSearch && (
+                      <button 
+                        type="button"
+                        onClick={() => setVoiceSearch('')}
+                        style={{ position: 'absolute', right: 10, top: 8, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Scrollable list */}
+                  <div style={{ 
+                    maxHeight: '260px', 
+                    overflowY: 'auto', 
+                    border: '1px solid var(--border-md)', 
+                    borderRadius: 'var(--r-md)',
+                    background: 'rgba(255,255,255,0.01)',
+                    padding: '4px'
+                  }}>
+                    {/* Auto option */}
+                    <div 
+                      onClick={() => {
+                        setSelectedVoiceName('');
+                        localStorage.setItem('cura-selected-voice', '');
+                      }}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 'var(--r-sm)',
+                        background: selectedVoiceName === '' ? 'rgba(138, 124, 255, 0.12)' : 'transparent',
+                        color: selectedVoiceName === '' ? 'var(--purple)' : 'var(--text)',
+                        fontSize: 'var(--fs-sm)',
+                        fontWeight: selectedVoiceName === '' ? 600 : 400,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        border: selectedVoiceName === '' ? '1.5px solid rgba(138, 124, 255, 0.3)' : '1.5px solid transparent',
+                        marginBottom: 4
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>🌐</span>
+                        <span>Auto (Gender Matched)</span>
+                      </span>
+                      {selectedVoiceName === '' && <span style={{ color: 'var(--purple)' }}>✓</span>}
+                    </div>
+
+                    {voices
+                      .filter(v => {
+                        const name = v.name.toLowerCase();
+                        const lang = getLanguageName(v.lang).toLowerCase();
+                        const query = voiceSearch.toLowerCase();
+                        return name.includes(query) || lang.includes(query) || v.lang.toLowerCase().includes(query);
+                      })
+                      .map(v => {
+                        const isSelected = selectedVoiceName === v.name;
+                        return (
+                          <div 
+                            key={v.name}
+                            onClick={() => {
+                              setSelectedVoiceName(v.name);
+                              localStorage.setItem('cura-selected-voice', v.name);
+                            }}
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: 'var(--r-sm)',
+                              background: isSelected ? 'rgba(138, 124, 255, 0.12)' : 'transparent',
+                              color: isSelected ? 'var(--purple)' : 'var(--text)',
+                              fontSize: 'var(--fs-sm)',
+                              fontWeight: isSelected ? 600 : 400,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              border: isSelected ? '1.5px solid rgba(138, 124, 255, 0.3)' : '1.5px solid transparent',
+                              marginBottom: 2
+                            }}
+                          >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <span>{getLanguageFlag(v.lang)}</span>
+                                <span>{getLanguageName(v.lang)} ({v.lang})</span>
+                              </span>
+                              <span style={{ fontSize: 'var(--fs-sm)' }}>
+                                {v.name.replace(/microsoft|google|desktop/gi, '').trim()}
+                              </span>
+                            </div>
+                            {isSelected && <span style={{ color: 'var(--purple)' }}>✓</span>}
+                          </div>
+                        );
+                      })}
+
+                    {voices.filter(v => {
+                      const name = v.name.toLowerCase();
+                      const lang = getLanguageName(v.lang).toLowerCase();
+                      const query = voiceSearch.toLowerCase();
+                      return name.includes(query) || lang.includes(query) || v.lang.toLowerCase().includes(query);
+                    }).length === 0 && (
+                      <div style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 'var(--fs-xs)', lineHeight: 1.5 }}>
+                        No matching voice packs found.<br/>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Make sure to install voice packs on your system.</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

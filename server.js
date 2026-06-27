@@ -56,6 +56,7 @@ const {
   isGroqConfigured,
   GROQ_MODEL
 } = require("./src/services/groq");
+const { generateNvidiaReply, generateNvidiaJson, isNvidiaConfigured, NVIDIA_MODEL } = require("./src/services/nvidia");
 const { storage, getStorageMode } = require("./src/storage");
 const { applyRateLimit, startCleanupTimer } = require("./src/http/rateLimiter");
 const {
@@ -404,6 +405,7 @@ const server = http.createServer(async (request, response) => {
       const geminiReady = isGeminiConfigured();
       const openaiReady = isOpenAIConfigured();
       const groqReady = isGroqConfigured();
+      const nvidiaReady = isNvidiaConfigured();
       let activeProvider = "local-scripted";
       let activeModel = "local-scripted";
       
@@ -413,6 +415,9 @@ const server = http.createServer(async (request, response) => {
       } else if (groqReady) {
         activeProvider = "groq";
         activeModel = GROQ_MODEL;
+      } else if (nvidiaReady) {
+        activeProvider = "nvidia";
+        activeModel = NVIDIA_MODEL;
       } else if (openaiReady) {
         activeProvider = "openai";
         activeModel = OPENAI_MODEL;
@@ -427,6 +432,7 @@ const server = http.createServer(async (request, response) => {
         providers: {
           gemini: { available: geminiReady, model: GEMINI_MODEL },
           groq: { available: groqReady, model: GROQ_MODEL },
+          nvidia: { available: nvidiaReady, model: NVIDIA_MODEL },
           openai: { available: openaiReady, model: OPENAI_MODEL },
           ollama: { available: ollamaReady, model: OLLAMA_MODEL, baseUrl: OLLAMA_BASE_URL }
         },
@@ -483,16 +489,54 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
 
 
           let aiCases = null;
-          if (isGeminiConfigured()) {
+
+          // 1. Groq Primary (70B)
+          if (!aiCases && isGroqConfigured()) {
+            console.log(`[AI Case Gen] Attempting Groq (Primary)...`);
+            aiCases = await generateGroqJson({ prompt: aiGenPrompt, timeout: 60000 }).catch((err) => {
+              console.warn(`[AI Case Gen] Groq Primary failed:`, err.message || err);
+              return null;
+            });
+          }
+
+          // 2. Nvidia NIM Primary (70B/Nemotron)
+          if (!aiCases && isNvidiaConfigured()) {
+            console.log(`[AI Case Gen] Attempting Nvidia NIM (Primary)...`);
+            aiCases = await generateNvidiaJson({ prompt: aiGenPrompt, timeout: 60000 }).catch((err) => {
+              console.warn(`[AI Case Gen] Nvidia NIM Primary failed:`, err.message || err);
+              return null;
+            });
+          }
+
+          // 3. Groq 8B Fallback
+          if (!aiCases && isGroqConfigured()) {
+            console.log(`[AI Case Gen] Attempting Groq 8B Fallback (llama-3.1-8b-instant)...`);
+            aiCases = await generateGroqJson({ prompt: aiGenPrompt, modelOverride: "llama-3.1-8b-instant", timeout: 60000 }).catch((err) => {
+              console.warn(`[AI Case Gen] Groq 8B failed:`, err.message || err);
+              return null;
+            });
+          }
+
+          // 4. Nvidia NIM 8B Fallback
+          if (!aiCases && isNvidiaConfigured()) {
+            console.log(`[AI Case Gen] Attempting Nvidia NIM 8B Fallback (meta/llama-3.1-8b-instruct)...`);
+            aiCases = await generateNvidiaJson({ prompt: aiGenPrompt, modelOverride: "meta/llama-3.1-8b-instruct", timeout: 60000 }).catch((err) => {
+              console.warn(`[AI Case Gen] Nvidia NIM 8B failed:`, err.message || err);
+              return null;
+            });
+          }
+
+          // 5. Other configured providers
+          if (!aiCases && isGeminiConfigured()) {
+            console.log(`[AI Case Gen] Attempting Gemini fallback...`);
             aiCases = await generateGeminiJson({ prompt: aiGenPrompt }).catch(() => null);
           }
-          if (!aiCases && isGroqConfigured()) {
-            aiCases = await generateGroqJson({ prompt: aiGenPrompt }).catch(() => null);
-          }
           if (!aiCases && isOpenAIConfigured()) {
+            console.log(`[AI Case Gen] Attempting OpenAI fallback...`);
             aiCases = await generateOpenAIJson({ prompt: aiGenPrompt }).catch(() => null);
           }
           if (!aiCases && await isOllamaAvailable()) {
+            console.log(`[AI Case Gen] Attempting Ollama fallback...`);
             aiCases = await generateOllamaJson({ prompt: aiGenPrompt }).catch(() => null);
           }
           
@@ -890,6 +934,51 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
 
       const { systemInstruction, prompt } = buildGeminiPrompt(caseStudy, session.messages, messageText);
 
+      // 1. Groq Primary (70B)
+      if (isGroqConfigured() && !replyText) {
+        try {
+          replyText = await generateGroqReply({ prompt, systemInstruction, timeout: 12000 });
+          replyProvider = "groq";
+          replyModel = GROQ_MODEL;
+        } catch (error) {
+          console.error("[AI Cascade] Groq Primary failed:", error.message || error);
+        }
+      }
+
+      // 2. Nvidia NIM Primary (70B/Nemotron)
+      if (isNvidiaConfigured() && !replyText) {
+        try {
+          replyText = await generateNvidiaReply({ prompt, systemInstruction, timeout: 12000 });
+          replyProvider = "nvidia";
+          replyModel = NVIDIA_MODEL;
+        } catch (error) {
+          console.error("[AI Cascade] Nvidia NIM Primary failed:", error.message || error);
+        }
+      }
+
+      // 3. Groq 8B Fallback
+      if (isGroqConfigured() && !replyText) {
+        try {
+          replyText = await generateGroqReply({ prompt, systemInstruction, modelOverride: "llama-3.1-8b-instant", timeout: 12000 });
+          replyProvider = "groq";
+          replyModel = "llama-3.1-8b-instant";
+        } catch (error) {
+          console.error("[AI Cascade] Groq 8B failed:", error.message || error);
+        }
+      }
+
+      // 4. Nvidia NIM 8B Fallback
+      if (isNvidiaConfigured() && !replyText) {
+        try {
+          replyText = await generateNvidiaReply({ prompt, systemInstruction, modelOverride: "meta/llama-3.1-8b-instruct", timeout: 12000 });
+          replyProvider = "nvidia";
+          replyModel = "meta/llama-3.1-8b-instruct";
+        } catch (error) {
+          console.error("[AI Cascade] Nvidia NIM 8B failed:", error.message || error);
+        }
+      }
+
+      // 5. Other Providers Fallback
       if (isGeminiConfigured() && !replyText) {
         try {
           replyText = await generateGeminiReply({ prompt, systemInstruction });
@@ -897,16 +986,6 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
           replyModel = GEMINI_MODEL;
         } catch (error) {
           console.error("[AI Cascade] Gemini failed:", error.message);
-        }
-      }
-
-      if (isGroqConfigured() && !replyText) {
-        try {
-          replyText = await generateGroqReply({ prompt, systemInstruction });
-          replyProvider = "groq";
-          replyModel = GROQ_MODEL;
-        } catch (error) {
-          console.error("[AI Cascade] Groq failed:", error.message);
         }
       }
 
@@ -993,19 +1072,60 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
         body.reasoning
       );
 
+      // 1. Groq Primary (70B)
+      if (isGroqConfigured() && !geminiEvaluation) {
+        geminiEvaluation = await generateGroqJson({ prompt: evalPrompt, timeout: 60000 }).catch((err) => {
+          console.error("[AI Cascade] Groq evaluation failed:", err.message || err);
+          return null;
+        });
+        if (geminiEvaluation) {
+          evalProvider = "groq";
+          evalModel = GROQ_MODEL;
+        }
+      }
+
+      // 2. Nvidia NIM Primary (70B/Nemotron)
+      if (isNvidiaConfigured() && !geminiEvaluation) {
+        geminiEvaluation = await generateNvidiaJson({ prompt: evalPrompt, timeout: 60000 }).catch((err) => {
+          console.error("[AI Cascade] Nvidia NIM evaluation failed:", err.message || err);
+          return null;
+        });
+        if (geminiEvaluation) {
+          evalProvider = "nvidia";
+          evalModel = NVIDIA_MODEL;
+        }
+      }
+
+      // 3. Groq 8B Fallback
+      if (isGroqConfigured() && !geminiEvaluation) {
+        geminiEvaluation = await generateGroqJson({ prompt: evalPrompt, modelOverride: "llama-3.1-8b-instant", timeout: 60000 }).catch((err) => {
+          console.error("[AI Cascade] Groq 8B evaluation failed:", err.message || err);
+          return null;
+        });
+        if (geminiEvaluation) {
+          evalProvider = "groq";
+          evalModel = "llama-3.1-8b-instant";
+        }
+      }
+
+      // 4. Nvidia NIM 8B Fallback
+      if (isNvidiaConfigured() && !geminiEvaluation) {
+        geminiEvaluation = await generateNvidiaJson({ prompt: evalPrompt, modelOverride: "meta/llama-3.1-8b-instruct", timeout: 60000 }).catch((err) => {
+          console.error("[AI Cascade] Nvidia NIM 8B evaluation failed:", err.message || err);
+          return null;
+        });
+        if (geminiEvaluation) {
+          evalProvider = "nvidia";
+          evalModel = "meta/llama-3.1-8b-instruct";
+        }
+      }
+
+      // 5. Other Providers Fallback
       if (isGeminiConfigured() && !geminiEvaluation) {
         geminiEvaluation = await generateGeminiJson({ prompt: evalPrompt }).catch(() => null);
         if (geminiEvaluation) {
           evalProvider = "gemini";
           evalModel = GEMINI_MODEL;
-        }
-      }
-      
-      if (isGroqConfigured() && !geminiEvaluation) {
-        geminiEvaluation = await generateGroqJson({ prompt: evalPrompt }).catch(() => null);
-        if (geminiEvaluation) {
-          evalProvider = "groq";
-          evalModel = GROQ_MODEL;
         }
       }
       
@@ -1268,18 +1388,20 @@ if (require.main === module) {
   server.listen(config.port, async () => {
     const ollamaReady = await isOllamaAvailable();
     console.log(`AI Virtual Patient Simulator backend running on http://localhost:${config.port}`);
-    console.log(`Storage: ${getStorageMode()} | Gemini: ${isGeminiConfigured() ? "enabled" : "disabled"} | Groq: ${isGroqConfigured() ? `enabled (${GROQ_MODEL})` : "disabled"} | OpenAI: ${isOpenAIConfigured() ? `enabled (${OPENAI_MODEL})` : "disabled"} | Ollama: ${ollamaReady ? `enabled (${OLLAMA_MODEL})` : "disabled"}`);
+    console.log(`Storage: ${getStorageMode()} | Gemini: ${isGeminiConfigured() ? "enabled" : "disabled"} | Groq: ${isGroqConfigured() ? `enabled (${GROQ_MODEL})` : "disabled"} | Nvidia NIM: ${isNvidiaConfigured() ? `enabled (${NVIDIA_MODEL})` : "disabled"} | OpenAI: ${isOpenAIConfigured() ? `enabled (${OPENAI_MODEL})` : "disabled"} | Ollama: ${ollamaReady ? `enabled (${OLLAMA_MODEL})` : "disabled"}`);
     if (isGeminiConfigured()) {
       console.log(`→ Using Gemini (${GEMINI_MODEL}) as primary AI provider`);
     } else if (isGroqConfigured()) {
       console.log(`→ Using Groq (${GROQ_MODEL}) as primary AI provider`);
+    } else if (isNvidiaConfigured()) {
+      console.log(`→ Using Nvidia NIM (${NVIDIA_MODEL}) as primary AI provider`);
     } else if (isOpenAIConfigured()) {
       console.log(`→ Using OpenAI (${OPENAI_MODEL}) as primary AI provider`);
     } else if (ollamaReady) {
       console.log(`→ Using Ollama (${OLLAMA_MODEL}) as primary AI provider`);
     } else {
       console.log(`⚠  No AI provider available! Using local scripted responses only.`);
-      console.log(`   To fix: run 'ollama pull qwen2.5:7b' or set GEMINI_API_KEY or GROQ_API_KEY`);
+      console.log(`   To fix: run 'ollama pull qwen2.5:7b' or set GEMINI_API_KEY, GROQ_API_KEY, or NVIDIA_API_KEY`);
     }
   });
 

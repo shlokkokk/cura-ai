@@ -1,16 +1,16 @@
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || "";
+const NVIDIA_MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.3-70b-instruct";
 
-function isGroqConfigured() {
-  return Boolean(GROQ_API_KEY);
+function isNvidiaConfigured() {
+  return Boolean(NVIDIA_API_KEY);
 }
 
-async function requestGroq({ prompt, systemInstruction, maxTokens = 300, responseFormat, modelOverride, timeout = 30000 }) {
-  if (!isGroqConfigured()) {
-    throw new Error("Groq API key is not configured.");
+async function requestNvidia({ prompt, systemInstruction, maxTokens = 300, responseFormat, modelOverride, timeout = 45000 }) {
+  if (!isNvidiaConfigured()) {
+    throw new Error("Nvidia API key is not configured.");
   }
 
-  const endpoint = "https://api.groq.com/openai/v1/chat/completions";
+  const endpoint = "https://integrate.api.nvidia.com/v1/chat/completions";
   const messages = [];
 
   if (systemInstruction) {
@@ -18,7 +18,7 @@ async function requestGroq({ prompt, systemInstruction, maxTokens = 300, respons
   }
   messages.push({ role: "user", content: prompt });
 
-  const selectedModel = modelOverride || GROQ_MODEL;
+  const selectedModel = modelOverride || NVIDIA_MODEL;
 
   const requestBody = {
     model: selectedModel,
@@ -35,7 +35,7 @@ async function requestGroq({ prompt, systemInstruction, maxTokens = 300, respons
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${GROQ_API_KEY}`
+      "Authorization": `Bearer ${NVIDIA_API_KEY}`
     },
     body: JSON.stringify(requestBody),
     signal: controller.signal
@@ -43,21 +43,21 @@ async function requestGroq({ prompt, systemInstruction, maxTokens = 300, respons
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(`Groq request failed: ${response.status} ${detail}`);
+    throw new Error(`Nvidia request failed: ${response.status} ${detail}`);
   }
 
   const data = await response.json();
   const text = data?.choices?.[0]?.message?.content?.trim();
 
   if (!text) {
-    throw new Error("Groq returned an empty response.");
+    throw new Error("Nvidia returned an empty response.");
   }
 
   return text;
 }
 
-async function generateGroqReply({ prompt, systemInstruction, maxTokens, modelOverride, timeout }) {
-  return requestGroq({ prompt, systemInstruction, maxTokens, modelOverride, timeout });
+async function generateNvidiaReply({ prompt, systemInstruction, maxTokens, modelOverride, timeout }) {
+  return requestNvidia({ prompt, systemInstruction, maxTokens, modelOverride, timeout });
 }
 
 function extractJsonBlock(text) {
@@ -115,11 +115,11 @@ function extractJsonBlock(text) {
   return text.trim();
 }
 
-async function generateGroqJson({ prompt, modelOverride, timeout }) {
-  const text = await requestGroq({
-    prompt: prompt + "\n\nRespond with ONLY valid JSON, no markdown wrapper or explanation.",
+async function generateNvidiaJson({ prompt, modelOverride, timeout }) {
+  const text = await requestNvidia({
+    prompt: prompt + "\n\nRespond with ONLY valid JSON, no markdown or explanation.",
     responseFormat: "json",
-    maxTokens: 4096,
+    maxTokens: 8192,
     modelOverride,
     timeout
   });
@@ -128,8 +128,8 @@ async function generateGroqJson({ prompt, modelOverride, timeout }) {
 }
 
 module.exports = {
-  generateGroqReply,
-  generateGroqJson,
-  isGroqConfigured,
-  GROQ_MODEL
+  generateNvidiaReply,
+  generateNvidiaJson,
+  isNvidiaConfigured,
+  NVIDIA_MODEL
 };
