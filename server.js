@@ -71,7 +71,7 @@ function buildBaseHeaders(context = {}) {
   return {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": config.allowedOrigin,
-    "Access-Control-Allow-Methods": "GET,POST,PUT,OPTIONS",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, x-admin-key, x-request-id",
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
@@ -592,6 +592,23 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
       }, context);
       return;
     }
+
+    if (request.method === "DELETE" && pathname === "/api/cases/ai") {
+      aiCaseCache.clear();
+      console.log("[AI Case Gen] Cleared all dynamic generated cases from cache.");
+      sendJson(response, 200, { success: true, message: "Cleared all generated cases" }, context);
+      return;
+    }
+
+    if (request.method === "POST" && pathname === "/api/cases/ai/clear") {
+      aiCaseCache.clear();
+      console.log("[AI Case Gen] Cleared all dynamic generated cases from cache (via POST).");
+      sendJson(response, 200, { success: true, message: "Cleared all generated cases" }, context);
+      return;
+    }
+
+
+
 
     const caseParams = routeMatches(pathname, "/api/cases/:caseId");
     if (caseParams) {

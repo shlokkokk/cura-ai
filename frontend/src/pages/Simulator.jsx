@@ -158,6 +158,8 @@ export default function Simulator() {
   const [toastType,     setToastType]     = useState('info'); // 'info' | 'error' | 'success'
   const [activeTab,     setActiveTab]     = useState('chat'); // 'chat' | 'tests' | 'profile'
   const [sheetExpanded, setSheetExpanded] = useState(false);
+  const [showTrashConfirm, setShowTrashConfirm] = useState(false);
+
   const [sheetDragY,    setSheetDragY]    = useState(0);
   const [isKeyboardOpen,setIsKeyboardOpen]= useState(false);
   const [visualViewportHeight, setVisualViewportHeight] = useState(null);
@@ -324,6 +326,10 @@ export default function Simulator() {
   };
 
   const [voices, setVoices] = useState([]);
+  const [selectedVoiceName, setSelectedVoiceName] = useState(
+    localStorage.getItem('cura-selected-voice') || ''
+  );
+
 
   const getBestVoice = (gender) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return null;
@@ -373,7 +379,7 @@ export default function Simulator() {
     return finalVoice;
   };
 
-  const speakText = (text, idx) => {
+  const speakText = async (text, idx) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
 
     if (speakingIdx === idx) {
@@ -392,19 +398,80 @@ export default function Simulator() {
     if (!cleanedText) return;
 
     const resolvedGender = activeCase?.gender?.toLowerCase();
-    const utterance = new SpeechSynthesisUtterance(cleanedText);
-    const voice = getBestVoice(resolvedGender);
+    
+    let voice = null;
+    if (selectedVoiceName) {
+      voice = voices.find(v => v.name === selectedVoiceName);
+    }
+    if (!voice) {
+      voice = getBestVoice(resolvedGender);
+    }
+
+    const voiceLang = voice?.lang?.split('-')[0]?.toLowerCase() || 'en';
+    let textToSpeak = cleanedText;
+
+    // Dynamic translation if voice language is not English
+    if (voiceLang && voiceLang !== 'en') {
+      try {
+        const transRes = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${voiceLang}&dt=t&q=${encodeURIComponent(cleanedText)}`);
+        if (transRes.ok) {
+          const transData = await transRes.json();
+          const translatedText = transData[0].map(item => item[0]).join('');
+          if (translatedText) {
+            textToSpeak = translatedText;
+            console.log(`[TTS Translation] Translated "${cleanedText}" to "${textToSpeak}" (${voiceLang})`);
+          }
+        }
+      } catch (err) {
+        console.warn("[TTS Translation] Failed to translate:", err);
+      }
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
     if (voice) {
       utterance.voice = voice;
     }
 
+    // Detect gender of selected voice
+    const voiceNameLower = voice ? voice.name.toLowerCase() : '';
+    const femaleKeywords = ['female', 'samantha', 'zira', 'siri', 'heera', 'hazel', 'veena', 'elsa', 'fiona', 'kalpana', 'swara', 'neerja', 'karen', 'tessa', 'moira', 'susan', 'jessica', 'swasti', 'lekha'];
+    const maleKeywords = ['male', 'david', 'george', 'ravi', 'mark', 'daniel', 'alex', 'fred', 'james', 'richard', 'guy', 'peter', 'tom'];
+    
+    let voiceIsFemale = true;
+    let voiceIsMale = false;
+    
+    const hasFemaleKw = femaleKeywords.some(kw => voiceNameLower.includes(kw));
+    const hasMaleKw = maleKeywords.some(kw => voiceNameLower.includes(kw));
+    
+    if (hasMaleKw && !hasFemaleKw) {
+      voiceIsMale = true;
+      voiceIsFemale = false;
+    } else if (hasFemaleKw) {
+      voiceIsFemale = true;
+      voiceIsMale = false;
+    }
 
-    // Startup-grade voice mapping: deeper male pitch & age-appropriate rate
-    const isMale = resolvedGender === 'male';
+    const patientIsMale = resolvedGender === 'male';
+    const patientIsFemale = resolvedGender === 'female';
     const isElderly = activeCase?.age && activeCase.age >= 60;
 
-    utterance.pitch = isMale ? 0.88 : 1.0;
+    // Pitch shifting to match patient gender if voice gender mismatches
+    let pitch = 1.0;
+    if (patientIsMale) {
+      if (voiceIsFemale) {
+        pitch = 0.68; // Deepen female voice significantly to sound male!
+      } else {
+        pitch = 0.88; // Deepen male voice slightly
+      }
+    } else if (patientIsFemale) {
+      if (voiceIsMale) {
+        pitch = 1.35; // Pitch up male voice to sound female!
+      }
+    }
+
+    utterance.pitch = pitch;
     utterance.rate = isElderly ? 0.94 : 1.05;
+
 
 
     utterance.onstart = () => {
@@ -682,6 +749,26 @@ export default function Simulator() {
     }
   };
 
+  const handleClearAIPatients = async () => {
+    try {
+      await api('/api/cases/ai/clear', { method: 'POST' });
+      const specialtyToUse = demoSpecialty ? demoSpecialty.charAt(0).toUpperCase() + demoSpecialty.slice(1) : effectiveUser.specialization;
+      const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
+      const data = await api(`/api/cases${specialtyParam}`);
+      if (data.cases) {
+        setCases(data.cases);
+        const activeStillExists = data.cases.find(c => c.id === activeCase?.id);
+        if (!activeStillExists && data.cases.length > 0) {
+          loadCase(data.cases[0].id, data.cases, data.cases[0]);
+        }
+      }
+      showToast('Successfully cleared generated patients.', 'success');
+      setShowTrashConfirm(false);
+    } catch (err) {
+      showToast('Failed to clear patients: ' + err.message, 'error');
+    }
+  };
+
   const handleVoice = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { showToast('Voice input not supported in this browser.', 'info'); return; }
@@ -832,6 +919,36 @@ export default function Simulator() {
             <span className="tts-btn-text">{ttsEnabled ? 'Voice ON' : 'Voice OFF'}</span>
           </button>
 
+          {ttsEnabled && voices.length > 0 && (
+            <select
+              value={selectedVoiceName}
+              onChange={(e) => {
+                setSelectedVoiceName(e.target.value);
+                localStorage.setItem('cura-selected-voice', e.target.value);
+              }}
+              className="chat-voice-selector"
+            >
+              <option value="">Auto (Gender)</option>
+              {Object.entries(
+                voices.reduce((groups, voice) => {
+                  const lang = voice.lang.split('-')[0].toUpperCase();
+                  if (!groups[lang]) groups[lang] = [];
+                  groups[lang].push(voice);
+                  return groups;
+                }, {})
+              ).map(([lang, langVoices]) => (
+                <optgroup key={lang} label={lang}>
+                  {langVoices.map((v) => (
+                    <option key={v.name} value={v.name}>
+                      {v.name.replace(/microsoft|google|desktop/gi, '').trim()}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          )}
+
+
           <button
             onClick={() => { setIsEmergencyMode(e => !e); setTimeLeft(600); }}
 
@@ -917,16 +1034,94 @@ export default function Simulator() {
           ><span>Recommended Tests</span><button type="button" className="sim-sheet-close" onClick={closeMobileSheet} aria-label="Close investigations"><XIcon /></button></div>
 
           <div className="sim-panel-body">
-            {/* New Patient button */}
-            <button
-              onClick={handleNewPatient}
-              className="btn btn-outline btn-sm w-full"
-              disabled={generatingAI}
-              style={{ marginBottom: 12, gap: 6 }}
-            >
-              <RefreshIcon />
-              New Patient
-            </button>
+            {showTrashConfirm ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                  padding: 10,
+                  background: 'rgba(239, 68, 68, 0.05)',
+                  border: '1px dashed rgba(239, 68, 68, 0.3)',
+                  borderRadius: 'var(--r-sm)',
+                  marginBottom: 12,
+                  animation: 'fadeIn 200ms ease'
+                }}
+              >
+                <div style={{ fontSize: 10, color: '#EF4444', fontWeight: 600, textAlign: 'center', lineHeight: 1.4 }}>
+                  Clear AI-generated patients only? (Pre-defined cases will not be deleted)
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    onClick={() => {
+                      setShowTrashConfirm(false);
+                      handleClearAIPatients();
+                    }}
+                    className="btn btn-sm"
+                    style={{
+                      flex: 1,
+                      background: '#EF4444',
+                      color: 'white',
+                      borderColor: '#EF4444',
+                      fontSize: 11,
+                      height: 28,
+                      padding: '0 8px'
+                    }}
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={() => setShowTrashConfirm(false)}
+                    className="btn btn-outline btn-sm"
+                    style={{
+                      flex: 1,
+                      fontSize: 11,
+                      height: 28,
+                      padding: '0 8px'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <button
+                  onClick={handleNewPatient}
+                  className="btn btn-outline btn-sm"
+                  disabled={generatingAI}
+                  style={{ flex: 1, gap: 6 }}
+                >
+                  <RefreshIcon />
+                  New Patient
+                </button>
+                {cases.some(c => c.id?.startsWith('ai-')) && (
+                  <button
+                    onClick={() => setShowTrashConfirm(true)}
+                    className="btn btn-outline btn-outline-danger btn-sm"
+                    title="Clear dynamically generated patients"
+                    style={{
+                      padding: '0 10px',
+                      borderColor: 'rgba(239, 68, 68, 0.25)',
+                      color: '#EF4444',
+                      background: 'rgba(239, 68, 68, 0.05)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            )}
+
+
 
             {/* Test list */}
             {activeCase?.recommendedTests?.length > 0 ? (
