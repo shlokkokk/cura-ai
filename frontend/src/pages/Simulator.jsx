@@ -344,40 +344,43 @@ export default function Simulator() {
 
     let selectedVoice = null;
 
-    if (isFemale) {
-      const femaleKeywords = ['female', 'samantha', 'zira', 'siri', 'heera', 'google uk english female', 'hazel', 'veena', 'elsa', 'fiona', 'microsoft zira'];
-      for (const kw of femaleKeywords) {
-        const found = enVoices.find(v => v.name.toLowerCase().includes(kw));
-        if (found) {
-          selectedVoice = found;
-          break;
-        }
-      }
+    if (isMale) {
+      // 1. Strict male markers
+      selectedVoice = enVoices.find(v => {
+        const name = v.name.toLowerCase();
+        return name.includes('male') || name.includes('#male') || name.includes('-male') || name.includes('siri voice 1') || name.includes('siri voice 3') || name.includes('siri voice 4');
+      });
+
+      // 2. Common male voice names (excluding generic Siri to avoid collision unless it has male markers)
       if (!selectedVoice) {
-        selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman'));
+        const maleNames = ['daniel', 'david', 'arthur', 'gordon', 'rishi', 'george', 'ravi', 'mark', 'alex', 'fred', 'james', 'richard', 'guy', 'peter', 'tom', 'en-us-x-sfg', 'en-us-x-iom', 'en-gb-x-fis', 'en-us-x-tpd'];
+        selectedVoice = enVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return maleNames.some(nm => name.includes(nm));
+        });
       }
-    } else if (isMale) {
-      const maleKeywords = ['male', 'david', 'george', 'ravi', 'google uk english male', 'mark', 'daniel', 'alex', 'fred', 'james', 'richard', 'microsoft david', 'microsoft george', 'guy'];
-      for (const kw of maleKeywords) {
-        const found = enVoices.find(v => v.name.toLowerCase().includes(kw));
-        if (found) {
-          selectedVoice = found;
-          break;
-        }
-      }
+    } else if (isFemale) {
+      // 1. Strict female markers
+      selectedVoice = enVoices.find(v => {
+        const name = v.name.toLowerCase();
+        return name.includes('female') || name.includes('siri voice 2') || name.includes('siri voice 5');
+      });
+
+      // 2. Common female voice names
       if (!selectedVoice) {
-        selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('man'));
+        const femaleNames = ['samantha', 'zira', 'heera', 'hazel', 'veena', 'elsa', 'fiona', 'kalpana', 'swara', 'neerja', 'karen', 'tessa', 'moira', 'susan', 'jessica', 'swasti', 'lekha', 'siri'];
+        selectedVoice = enVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return femaleNames.some(nm => name.includes(nm));
+        });
       }
     }
 
-    if (!selectedVoice) {
-      selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('google') || v.name.toLowerCase().includes('natural'));
-    }
-
-    const finalVoice = selectedVoice || enVoices[0];
+    const finalVoice = selectedVoice || enVoices.find(v => v.default) || enVoices[0];
     console.log(`[TTS] Dynamic voice selection for ${gender}:`, finalVoice?.name);
     return finalVoice;
   };
+
 
   const speakText = async (text, idx) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -434,22 +437,26 @@ export default function Simulator() {
 
     // Detect gender of selected voice
     const voiceNameLower = voice ? voice.name.toLowerCase() : '';
-    const femaleKeywords = ['female', 'samantha', 'zira', 'siri', 'heera', 'hazel', 'veena', 'elsa', 'fiona', 'kalpana', 'swara', 'neerja', 'karen', 'tessa', 'moira', 'susan', 'jessica', 'swasti', 'lekha'];
-    const maleKeywords = ['male', 'david', 'george', 'ravi', 'mark', 'daniel', 'alex', 'fred', 'james', 'richard', 'guy', 'peter', 'tom'];
     
     let voiceIsFemale = true;
     let voiceIsMale = false;
-    
-    const hasFemaleKw = femaleKeywords.some(kw => voiceNameLower.includes(kw));
-    const hasMaleKw = maleKeywords.some(kw => voiceNameLower.includes(kw));
-    
-    if (hasMaleKw && !hasFemaleKw) {
+
+    // Strict male markers (e.g. "Siri Voice 1", "Male", etc.)
+    const isStrictMale = voiceNameLower.includes('male') || 
+                         voiceNameLower.includes('#male') || 
+                         voiceNameLower.includes('-male') ||
+                         voiceNameLower.includes('siri voice 1') || 
+                         voiceNameLower.includes('siri voice 3') || 
+                         voiceNameLower.includes('siri voice 4');
+                         
+    const maleNames = ['daniel', 'david', 'arthur', 'gordon', 'rishi', 'george', 'ravi', 'mark', 'alex', 'fred', 'james', 'richard', 'guy', 'peter', 'tom', 'en-us-x-sfg', 'en-us-x-iom', 'en-gb-x-fis', 'en-us-x-tpd'];
+    const isNamedMale = maleNames.some(nm => voiceNameLower.includes(nm));
+
+    if (isStrictMale || isNamedMale) {
       voiceIsMale = true;
       voiceIsFemale = false;
-    } else if (hasFemaleKw) {
-      voiceIsFemale = true;
-      voiceIsMale = false;
     }
+
 
     const patientIsMale = resolvedGender === 'male';
     const patientIsFemale = resolvedGender === 'female';
@@ -496,16 +503,27 @@ export default function Simulator() {
     
     const handleVoicesChanged = () => {
       const loadedVoices = window.speechSynthesis.getVoices();
-      setVoices(loadedVoices);
+      if (loadedVoices && loadedVoices.length > 0) {
+        setVoices(loadedVoices);
+        console.log(`[TTS] Loaded ${loadedVoices.length} voices via voiceschanged event`);
+      }
     };
     
     window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
     
-    // Trigger initial load
-    const initialVoices = window.speechSynthesis.getVoices();
-    if (initialVoices && initialVoices.length > 0) {
-      setVoices(initialVoices);
-    }
+    // Polling retry for Android Chrome async SpeechSynthesis initialization
+    let retries = 0;
+    const fetchVoices = () => {
+      const loadedVoices = window.speechSynthesis.getVoices();
+      if (loadedVoices && loadedVoices.length > 0) {
+        setVoices(loadedVoices);
+        console.log(`[TTS] Loaded ${loadedVoices.length} voices via polling (retry ${retries})`);
+      } else if (retries < 12) {
+        retries++;
+        setTimeout(fetchVoices, 200);
+      }
+    };
+    fetchVoices();
     
     return () => {
       window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
