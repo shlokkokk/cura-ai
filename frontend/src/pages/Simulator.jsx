@@ -769,6 +769,18 @@ export default function Simulator() {
     }
   };
 
+  const handleVoiceToggleClick = () => {
+    if (isMobileViewport()) {
+      openMobileSheet('voice');
+    } else {
+      const next = !ttsEnabled;
+      setTtsEnabled(next);
+      localStorage.setItem('cura-tts', next ? 'true' : 'false');
+      if (!next) cancelSpeech();
+    }
+  };
+
+
   const handleVoice = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { showToast('Voice input not supported in this browser.', 'info'); return; }
@@ -896,7 +908,7 @@ export default function Simulator() {
               {formatTime(timeLeft)}
             </div>
           )}
-          {/* Patient auto-voice toggle */}
+          {/* Patient auto-voice toggle - Desktop */}
           <button
             onClick={() => {
               const next = !ttsEnabled;
@@ -904,7 +916,7 @@ export default function Simulator() {
               localStorage.setItem('cura-tts', next ? 'true' : 'false');
               if (!next) cancelSpeech();
             }}
-            className="btn btn-sm"
+            className="btn btn-sm desktop-voice-btn"
             title="Toggle Patient Auto-Voice"
             style={{
               gap: 6,
@@ -919,14 +931,44 @@ export default function Simulator() {
             <span className="tts-btn-text">{ttsEnabled ? 'Voice ON' : 'Voice OFF'}</span>
           </button>
 
-          {ttsEnabled && voices.length > 0 && (
+          {/* Patient auto-voice toggle - Mobile */}
+          <button
+            onClick={() => openMobileSheet('voice')}
+            className="btn btn-sm mobile-voice-btn"
+            title="Voice Settings"
+            style={{
+              gap: 6,
+              borderColor: ttsEnabled ? 'var(--purple)' : 'var(--border-md)',
+              background: ttsEnabled ? 'rgba(138, 124, 255, 0.12)' : 'transparent',
+              color: ttsEnabled ? 'var(--purple)' : 'var(--text-muted)',
+              display: 'inline-flex',
+              alignItems: 'center'
+            }}
+          >
+            <VolumeIcon active={ttsEnabled} />
+          </button>
+
+          {!isMobileViewport() && ttsEnabled && voices.length > 0 && (
             <select
               value={selectedVoiceName}
               onChange={(e) => {
                 setSelectedVoiceName(e.target.value);
                 localStorage.setItem('cura-selected-voice', e.target.value);
               }}
-              className="chat-voice-selector"
+              style={{
+                fontSize: 'var(--fs-xs)',
+                padding: '0 8px',
+                height: '32px',
+                borderRadius: 'var(--r-sm)',
+                background: 'var(--bg-card)',
+                color: 'var(--text)',
+                border: '1px solid var(--border-md)',
+                maxWidth: 150,
+                outline: 'none',
+                cursor: 'pointer',
+                fontFamily: 'var(--mono)',
+                animation: 'fadeIn 200ms ease'
+              }}
             >
               <option value="">Auto (Gender)</option>
               {Object.entries(
@@ -1170,6 +1212,84 @@ export default function Simulator() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Voice Settings Panel */}
+        <div
+          className={`sim-panel sim-panel-left mobile-voice-settings-panel ${activeTab === 'voice' ? 'mobile-active' : ''} ${sheetExpanded ? 'sheet-expanded' : ''} ${sheetDragY ? 'sheet-dragging' : ''}`}
+          style={{ '--sheet-drag-y': `${sheetDragY}px` }}
+        >
+          <div
+            className="sim-panel-header sim-sheet-header"
+            onPointerDown={handleSheetPointerDown}
+            onPointerMove={handleSheetPointerMove}
+            onPointerUp={handleSheetPointerUp}
+            onPointerCancel={handleSheetPointerUp}
+          >
+            <span>Voice Settings</span>
+            <button type="button" className="sim-sheet-close" onClick={closeMobileSheet} aria-label="Close voice settings">
+              <XIcon />
+            </button>
+          </div>
+
+          <div className="sim-panel-body" style={{ padding: '20px 16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid var(--border)' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>Patient Voice Synthesis</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.4 }}>Speak incoming patient replies aloud</div>
+              </div>
+              <label className="switch-toggle">
+                <input
+                  type="checkbox"
+                  checked={ttsEnabled}
+                  onChange={(e) => {
+                    const next = e.target.checked;
+                    setTtsEnabled(next);
+                    localStorage.setItem('cura-tts', next ? 'true' : 'false');
+                    if (!next) cancelSpeech();
+                  }}
+                />
+                <span className="slider-round" />
+              </label>
+            </div>
+
+            {ttsEnabled && voices.length > 0 && (
+              <div style={{ animation: 'fadeIn 200ms ease' }}>
+                <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)', marginBottom: 8 }}>
+                  Accent / Language
+                </div>
+                <select
+                  value={selectedVoiceName}
+                  onChange={(e) => {
+                    setSelectedVoiceName(e.target.value);
+                    localStorage.setItem('cura-selected-voice', e.target.value);
+                  }}
+                  className="mobile-voice-selector"
+                >
+                  <option value="">Auto (Gender Matched)</option>
+                  {Object.entries(
+                    voices.reduce((groups, voice) => {
+                      const lang = voice.lang.split('-')[0].toUpperCase();
+                      if (!groups[lang]) groups[lang] = [];
+                      groups[lang].push(voice);
+                      return groups;
+                    }, {})
+                  ).map(([lang, langVoices]) => (
+                    <optgroup key={lang} label={lang}>
+                      {langVoices.map((v) => (
+                        <option key={v.name} value={v.name}>
+                          {v.name.replace(/microsoft|google|desktop/gi, '').trim()}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.5 }}>
+                  Choose a locale/accent. Cura automatically pitch-shifts mismatched voice genders to sound male or female as needed!
+                </div>
               </div>
             )}
           </div>
