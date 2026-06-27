@@ -667,9 +667,10 @@ export default function Simulator() {
       const data = await api(`/api/cases${query}`);
       const nextCases = data.cases || [];
       setCases(nextCases);
-      const nextCase = pickNextCase(nextCases);
+      const nextCase = nextCases.find(c => c.id !== activeCase?.id) || nextCases[0];
       if (nextCase) {
         await loadCase(nextCase.id, nextCases, nextCase);
+
         if (isMobileViewport()) setActiveTab('chat');
       } else {
         showToast('No patient cases available for this specialty yet.', 'info');

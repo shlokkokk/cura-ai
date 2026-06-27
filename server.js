@@ -462,9 +462,24 @@ const server = http.createServer(async (request, response) => {
 
         // AI case generation helper
         const generateSpecialtyCases = async (count, specialty) => {
+          const randomSalt = Math.random().toString(36).substring(2, 10);
+          
+          // Gather existing patient names to prevent duplication
+          const existingNames = [
+            ...caseStudies.map(c => c.name),
+            ...Array.from(aiCaseCache.values()).map(c => c.name)
+          ].filter(Boolean);
+          const uniqueNames = Array.from(new Set(existingNames));
+          const prohibitedNamesString = uniqueNames.slice(-20).join(", ");
+
           const aiGenPrompt = `Generate ${count} realistic virtual patient case(s) for medical specialty: "${specialty}".
+Ensure the patient name, age, gender, exact complaint, and clinical parameters are completely unique, creative, and random.
+CRITICAL: Do NOT use any of the following names: [${prohibitedNamesString}]. You must invent a completely fresh, realistic name.
+Random seed: [${randomSalt}].
 Return a JSON array. Each case object must have: name (string), age (number), gender (string "Male" or "Female"), role (string), complaint (string), specialty: "${specialty}", complexity ("Low"/"Moderate"/"High"), urgency (string), personality (string), summary (string), vitals (string), history (string), expectedDiagnosis (array), differentialDiagnoses (array of 3-4), redFlags (array of 3-5), expectedQuestions (array of 5), recommendedTests (array of 4-5), communicationGoals (array of 2), hints (array of 3), evaluationFocus (array of 3).
 Make cases medically accurate and diverse. Return ONLY valid JSON array, no markdown.`;
+
+
 
 
           let aiCases = null;
@@ -483,9 +498,20 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
           
           const generated = [];
           if (aiCases) {
-            const casesArray = Array.isArray(aiCases) ? aiCases : [aiCases];
+            let casesArray = [];
+            if (Array.isArray(aiCases)) {
+              casesArray = aiCases;
+            } else if (aiCases.cases && Array.isArray(aiCases.cases)) {
+              casesArray = aiCases.cases;
+            } else if (aiCases.caseStudies && Array.isArray(aiCases.caseStudies)) {
+              casesArray = aiCases.caseStudies;
+            } else {
+              casesArray = [aiCases];
+            }
+
             for (let i = 0; i < casesArray.length; i++) {
               const aiCase = casesArray[i];
+              if (!aiCase) continue;
               const caseId = `ai-${specialty.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}-${i}`;
               const fullCase = {
                 ...aiCase,
@@ -504,6 +530,7 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
             }
             console.log(`[AI Case Gen] Generated ${generated.length} cases for ${specialty}`);
           }
+
           return generated;
         };
 
