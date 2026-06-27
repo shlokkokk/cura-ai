@@ -182,8 +182,6 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Prevent rubber-band bounce fighting with ScrollSmoother on desktop */
-  overscroll-behavior-y: none;
 }
 
 body {
@@ -4246,20 +4244,14 @@ select:autofill:active {
     overflow-x: hidden;
   }
 
-  /* On mobile ScrollSmoother is OFF — undo fixed wrapper, restore native scroll */
   html {
-    scroll-behavior: auto !important; /* smooth conflicts with touch inertia */
-    overscroll-behavior-y: auto !important;
+    /* CSS smooth-scroll conflicts with native touch inertia */
+    scroll-behavior: auto !important;
   }
 
   body {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch; /* iOS momentum scroll */
-    overscroll-behavior-y: contain;    /* no chained bounce to parent */
-  }
-
-  #root {
-    touch-action: pan-y !important;   /* tell browser this scrolls vertically */
+    /* iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch;
   }
 
 
