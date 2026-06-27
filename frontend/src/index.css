@@ -5647,3 +5647,485 @@ select:autofill:active {
     display: none;
   }
 }
+
+/* Mobile clinical sheet redesign */
+@media (max-width: 768px) {
+  .sim-header {
+    min-height: 96px !important;
+    gap: 8px !important;
+  }
+
+  .sim-header-patient {
+    grid-template-columns: 34px minmax(0, 1fr) auto !important;
+    grid-template-areas: "avatar copy urgency" !important;
+    min-height: 70px;
+    padding: 9px 10px !important;
+    column-gap: 10px !important;
+    row-gap: 0 !important;
+  }
+
+  .sim-header-patient-copy > div:first-child {
+    font-size: 0.98rem !important;
+  }
+
+  .sim-header-patient-copy > div:last-child {
+    font-size: 0.72rem !important;
+  }
+
+  .sim-header-urgency {
+    align-self: center;
+    justify-self: end !important;
+    max-width: 118px !important;
+    padding: 6px 8px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.03em !important;
+  }
+
+  .sim-workspace {
+    height: calc(var(--sim-vvh, 100dvh) - 144px) !important;
+  }
+
+  .sim-mobile-drawer-scrim {
+    inset: 0 !important;
+    z-index: 36 !important;
+    background:
+      linear-gradient(180deg, rgba(4, 3, 16, 0.18), rgba(4, 3, 16, 0.74)),
+      rgba(3, 2, 14, 0.38) !important;
+    backdrop-filter: blur(5px) saturate(115%) !important;
+  }
+
+  .sim-panel-left,
+  .sim-panel-right {
+    position: fixed !important;
+    left: 10px !important;
+    right: 10px !important;
+    top: auto !important;
+    bottom: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: min(72dvh, calc(var(--sim-vvh, 100dvh) - 184px)) !important;
+    border-radius: 26px 26px 0 0 !important;
+    border: 1px solid rgba(138, 124, 255, 0.26) !important;
+    border-bottom: 0 !important;
+    background:
+      radial-gradient(circle at 18% 0%, rgba(138, 124, 255, 0.13), transparent 34%),
+      color-mix(in srgb, var(--surface) 95%, #000 5%) !important;
+    box-shadow: 0 -28px 80px rgba(0, 0, 0, 0.48) !important;
+    transform: translateY(108%) scale(0.98) !important;
+    opacity: 0;
+    overflow: hidden;
+    z-index: 42 !important;
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 180ms ease !important;
+  }
+
+  .sim-panel-left::before,
+  .sim-panel-right::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 42px;
+    height: 4px;
+    border-radius: 999px;
+    transform: translateX(-50%);
+    background: rgba(195, 183, 211, 0.42);
+    z-index: 1;
+  }
+
+  .sim-panel-left.mobile-active,
+  .sim-panel-right.mobile-active {
+    opacity: 1 !important;
+    pointer-events: auto;
+    transform: translateY(0) scale(1) !important;
+  }
+
+  .sim-panel-left .sim-panel-header,
+  .sim-panel-right .sim-panel-header {
+    min-height: 64px;
+    padding: 26px 20px 14px !important;
+    border-bottom: 1px solid rgba(138, 124, 255, 0.18) !important;
+    background: rgba(255, 255, 255, 0.018);
+    letter-spacing: 0.08em;
+  }
+
+  .sim-panel-left .sim-panel-body,
+  .sim-panel-right .sim-panel-body {
+    padding: 16px 18px max(22px, env(safe-area-inset-bottom)) !important;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .sim-panel-left .sim-panel-body::-webkit-scrollbar,
+  .sim-panel-right .sim-panel-body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .sim-panel-left .btn.w-full {
+    min-height: 46px !important;
+    border-radius: 16px !important;
+    margin-bottom: 14px !important;
+    background: rgba(138, 124, 255, 0.08) !important;
+  }
+
+  .sim-panel-left .test-item {
+    min-height: 48px;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.018);
+    border: 1px solid transparent;
+  }
+
+  .sim-panel-left .test-item.ordered {
+    border-color: rgba(138, 124, 255, 0.36) !important;
+    background: rgba(138, 124, 255, 0.12) !important;
+  }
+
+  .sim-panel-right .patient-avatar-lg {
+    width: 72px !important;
+    height: 72px !important;
+    font-size: 1.45rem !important;
+    border-radius: 24px !important;
+  }
+
+  .sim-panel-right .badge-danger,
+  .sim-panel-right .badge-success {
+    max-width: 100%;
+    padding: 7px 12px !important;
+    border-radius: 999px !important;
+  }
+
+  .sim-panel-right .vitals-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .sim-panel-right .vital-item {
+    min-height: 88px;
+    border-radius: 18px !important;
+  }
+
+  .sim-panel-right .vital-value {
+    font-size: 1.52rem !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .sim-header-patient {
+    grid-template-columns: 32px minmax(0, 1fr) auto !important;
+  }
+
+  .sim-header-urgency {
+    max-width: 104px !important;
+    padding-inline: 7px !important;
+  }
+
+  .sim-panel-left,
+  .sim-panel-right {
+    left: 8px !important;
+    right: 8px !important;
+    max-height: min(70dvh, calc(var(--sim-vvh, 100dvh) - 174px)) !important;
+    border-radius: 24px 24px 0 0 !important;
+  }
+}
+
+/* Loader icon and mobile sheet finish */
+.spinner-lg {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(138, 124, 255, 0.22);
+  border-top-color: var(--purple);
+  border-right-color: var(--teal);
+  animation: spin 0.72s linear infinite;
+  box-shadow: 0 0 22px rgba(138, 124, 255, 0.24);
+}
+
+.sim-loading-card > div:first-child {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px !important;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(0, 201, 177, 0.24), transparent 42%),
+    var(--purple-dim) !important;
+}
+
+.sim-loading-card > div:first-child::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: inherit;
+  border: 1px solid rgba(138, 124, 255, 0.38);
+  animation: simPulseRing 1.4s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+}
+
+@keyframes simPulseRing {
+  0% { transform: scale(0.72); opacity: 0.8; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+
+.sim-sheet-header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sim-sheet-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(138, 124, 255, 0.2);
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background 150ms ease, color 150ms ease;
+}
+
+.sim-sheet-close:active {
+  transform: scale(0.94);
+}
+
+.sim-sheet-close:hover,
+.sim-sheet-close:focus-visible {
+  background: var(--purple-dim);
+  color: var(--text);
+  outline: none;
+}
+
+.sim-sheet-close svg {
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 768px) {
+  .sim-panel-left,
+  .sim-panel-right {
+    transform-origin: 50% 100%;
+  }
+
+  .sim-panel-left .sim-panel-header span,
+  .sim-panel-right .sim-panel-header span {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sim-panel-left .sim-panel-header span::before,
+  .sim-panel-right .sim-panel-header span::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--teal);
+    box-shadow: 0 0 16px rgba(0, 201, 177, 0.5);
+  }
+
+  .sim-panel-right .sim-panel-header span::before {
+    background: var(--purple);
+    box-shadow: 0 0 16px rgba(138, 124, 255, 0.5);
+  }
+
+  .sim-panel-left .sim-panel-body > div[style*="borderTop"] {
+    margin-top: 18px !important;
+    padding-top: 18px !important;
+    border-top-color: rgba(138, 124, 255, 0.18) !important;
+  }
+
+  .sim-panel-left .test-checkbox {
+    border-color: rgba(138, 124, 255, 0.34) !important;
+  }
+
+  .sim-panel-left .test-item.ordered .test-checkbox {
+    background: var(--purple-dim) !important;
+    border-color: rgba(138, 124, 255, 0.6) !important;
+  }
+
+  .sim-panel-right .report-thumb,
+  .sim-panel-right .vital-item {
+    background: rgba(255, 255, 255, 0.022) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner-lg,
+  .sim-loading-card > div:first-child::before {
+    animation-duration: 1.5s !important;
+  }
+}
+
+/* Regression guard: desktop simulator keeps original layout */
+@media (min-width: 769px) {
+  .sim-sheet-close {
+    display: none !important;
+  }
+
+  .sim-sheet-header {
+    display: block !important;
+  }
+
+  .chat-patient-switcher {
+    display: block !important;
+    width: auto !important;
+    max-width: 360px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+    cursor: default !important;
+  }
+
+  .chat-patient-switcher-main,
+  .chat-patient-switcher-icon {
+    display: none !important;
+  }
+
+  .chat-patient-switcher .chat-patient-selector {
+    position: static !important;
+    inset: auto !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: auto !important;
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    font-size: var(--fs-base) !important;
+    font-weight: 700 !important;
+    font-family: var(--font) !important;
+    color: var(--text) !important;
+  }
+}
+
+/* Mobile simulator back control: one action, no mixed logo link */
+@media (max-width: 768px) {
+  .sim-header-left {
+    width: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .sim-header-left .logo-container,
+  .sim-header-left .sim-header-divider {
+    display: none !important;
+  }
+
+  .sim-header-left .btn {
+    background: var(--surface-2) !important;
+    border: 1px solid var(--border-md) !important;
+    color: var(--text-2) !important;
+  }
+}
+
+/* Clean mobile navigation drawer */
+@media (max-width: 768px) {
+  .mobile-drawer {
+    position: fixed !important;
+    top: 74px !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    max-height: calc(100dvh - 96px) !important;
+    overflow-y: auto !important;
+    padding: 16px !important;
+    gap: 14px !important;
+    border: 1px solid rgba(138, 124, 255, 0.24) !important;
+    border-radius: 22px !important;
+    background: color-mix(in srgb, var(--surface) 94%, #000 6%) !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42) !important;
+    z-index: calc(var(--z-sticky) + 2) !important;
+  }
+
+  .mobile-drawer-top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid rgba(138, 124, 255, 0.16) !important;
+  }
+
+  .mobile-drawer-kicker {
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+    color: var(--purple) !important;
+    margin-bottom: 4px !important;
+  }
+
+  .mobile-drawer-title {
+    font-size: 1.08rem !important;
+    line-height: 1.2 !important;
+    color: var(--text) !important;
+  }
+
+  .mobile-drawer-links,
+  .mobile-drawer-quick {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .mobile-drawer-link,
+  .mobile-drawer-card {
+    min-height: 52px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(138, 124, 255, 0.16) !important;
+    border-radius: 14px !important;
+    background: rgba(255, 255, 255, 0.026) !important;
+    color: var(--text) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+  }
+
+  .mobile-drawer-link span,
+  .mobile-drawer-card span {
+    color: var(--text) !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+  }
+
+  .mobile-drawer-card small {
+    display: block !important;
+    color: var(--text-muted) !important;
+    font-size: 0.72rem !important;
+    line-height: 1.3 !important;
+    margin-top: 4px !important;
+  }
+
+  .mobile-drawer-section {
+    margin-top: 2px !important;
+    color: var(--purple) !important;
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+  }
+
+  .mobile-drawer-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid rgba(138, 124, 255, 0.16) !important;
+  }
+
+  .mobile-drawer-actions .btn {
+    width: 100% !important;
+    min-height: 44px !important;
+    border-radius: 14px !important;
+    white-space: nowrap !important;
+  }
+}

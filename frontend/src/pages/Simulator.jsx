@@ -660,7 +660,7 @@ export default function Simulator() {
       <div className="sim-workspace">
 
         <div className={`sim-panel sim-panel-left ${activeTab === 'tests' ? 'mobile-active' : ''}`}>
-          <div className="sim-panel-header">Recommended Tests</div>
+          <div className="sim-panel-header sim-sheet-header"><span>Recommended Tests</span><button type="button" className="sim-sheet-close" onClick={() => setActiveTab('chat')} aria-label="Close investigations"><XIcon /></button></div>
 
           <div className="sim-panel-body">
             {/* New Patient button */}
@@ -902,7 +902,7 @@ export default function Simulator() {
         </div>
 
         <div className={`sim-panel sim-panel-right ${activeTab === 'profile' ? 'mobile-active' : ''}`}>
-          <div className="sim-panel-header">Patient Profile</div>
+          <div className="sim-panel-header sim-sheet-header"><span>Patient Profile</span><button type="button" className="sim-sheet-close" onClick={() => setActiveTab('chat')} aria-label="Close patient profile"><XIcon /></button></div>
 
           <div className="sim-panel-body">
             {/* Patient card */}
