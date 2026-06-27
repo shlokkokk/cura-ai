@@ -1,6 +1,17 @@
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || "";
 const NVIDIA_MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.3-70b-instruct";
 
+let rateLimitCooldownUntil = 0;
+
+function isNvidiaRateLimited() {
+  return Date.now() < rateLimitCooldownUntil;
+}
+
+function getNvidiaCooldownRemaining() {
+  const remaining = rateLimitCooldownUntil - Date.now();
+  return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+}
+
 function isNvidiaConfigured() {
   return Boolean(NVIDIA_API_KEY);
 }
@@ -8,6 +19,11 @@ function isNvidiaConfigured() {
 async function requestNvidia({ prompt, systemInstruction, maxTokens = 300, responseFormat, modelOverride, timeout = 45000 }) {
   if (!isNvidiaConfigured()) {
     throw new Error("Nvidia API key is not configured.");
+  }
+
+  if (isNvidiaRateLimited()) {
+    const secs = getNvidiaCooldownRemaining();
+    throw new Error(`Nvidia is temporarily rate-limited (cooldown active for another ${secs}s).`);
   }
 
   const endpoint = "https://integrate.api.nvidia.com/v1/chat/completions";
@@ -43,6 +59,18 @@ async function requestNvidia({ prompt, systemInstruction, maxTokens = 300, respo
 
   if (!response.ok) {
     const detail = await response.text();
+    if (response.status === 429) {
+      let cooldownMs = 120000; // Default to 2 minutes
+      const retryAfter = response.headers.get("retry-after");
+      if (retryAfter) {
+        const parsed = parseFloat(retryAfter);
+        if (!isNaN(parsed) && parsed > 0) {
+          cooldownMs = parsed * 1000;
+        }
+      }
+      rateLimitCooldownUntil = Date.now() + Math.max(cooldownMs, 10000); // minimum 10s
+      console.warn(`\n[Nvidia Circuit Breaker] Tripped! Rate limit 429 reached. Cooldown active for ${Math.ceil(cooldownMs / 1000)}s.\n`);
+    }
     throw new Error(`Nvidia request failed: ${response.status} ${detail}`);
   }
 

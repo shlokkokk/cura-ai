@@ -1,6 +1,17 @@
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
 const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
+let rateLimitCooldownUntil = 0;
+
+function isGroqRateLimited() {
+  return Date.now() < rateLimitCooldownUntil;
+}
+
+function getGroqCooldownRemaining() {
+  const remaining = rateLimitCooldownUntil - Date.now();
+  return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+}
+
 function isGroqConfigured() {
   return Boolean(GROQ_API_KEY);
 }
@@ -8,6 +19,11 @@ function isGroqConfigured() {
 async function requestGroq({ prompt, systemInstruction, maxTokens = 300, responseFormat, modelOverride, timeout = 30000 }) {
   if (!isGroqConfigured()) {
     throw new Error("Groq API key is not configured.");
+  }
+
+  if (isGroqRateLimited()) {
+    const secs = getGroqCooldownRemaining();
+    throw new Error(`Groq is temporarily rate-limited (cooldown active for another ${secs}s).`);
   }
 
   const endpoint = "https://api.groq.com/openai/v1/chat/completions";
@@ -43,6 +59,26 @@ async function requestGroq({ prompt, systemInstruction, maxTokens = 300, respons
 
   if (!response.ok) {
     const detail = await response.text();
+    if (response.status === 429) {
+      let cooldownMs = 120000; // Default to 2 minutes
+      const retryAfter = response.headers.get("retry-after");
+      if (retryAfter) {
+        const parsed = parseFloat(retryAfter);
+        if (!isNaN(parsed) && parsed > 0) {
+          cooldownMs = parsed * 1000;
+        }
+      } else {
+        const xReset = response.headers.get("x-ratelimit-reset");
+        if (xReset) {
+          const parsed = parseFloat(xReset);
+          if (!isNaN(parsed) && parsed > 0) {
+            cooldownMs = parsed > 1e11 ? (parsed - Date.now()) : (parsed * 1000);
+          }
+        }
+      }
+      rateLimitCooldownUntil = Date.now() + Math.max(cooldownMs, 10000); // minimum 10s
+      console.warn(`\n[Groq Circuit Breaker] Tripped! Rate limit 429 reached. Cooldown active for ${Math.ceil(cooldownMs / 1000)}s.\n`);
+    }
     throw new Error(`Groq request failed: ${response.status} ${detail}`);
   }
 
