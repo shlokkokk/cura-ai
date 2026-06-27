@@ -9,6 +9,9 @@ import { api } from '../utils/api';
 import Logo from '../components/Logo';
 import EkgMouseTrail from '../components/EkgMouseTrail';
 
+// Register GSAP plugins locally for this file's context
+gsap.registerPlugin(SplitText, ScrambleTextPlugin);
+
 const EyeIcon = ({ open }) => open ? (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
@@ -88,8 +91,10 @@ export default function Login() {
 
   // ── GSAP entrance ──────────────────────────────────────────────────────────
   useGSAP(() => {
+    console.log("Login useGSAP callback running. shellRef.current exists:", !!shellRef.current);
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      console.log("Login matchMedia prefers-reduced-motion: no-preference matched. Setting up timeline...");
       // Floating orbs continuous animation
       gsap.to('.auth-orb-purple', {
         y: -30, x: 20, duration: 6, ease: 'sine.inOut', repeat: -1, yoyo: true,
@@ -102,17 +107,26 @@ export default function Login() {
       });
 
       // Card entrance cascade
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({
+        onComplete: () => console.log("Login entrance timeline played to completion!"),
+        onStart: () => console.log("Login entrance timeline started!"),
+        onUpdate: () => console.log("Login entrance timeline update, progress:", tl.progress().toFixed(2)),
+      });
       tl
-        .from('.auth-box', {
-          y: 50, autoAlpha: 0, scale: 0.97, duration: 0.7, ease: 'power3.out',
-        })
-        .from('.auth-box .login-logo-wrap', {
-          scale: 0, rotation: -90, autoAlpha: 0, duration: 0.5, ease: 'back.out(2.5)',
-        }, '-=0.4')
-        .from('.auth-box .login-eyebrow', {
-          y: -16, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
-        }, '-=0.3')
+        .fromTo('.auth-box',
+          { y: 50, autoAlpha: 0, scale: 0.97 },
+          { y: 0, autoAlpha: 1, scale: 1, duration: 0.7, ease: 'power3.out' }
+        )
+        .fromTo('.auth-box .login-logo-wrap',
+          { scale: 0, rotation: -90, autoAlpha: 0 },
+          { scale: 1, rotation: 0, autoAlpha: 1, duration: 0.5, ease: 'back.out(2.5)' },
+          '-=0.4'
+        )
+        .fromTo('.auth-box .login-eyebrow',
+          { y: -16, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+          '-=0.3'
+        )
         .to('.login-eyebrow-text', {
           duration: 0.8,
           scrambleText: {
@@ -123,29 +137,35 @@ export default function Login() {
           },
           ease: 'none',
         }, '-=0.2')
-        .from('.auth-box .auth-title', {
-          y: 20, autoAlpha: 0, duration: 0.45, ease: 'power2.out',
-        }, '-=0.2');
+        .fromTo('.auth-box .auth-title',
+          { y: 20, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.45, ease: 'power2.out' },
+          '-=0.2'
+        );
 
       // SplitText on auth-title
-      const split = new SplitText('.auth-title', {
+      const titleEl = shellRef.current.querySelector('.auth-title');
+      const split = new SplitText(titleEl, {
         type: 'words',
         wordsClass: 'split-word',
       });
 
       tl
-        .from(split.words, {
-          yPercent: 110,
-          duration: 0.7,
-          stagger: 0.04,
-          ease: 'power3.out',
-        }, '-=0.2')
-        .from('.auth-box .auth-subtitle', {
-          y: 15, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
-        }, '-=0.3')
-        .from('.medical-monitor-panel', {
-          y: 16, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
-        }, '-=0.2')
+        .fromTo(split.words,
+          { yPercent: 110, autoAlpha: 0 },
+          { yPercent: 0, autoAlpha: 1, duration: 0.7, stagger: 0.04, ease: 'power3.out' },
+          '-=0.2'
+        )
+        .fromTo('.auth-box .auth-subtitle',
+          { y: 15, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+          '-=0.3'
+        )
+        .fromTo('.medical-monitor-panel',
+          { y: 16, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+          '-=0.2'
+        )
         .to('.monitor-vital-syslink', {
           duration: 0.8,
           scrambleText: {
@@ -155,12 +175,16 @@ export default function Login() {
           },
           ease: 'none',
         }, '-=0.25')
-        .from('.auth-form .reg-field', {
-          x: -20, autoAlpha: 0, stagger: 0.09, duration: 0.45, ease: 'power2.out',
-        }, '-=0.15')
-        .from('.reg-submit', {
-          y: 16, autoAlpha: 0, scale: 0.95, duration: 0.45, ease: 'back.out(1.7)',
-        }, '-=0.1');
+        .fromTo('.auth-form .reg-field',
+          { x: -20, autoAlpha: 0 },
+          { x: 0, autoAlpha: 1, stagger: 0.09, duration: 0.45, ease: 'power2.out' },
+          '-=0.15'
+        )
+        .fromTo('.reg-submit',
+          { y: 16, autoAlpha: 0, scale: 0.95 },
+          { y: 0, autoAlpha: 1, scale: 1, duration: 0.45, ease: 'back.out(1.7)' },
+          '-=0.1'
+        );
 
       // 3D tilt on .auth-box
       const card = shellRef.current.querySelector('.auth-box');

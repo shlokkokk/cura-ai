@@ -77,13 +77,7 @@ export default function Profile() {
           </div>
 
           {/* Profile card header */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 20,
-            padding: 'var(--sp-6)',
-            background: 'linear-gradient(135deg, rgba(0,201,177,0.08) 0%, rgba(129,140,248,0.05) 100%)',
-            border: '1px solid var(--border-acc)', borderRadius: 'var(--r-xl)',
-            marginBottom: 'var(--sp-6)',
-          }}>
+          <div className="profile-header-card">
             <div style={{
               width: 72, height: 72, borderRadius: 'var(--r-lg)',
               background: 'var(--teal-dim)', border: '2px solid rgba(0,201,177,0.25)',
@@ -142,7 +136,7 @@ export default function Profile() {
                 Your basic account details.
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+              <div className="profile-form-grid">
                 <div className="field">
                   <label htmlFor="prof-name">Full Name *</label>
                   <input id="prof-name" type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Dr. Jane Smith" />
@@ -169,7 +163,7 @@ export default function Profile() {
                 Your specialty determines which AI patients you receive in the Simulation Lab.
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+              <div className="profile-form-grid">
                 <div className="field">
                   <label htmlFor="prof-role">Role *</label>
                   <select id="prof-role" name="role" value={formData.role} onChange={handleChange}>

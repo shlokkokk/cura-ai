@@ -9,6 +9,9 @@ import { api } from '../utils/api';
 import Logo from '../components/Logo';
 import EkgMouseTrail from '../components/EkgMouseTrail';
 
+// Register GSAP plugins locally for this file's context
+gsap.registerPlugin(SplitText, ScrambleTextPlugin, useGSAP);
+
 const EyeIcon = ({ open }) => open ? (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
@@ -110,20 +113,35 @@ export default function Register() {
 
   // Animate orbs on mount
   useGSAP(() => {
+    console.log("Register useGSAP callback running. shellRef.current exists:", !!shellRef.current);
     const mm = gsap.matchMedia();
     mm.add('(prefers-reduced-motion: no-preference)', () => {
+      console.log("Register matchMedia prefers-reduced-motion: no-preference matched. Setting up timeline...");
       gsap.to('.auth-orb-purple', { y: -30, x: 20, duration: 6, ease: 'sine.inOut', repeat: -1, yoyo: true });
       gsap.to('.auth-orb-mint',   { y: 25, x: -15, duration: 7, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1 });
       gsap.to('.auth-orb-indigo', { y: -20, x: 30, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2 });
 
       // Card entrance
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({
+        onComplete: () => console.log("Register entrance timeline played to completion!"),
+        onStart: () => console.log("Register entrance timeline started!"),
+        onUpdate: () => console.log("Register entrance timeline update, progress:", tl.progress().toFixed(2)),
+      });
       tl
-        .from('.reg-form-card', { y: 50, autoAlpha: 0, scale: 0.97, duration: 0.7, ease: 'power3.out' })
-        .from('.reg-form-header .reg-logo-wrap', { scale: 0, rotation: -90, autoAlpha: 0, duration: 0.5, ease: 'back.out(2.5)' }, '-=0.4')
-        .from('.reg-form-header .reg-form-eyebrow', {
-          y: -16, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
-        }, '-=0.3')
+        .fromTo('.reg-form-card',
+          { y: 50, autoAlpha: 0, scale: 0.97 },
+          { y: 0, autoAlpha: 1, scale: 1, duration: 0.7, ease: 'power3.out' }
+        )
+        .fromTo('.reg-form-header .reg-logo-wrap',
+          { scale: 0, rotation: -90, autoAlpha: 0 },
+          { scale: 1, rotation: 0, autoAlpha: 1, duration: 0.5, ease: 'back.out(2.5)' },
+          '-=0.4'
+        )
+        .fromTo('.reg-form-header .reg-form-eyebrow',
+          { y: -16, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+          '-=0.3'
+        )
         .to('.reg-form-eyebrow-text', {
           duration: 0.8,
           scrambleText: {
@@ -134,28 +152,40 @@ export default function Register() {
           },
           ease: 'none',
         }, '-=0.2')
-        .from('.reg-form-header .reg-form-title', {
-          y: 20, autoAlpha: 0, duration: 0.45, ease: 'power2.out',
-        }, '-=0.25');
+        .fromTo('.reg-form-header .reg-form-title',
+          { y: 20, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.45, ease: 'power2.out' },
+          '-=0.25'
+        );
 
       // SplitText on reg-form-title
-      const split = new SplitText('.reg-form-title', {
+      const titleEl = shellRef.current.querySelector('.reg-form-title');
+      const split = new SplitText(titleEl, {
         type: 'words',
         wordsClass: 'split-word',
       });
 
       tl
-        .from(split.words, {
-          yPercent: 110,
-          duration: 0.7,
-          stagger: 0.04,
-          ease: 'power3.out',
-        }, '-=0.25')
-        .from('.reg-form-header .reg-form-sub', {
-          y: 15, autoAlpha: 0, duration: 0.4, ease: 'power2.out',
-        }, '-=0.3')
-        .from('.medical-monitor-panel', { y: 16, autoAlpha: 0, duration: 0.4, ease: 'power2.out' }, '-=0.2')
-        .from('.medical-step-tracker', { y: 12, autoAlpha: 0, duration: 0.35, ease: 'power2.out' }, '-=0.15');
+        .fromTo(split.words,
+          { yPercent: 110, autoAlpha: 0 },
+          { yPercent: 0, autoAlpha: 1, duration: 0.7, stagger: 0.04, ease: 'power3.out' },
+          '-=0.25'
+        )
+        .fromTo('.reg-form-header .reg-form-sub',
+          { y: 15, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+          '-=0.3'
+        )
+        .fromTo('.medical-monitor-panel',
+          { y: 16, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.4, ease: 'power2.out' },
+          '-=0.2'
+        )
+        .fromTo('.medical-step-tracker',
+          { y: 12, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.35, ease: 'power2.out' },
+          '-=0.15'
+        );
 
       // 3D tilt on .reg-form-card
       const card = shellRef.current.querySelector('.reg-form-card');

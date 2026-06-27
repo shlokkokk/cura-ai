@@ -1,9 +1,19 @@
 import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export default function EkgMouseTrail() {
   const canvasRef = useRef(null);
+  const location = useLocation();
+  const allowedPaths = ['/', '/features', '/about', '/pricing', '/login', '/register'];
+  const shouldShow = allowedPaths.includes(location.pathname);
 
   useEffect(() => {
+    if (!shouldShow) return;
+
+    // Disable on mobile/touch devices to save performance and battery
+    const isMobile = window.matchMedia('(max-width: 768px)').matches || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isMobile) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -55,6 +65,13 @@ export default function EkgMouseTrail() {
       const dx = x - lastX;
       const dy = y - lastY;
       const segmentLen = Math.sqrt(dx * dx + dy * dy);
+
+      if (segmentLen > 150) {
+        // Reset position without connecting a long straight line
+        lastX = x;
+        lastY = y;
+        return;
+      }
 
       if (segmentLen > 3) {
         totalDist += segmentLen;
@@ -234,7 +251,9 @@ export default function EkgMouseTrail() {
       window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [shouldShow]);
+
+  if (!shouldShow) return null;
 
   return (
     <canvas
