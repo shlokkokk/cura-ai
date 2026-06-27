@@ -194,6 +194,18 @@ export default function Navbar() {
     { to: '/pricing',  label: 'Pricing'  },
   ];
 
+  const mobileQuickLinks = user
+    ? [
+        { to: '/dashboard', label: 'Dashboard', meta: 'Progress and scores' },
+        { to: '/simulator', label: 'Simulation Lab', meta: 'Start a patient case' },
+        { to: '/history', label: 'History', meta: 'Review reports' },
+        { to: '/profile', label: 'Profile', meta: 'Specialty settings' },
+      ]
+    : [
+        { to: '/simulator?demo=cardiology', label: 'Try demo', meta: 'Cardiology consultation' },
+        { to: '/login', label: 'Sign in', meta: 'Return to your console' },
+        { to: '/register', label: 'Create account', meta: 'Free practitioner profile' },
+      ];
   return (
     <>
       <nav
@@ -268,55 +280,72 @@ export default function Navbar() {
       {/* Mobile Drawer */}
       {menuOpen && (
         <div ref={drawerRef} className="mobile-drawer" role="navigation" aria-label="Mobile navigation">
-          {navLinks.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              className="nav-link drawer-link-anim"
-              style={{ display: 'block', padding: '10px 14px' }}
-              onClick={() => setMenuOpen(false)}
+          <div className="mobile-drawer-top drawer-link-anim">
+            <div>
+              <div className="mobile-drawer-kicker">CURA.AI</div>
+              <div className="mobile-drawer-title">
+                {user ? `Welcome, ${user.name?.split(' ')[0] || 'Doctor'}` : 'Clinical training console'}
+              </div>
+            </div>
+            <button
+              className="theme-toggle"
+              onClick={toggle}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={isDark ? 'Light mode' : 'Dark mode'}
             >
-              {label}
-            </Link>
-          ))}
-          <div className="drawer-link-anim" style={{ height: 1, background: 'var(--border-md)', margin: '4px 0' }} />
-          {user ? (
-            <>
+              {isDark ? <SunIcon /> : <MoonIcon />}
+            </button>
+          </div>
+
+          <div className="mobile-drawer-links">
+            {navLinks.map(({ to, label }) => (
               <Link
-                to="/dashboard"
-                className="btn btn-outline btn-sm w-full drawer-link-anim"
+                key={to}
+                to={to}
+                className="mobile-drawer-link drawer-link-anim"
                 onClick={() => setMenuOpen(false)}
-                style={{ textAlign: 'center', justifyContent: 'center' }}
               >
-                Dashboard
+                <span>{label}</span>
               </Link>
-              <button className="btn btn-ghost btn-sm w-full drawer-link-anim" onClick={handleLogout}>
+            ))}
+          </div>
+
+          <div className="mobile-drawer-section drawer-link-anim">Workspace</div>
+          <div className="mobile-drawer-quick">
+            {mobileQuickLinks.map(({ to, label, meta }) => (
+              <Link
+                key={to}
+                to={to}
+                className="mobile-drawer-card drawer-link-anim"
+                onClick={() => setMenuOpen(false)}
+              >
+                <span>{label}</span>
+                <small>{meta}</small>
+              </Link>
+            ))}
+          </div>
+
+          {user ? (
+            <div className="mobile-drawer-actions drawer-link-anim">
+              <Link to="/simulator" className="btn btn-primary btn-sm w-full" onClick={() => setMenuOpen(false)}>
+                Open Lab
+              </Link>
+              <button className="btn btn-ghost btn-sm w-full" onClick={handleLogout}>
                 Sign Out
               </button>
-            </>
+            </div>
           ) : (
-            <>
-              <Link
-                to="/login"
-                className="btn btn-outline btn-sm w-full drawer-link-anim"
-                onClick={() => setMenuOpen(false)}
-                style={{ textAlign: 'center', justifyContent: 'center' }}
-              >
+            <div className="mobile-drawer-actions drawer-link-anim">
+              <Link to="/login" className="btn btn-outline btn-sm w-full" onClick={() => setMenuOpen(false)}>
                 Sign In
               </Link>
-              <Link
-                to="/register"
-                className="btn btn-primary btn-sm w-full drawer-link-anim"
-                onClick={() => setMenuOpen(false)}
-                style={{ textAlign: 'center', justifyContent: 'center' }}
-              >
+              <Link to="/register" className="btn btn-primary btn-sm w-full" onClick={() => setMenuOpen(false)}>
                 Get Started
               </Link>
-            </>
+            </div>
           )}
         </div>
       )}
-
       <style>{`
         @media (max-width: 768px) {
           #nav-mobile-toggle { display: flex !important; }

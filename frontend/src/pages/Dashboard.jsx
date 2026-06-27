@@ -239,7 +239,7 @@ export default function Dashboard() {
     );
   }, { dependencies: [loading], scope: dashRef });
 
-  const buildDerivedData = useCallback((sessions, progress) => {
+  const buildDerivedData = useCallback((sessions, progress, caseMap = {}) => {
     // Score over time — last 12 evaluated sessions
     const evaluated = sessions
       .filter(s => s.lastEvaluation?.score != null)
@@ -251,14 +251,20 @@ export default function Dashboard() {
       }));
     setScoreHistory(evaluated);
 
-    // Specialty distribution
+    // Specialty distribution. Prefer loaded case metadata because generated sessions can store a stale generic label.
+    const normalizeSpecialty = (value) => {
+      const raw = (value || '').trim();
+      if (!raw) return 'General Medicine';
+      if (raw.toLowerCase() === 'general') return 'General Medicine';
+      return raw;
+    };
     const specMap = {};
     sessions.forEach(s => {
-      const name = s.specialty || 'General';
+      const caseInfo = caseMap[s.caseId];
+      const name = normalizeSpecialty(caseInfo?.specialty || s.caseData?.specialty || s.specialty);
       specMap[name] = (specMap[name] || 0) + 1;
     });
     setSpecialtyDist(Object.entries(specMap).map(([name, value]) => ({ name, value })));
-
     // Radar — build from case breakdown if available
     const breakdown = progress?.caseBreakdown || [];
     if (breakdown.length > 0) {
@@ -298,7 +304,7 @@ export default function Dashboard() {
         setStats(prog.progress);
         const sessions = (sess.sessions || []).filter(s => s.questionsAsked > 0);
         setHistory(sessions);
-        buildDerivedData(sessions, prog.progress);
+        buildDerivedData(sessions, prog.progress, caseMap);
       } catch (err) {
         setError('Failed to load dashboard: ' + (err.message || 'Unknown error'));
       } finally {

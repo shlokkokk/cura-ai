@@ -285,7 +285,6 @@ export default function Landing() {
       document.querySelectorAll('.feature-card').forEach(card => {
         const rotX = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
         const rotY = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
-        const glowX = gsap.quickTo(card.querySelector('.card-glow') || card, 'backgroundPositionX', { duration: 0.4 });
 
         card.style.transformPerspective = '800px';
         card.addEventListener('mousemove', (e) => {
@@ -321,7 +320,6 @@ export default function Landing() {
       ScrollTrigger.batch('.review-card', {
         start: 'top 92%',
         onEnter: batch => {
-          const total = batch.length;
           gsap.to(batch, {
             autoAlpha: 1, y: 0, scale: 1,
             // distribute() — center card enters first, edges last

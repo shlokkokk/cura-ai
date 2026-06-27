@@ -459,7 +459,7 @@ export default function Simulator() {
       )}
 
       <header className="sim-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div className="sim-header-left" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <button
             onClick={() => navigate(user ? '/dashboard' : '/')}
             className="btn btn-ghost btn-sm"
@@ -470,14 +470,14 @@ export default function Simulator() {
             </svg>
             {user ? 'Dashboard' : 'Home'}
           </button>
-          <div style={{ width: 1, height: 20, background: 'var(--border-md)' }} />
+          <div className="sim-header-divider" style={{ width: 1, height: 20, background: 'var(--border-md)' }} />
           <Logo size={24} />
         </div>
 
         {/* Patient info in header */}
         {activeCase && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{
+          <div className="sim-header-patient" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="sim-header-patient-avatar" style={{
               width: 32, height: 32, borderRadius: 'var(--r-sm)',
               background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -485,7 +485,7 @@ export default function Simulator() {
             }}>
               {patientInitials}
             </div>
-            <div>
+            <div className="sim-header-patient-copy">
               <div style={{ fontWeight: 700, fontSize: 'var(--fs-sm)', color: 'var(--text)', lineHeight: 1.2 }}>
                 {activeCase.name}
               </div>
@@ -494,7 +494,7 @@ export default function Simulator() {
               </div>
             </div>
             {isUrgent && (
-              <div className="badge badge-danger">
+              <div className="badge badge-danger sim-header-urgency">
                 <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--danger)', animation: 'pulse 1.5s infinite' }} />
                 {activeCase.urgency}
               </div>
@@ -503,7 +503,7 @@ export default function Simulator() {
         )}
 
         {/* Right actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="sim-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {isEmergencyMode && (
             <div className="emergency-timer" style={{ fontSize: 'var(--fs-lg)' }}>
               {formatTime(timeLeft)}
@@ -721,7 +721,7 @@ export default function Simulator() {
                 <button
                   type="button"
                   onClick={handleHint}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-ghost btn-sm chat-tool-btn"
                   title="Get a hint question"
                   style={{ padding: '6px', flexShrink: 0, color: 'var(--text-muted)' }}
                 >
@@ -743,7 +743,7 @@ export default function Simulator() {
                 <button
                   type="button"
                   onClick={handleVoice}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-ghost btn-sm chat-tool-btn"
                   title="Voice input (Chrome/Edge)"
                   style={{
                     padding: '6px', flexShrink: 0,
