@@ -14,6 +14,13 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+const scoreClass = (score) => {
+  if (score == null) return 'none';
+  if (score >= 75) return 'high';
+  if (score >= 50) return 'mid';
+  return 'low';
+};
+
 export default function PatientHistory() {
   const { user }    = useAuth();
   const navigate    = useNavigate();
@@ -181,8 +188,64 @@ export default function PatientHistory() {
               </div>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="history-mobile-list">
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div className="history-mobile-card history-mobile-card-loading" key={i}>
+                    <div className="skeleton" style={{ height: 18, width: '58%' }} />
+                    <div className="skeleton" style={{ height: 14, width: '82%' }} />
+                    <div className="skeleton" style={{ height: 34, width: '100%' }} />
+                  </div>
+                ))
+              ) : filtered.length > 0 ? (
+                filtered.map((s) => {
+                  const c = cases[s.caseId] || {};
+                  const score = s.lastEvaluation?.score;
+                  const isLoading = reportLoadingId === s.id;
+
+                  return (
+                    <button
+                      type="button"
+                      key={`mobile-${s.id}`}
+                      className={`history-mobile-card ${isLoading ? 'loading' : ''}`}
+                      onClick={() => downloadReport(s.id)}
+                    >
+                      <div className="history-card-topline">
+                        <div>
+                          <div className="history-card-patient">{c.name || 'Unknown Patient'}</div>
+                          <div className="history-card-meta">
+                            {c.age && `${c.age}y`} {c.gender ? `/ ${c.gender}` : ''} {c.specialty ? `/ ${c.specialty}` : ''}
+                          </div>
+                        </div>
+                        <div className={`history-score-pill ${scoreClass(score)}`}>
+                          {score != null ? score : '-'}
+                        </div>
+                      </div>
+                      <div className="history-card-complaint">{c.complaint || 'No complaint recorded'}</div>
+                      <div className="history-card-footer">
+                        <span>{formatDate(s.createdAt)}</span>
+                        <span>{formatTime(s.createdAt)} - {formatTime(s.updatedAt)}</span>
+                        {s.lastEvaluation?.diagnosisCorrect != null && (
+                          <span className={s.lastEvaluation.diagnosisCorrect ? 'history-status correct' : 'history-status wrong'}>
+                            {s.lastEvaluation.diagnosisCorrect ? 'Correct' : 'Review'}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="history-mobile-empty">
+                  <div className="empty-state-title">{search ? 'No matching sessions' : 'No session history yet'}</div>
+                  <div className="empty-state-desc">
+                    {search ? 'Try different search terms.' : 'Start your first case to begin building your history.'}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="history-table-scroll" style={{ overflowX: 'auto' }}>
+              <table className="history-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     {['#', 'Patient', 'Specialty / Complaint', 'Date', 'Session Time', 'Score', 'Diagnosis'].map(h => (

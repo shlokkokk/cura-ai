@@ -71,6 +71,9 @@ function parseVitals(vitalsStr) {
 const formatTime = (s) =>
   `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
 
+const isMobileViewport = () =>
+  typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+
 function ScoreRing({ score }) {
   const r = 54;
   const circ = 2 * Math.PI * r;
@@ -368,7 +371,8 @@ export default function Simulator() {
     }
     const asked = messages.filter(m => m.role === 'user').length;
     setQuestion(activeCase.hints[asked % activeCase.hints.length]);
-    inputRef.current?.focus();
+    if (isMobileViewport()) setActiveTab('chat');
+    window.setTimeout(() => inputRef.current?.focus(), 180);
   };
 
   const handleKeyDown = (e) => {
@@ -387,7 +391,10 @@ export default function Simulator() {
       const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
       const data = await api(`/api/cases${specialtyParam}`);
       setCases(data.cases);
-      if (data.cases.length > 0) loadCase(data.cases[0].id, data.cases, data.cases[0]);
+      if (data.cases.length > 0) {
+        await loadCase(data.cases[0].id, data.cases, data.cases[0]);
+        if (isMobileViewport()) setActiveTab('chat');
+      }
     } catch (err) {
       showToast('Failed to generate new patient: ' + err.message, 'error');
     } finally {
@@ -419,12 +426,19 @@ export default function Simulator() {
     recognition.onerror = (err) => {
       setListening(false);
       if (err.error !== 'no-speech' && err.error !== 'aborted') {
-        showToast('Voice input failed: ' + err.error, 'error');
+        const message = err.error === 'network'
+          ? 'Voice dictation is blocked by this browser or network. You can keep typing or try Chrome with microphone permission.'
+          : 'Voice input failed: ' + err.error;
+        showToast(message, err.error === 'network' ? 'info' : 'error');
       }
     };
     recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
+    try {
+      recognition.start();
+      setListening(true);
+    } catch {
+      showToast('Voice input could not start. Check microphone permission and try again.', 'info');
+    }
   };
 
   const vitals = parseVitals(activeCase?.vitals);
@@ -511,11 +525,11 @@ export default function Simulator() {
           )}
           <button
             onClick={() => { setIsEmergencyMode(e => !e); setTimeLeft(600); }}
-            className={`btn btn-sm ${isEmergencyMode ? 'btn-danger' : 'btn-outline'}`}
+            className={`btn btn-sm sim-emergency-btn ${isEmergencyMode ? 'btn-danger' : 'btn-outline'}`}
             title="Toggle Emergency Mode"
           >
             <ZapIcon />
-            {isEmergencyMode ? 'Emergency ON' : 'Emergency'}
+            Emergency
           </button>
           {!evaluation && (
             <button
@@ -568,6 +582,15 @@ export default function Simulator() {
           Patient Profile
         </button>
       </div>
+
+      {activeTab !== 'chat' && (
+        <button
+          className="sim-mobile-drawer-scrim"
+          type="button"
+          aria-label="Close side panel"
+          onClick={() => setActiveTab('chat')}
+        />
+      )}
 
       <div className="sim-workspace">
 
