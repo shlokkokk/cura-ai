@@ -130,9 +130,31 @@ const aiCaseCache = new Map();
 function sanitizeCase(caseStudy) {
   const ensureArray = (val) => Array.isArray(val) ? val : (val ? [val] : []);
   
+  let resolvedGender = caseStudy.gender;
+  if (!resolvedGender) {
+    const maleNames = ['daniel', 'james', 'david', 'michael', 'robert', 'john', 'william', 'richard', 'joseph', 'thomas', 'charles', 'christopher', 'matthew', 'anthony', 'mark', 'donald', 'steven', 'paul', 'andrew', 'joshua', 'kenneth', 'kevin', 'brian', 'george', 'timothy', 'ronald', 'edward', 'jason', 'jeffrey', 'ryan', 'jacob', 'gary', 'nicholas', 'eric', 'jonathan', 'stephen', 'larry', 'justin', 'scott', 'brandon', 'frank', 'benjamin', 'gregory', 'samuel', 'raymond', 'patrick', 'alexander', 'jack', 'dennis', 'jerry', 'tyler', 'aaron', 'jose', 'henry', 'douglas', 'peter', 'arthur', 'walter', 'harold', 'carl', 'jeremy', 'albert', 'lawrence', 'leo', 'carlos'];
+    const firstName = caseStudy.name?.split(' ')[0]?.toLowerCase() || '';
+    if (maleNames.includes(firstName)) {
+      resolvedGender = 'Male';
+    } else {
+      const contextText = [
+        caseStudy.summary,
+        caseStudy.personality,
+        caseStudy.history,
+        caseStudy.complaint
+      ].join(' ').toLowerCase();
+
+      const maleCount = (contextText.match(/\b(he|him|his|man|boy|gentleman|husband|father|son|brother)\b/g) || []).length;
+      const femaleCount = (contextText.match(/\b(she|her|hers|woman|girl|lady|wife|mother|daughter|sister)\b/g) || []).length;
+
+      resolvedGender = maleCount > femaleCount ? 'Male' : 'Female';
+    }
+  }
+
   return {
     id: caseStudy.id || `ai-${Date.now()}`,
     name: caseStudy.name || 'Unknown Patient',
+    gender: resolvedGender,
     age: caseStudy.age || 40,
     role: caseStudy.role || 'Patient',
     specialty: caseStudy.specialty || 'General Medicine',
@@ -152,6 +174,8 @@ function sanitizeCase(caseStudy) {
     communicationGoals: ensureArray(caseStudy.communicationGoals)
   };
 }
+
+
 
 function seedSessionMessages(caseStudy) {
   return [
@@ -439,8 +463,9 @@ const server = http.createServer(async (request, response) => {
         // AI case generation helper
         const generateSpecialtyCases = async (count, specialty) => {
           const aiGenPrompt = `Generate ${count} realistic virtual patient case(s) for medical specialty: "${specialty}".
-Return a JSON array. Each case object must have: name (string), age (number), role (string), complaint (string), specialty: "${specialty}", complexity ("Low"/"Moderate"/"High"), urgency (string), personality (string), summary (string), vitals (string), history (string), expectedDiagnosis (array), differentialDiagnoses (array of 3-4), redFlags (array of 3-5), expectedQuestions (array of 5), recommendedTests (array of 4-5), communicationGoals (array of 2), hints (array of 3), evaluationFocus (array of 3).
+Return a JSON array. Each case object must have: name (string), age (number), gender (string "Male" or "Female"), role (string), complaint (string), specialty: "${specialty}", complexity ("Low"/"Moderate"/"High"), urgency (string), personality (string), summary (string), vitals (string), history (string), expectedDiagnosis (array), differentialDiagnoses (array of 3-4), redFlags (array of 3-5), expectedQuestions (array of 5), recommendedTests (array of 4-5), communicationGoals (array of 2), hints (array of 3), evaluationFocus (array of 3).
 Make cases medically accurate and diverse. Return ONLY valid JSON array, no markdown.`;
+
 
           let aiCases = null;
           if (isGeminiConfigured()) {

@@ -6388,3 +6388,40 @@ select:autofill:active {
     bottom: -110px !important;
   }
 }
+
+/* Patient Voice TTS Styles */
+.bubble-speak-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.bubble-speak-btn:hover {
+  color: var(--purple);
+  background: var(--surface-hov);
+}
+.bubble-speak-btn.speaking {
+  color: var(--purple) !important;
+  background: rgba(138, 124, 255, 0.12) !important;
+  animation: pulse-speaking 1.4s infinite ease-in-out;
+}
+@keyframes pulse-speaking {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .tts-btn-text {
+    display: none !important;
+  }
+}
+

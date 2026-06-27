@@ -50,6 +50,23 @@ const DownloadIcon = () => (
     <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
 );
+const VolumeIcon = ({ active }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={active ? 'currentColor' : 'none'} />
+    {active ? (
+      <>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      </>
+    ) : (
+      <>
+        <line x1="22" y1="9" x2="16" y2="15" />
+        <line x1="16" y1="9" x2="22" y2="15" />
+      </>
+    )}
+  </svg>
+);
+
 
 function parseVitals(vitalsStr) {
   if (!vitalsStr) return [];
@@ -145,10 +162,20 @@ export default function Simulator() {
   const [isKeyboardOpen,setIsKeyboardOpen]= useState(false);
   const [visualViewportHeight, setVisualViewportHeight] = useState(null);
 
+  const [speakingIdx, setSpeakingIdx] = useState(null);
+  const [ttsEnabled, setTtsEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('cura-tts') === 'true';
+    }
+    return false;
+  });
+
   const chatLogRef = useRef(null);
   const inputRef   = useRef(null);
   const recognitionRef = useRef(null);
   const sheetDragRef = useRef({ startY: 0, lastY: 0, dragging: false });
+  const utteranceRef = useRef(null);
+
 
   const cardiologyReports = [
     { id: 'ecg-interpretation', title: 'ECG — 12 Lead Interpretation', image: '/reports/ecg-interpretation.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
@@ -289,6 +316,135 @@ export default function Simulator() {
     }
   }, [messages, evaluation]);
 
+  const cancelSpeech = () => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setSpeakingIdx(null);
+  };
+
+  const [voices, setVoices] = useState([]);
+
+  const getBestVoice = (gender) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+    const voiceList = voices.length > 0 ? voices : window.speechSynthesis.getVoices();
+    if (!voiceList || voiceList.length === 0) return null;
+
+    const enVoices = voiceList.filter(v => v.lang.toLowerCase().startsWith('en'));
+    if (enVoices.length === 0) return voiceList[0];
+
+    const isFemale = gender?.toLowerCase() === 'female';
+    const isMale = gender?.toLowerCase() === 'male';
+
+    let selectedVoice = null;
+
+    if (isFemale) {
+      const femaleKeywords = ['female', 'samantha', 'zira', 'siri', 'heera', 'google uk english female', 'hazel', 'veena', 'elsa', 'fiona', 'microsoft zira'];
+      for (const kw of femaleKeywords) {
+        const found = enVoices.find(v => v.name.toLowerCase().includes(kw));
+        if (found) {
+          selectedVoice = found;
+          break;
+        }
+      }
+      if (!selectedVoice) {
+        selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman'));
+      }
+    } else if (isMale) {
+      const maleKeywords = ['male', 'david', 'george', 'ravi', 'google uk english male', 'mark', 'daniel', 'alex', 'fred', 'james', 'richard', 'microsoft david', 'microsoft george', 'guy'];
+      for (const kw of maleKeywords) {
+        const found = enVoices.find(v => v.name.toLowerCase().includes(kw));
+        if (found) {
+          selectedVoice = found;
+          break;
+        }
+      }
+      if (!selectedVoice) {
+        selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('man'));
+      }
+    }
+
+    if (!selectedVoice) {
+      selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('google') || v.name.toLowerCase().includes('natural'));
+    }
+
+    const finalVoice = selectedVoice || enVoices[0];
+    console.log(`[TTS] Dynamic voice selection for ${gender}:`, finalVoice?.name);
+    return finalVoice;
+  };
+
+  const speakText = (text, idx) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    if (speakingIdx === idx) {
+      cancelSpeech();
+      return;
+    }
+
+    cancelSpeech();
+
+    const cleanedText = cleanMarkdown(text)
+      .replace(/\(.*?\)/g, '')
+      .replace(/\[.*?\]/g, '')
+      .replace(/\*.*?\*/g, '')
+      .trim();
+
+    if (!cleanedText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    const voice = getBestVoice(activeCase?.gender);
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    
+    utterance.rate = 1.05;
+
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => {
+      setSpeakingIdx(idx);
+    };
+
+    utterance.onend = () => {
+      setSpeakingIdx(null);
+    };
+
+    utterance.onerror = (e) => {
+      console.warn("Speech synthesis error:", e);
+      setSpeakingIdx(null);
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return undefined;
+    
+    const handleVoicesChanged = () => {
+      const loadedVoices = window.speechSynthesis.getVoices();
+      setVoices(loadedVoices);
+    };
+    
+    window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+    
+    // Trigger initial load
+    const initialVoices = window.speechSynthesis.getVoices();
+    if (initialVoices && initialVoices.length > 0) {
+      setVoices(initialVoices);
+    }
+    
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+
+
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return undefined;
 
@@ -381,8 +537,10 @@ export default function Simulator() {
   }
 
   async function loadCase(caseId, caseList = cases, caseData = null) {
+    cancelSpeech();
     setLoading(true);
     setEvaluation(null);
+
     setDiagnosis('');
     setReasoning('');
     setQuestion('');
@@ -426,8 +584,13 @@ export default function Simulator() {
         const audio = new Audio('/pop.mp3');
         audio.volume = 0.4;
         audio.play().catch(() => {});
+        const nextIdx = messages.length + 1;
         setMessages(prev => [...prev, { role: 'assistant', content: replyContent }]);
+        if (ttsEnabled) {
+          speakText(replyContent, nextIdx);
+        }
       }
+
     } catch (err) {
       showToast('Network error: ' + err.message, 'error');
     } finally {
@@ -620,8 +783,9 @@ export default function Simulator() {
                 {activeCase.name}
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
-                {activeCase.age}y · {activeCase.gender} · {activeCase.specialty}
+                {activeCase.age}y{activeCase.gender ? ` · ${activeCase.gender}` : ''} · {activeCase.specialty}
               </div>
+
             </div>
             {isUrgent && (
               <div className="badge badge-danger sim-header-urgency">
@@ -639,8 +803,32 @@ export default function Simulator() {
               {formatTime(timeLeft)}
             </div>
           )}
+          {/* Patient auto-voice toggle */}
+          <button
+            onClick={() => {
+              const next = !ttsEnabled;
+              setTtsEnabled(next);
+              localStorage.setItem('cura-tts', next ? 'true' : 'false');
+              if (!next) cancelSpeech();
+            }}
+            className="btn btn-sm"
+            title="Toggle Patient Auto-Voice"
+            style={{
+              gap: 6,
+              borderColor: ttsEnabled ? 'var(--purple)' : 'var(--border-md)',
+              background: ttsEnabled ? 'rgba(138, 124, 255, 0.12)' : 'transparent',
+              color: ttsEnabled ? 'var(--purple)' : 'var(--text-muted)',
+              display: 'inline-flex',
+              alignItems: 'center'
+            }}
+          >
+            <VolumeIcon active={ttsEnabled} />
+            <span className="tts-btn-text">{ttsEnabled ? 'Voice ON' : 'Voice OFF'}</span>
+          </button>
+
           <button
             onClick={() => { setIsEmergencyMode(e => !e); setTimeLeft(600); }}
+
             className={`btn btn-sm sim-emergency-btn ${isEmergencyMode ? 'btn-danger' : 'btn-outline'}`}
             title="Toggle Emergency Mode"
           >
@@ -851,9 +1039,20 @@ export default function Simulator() {
                     }
                   </div>
                   <div>
-                    <div className={`chat-bubble ${isDoc ? 'chat-bubble-doctor' : 'chat-bubble-patient'}`}>
-                      {cleanMarkdown(m.content)}
+                    <div className={`chat-bubble ${isDoc ? 'chat-bubble-doctor' : 'chat-bubble-patient'}`} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>{cleanMarkdown(m.content)}</div>
+                      {!isDoc && (
+                        <button
+                          type="button"
+                          onClick={() => speakText(m.content, idx)}
+                          className={`bubble-speak-btn ${speakingIdx === idx ? 'speaking' : ''}`}
+                          title={speakingIdx === idx ? "Stop speaking" : "Listen to patient"}
+                        >
+                          <VolumeIcon active={speakingIdx === idx} />
+                        </button>
+                      )}
                     </div>
+
                     <div className={`chat-time`} style={{ textAlign: isDoc ? 'right' : 'left' }}>
                       {isDoc ? (effectiveUser.name?.split(' ')[0] || 'Doctor') : (activeCase?.name?.split(' ')[0] || 'Patient')}
                     </div>
