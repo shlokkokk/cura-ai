@@ -11,5 +11,5 @@ scratch/
 legacy/
 .agents/
 .agent/
-
+*.png
 
