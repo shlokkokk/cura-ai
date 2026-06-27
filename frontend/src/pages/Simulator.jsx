@@ -140,12 +140,15 @@ export default function Simulator() {
   const [listening,     setListening]     = useState(false);
   const [toastType,     setToastType]     = useState('info'); // 'info' | 'error' | 'success'
   const [activeTab,     setActiveTab]     = useState('chat'); // 'chat' | 'tests' | 'profile'
+  const [sheetExpanded, setSheetExpanded] = useState(false);
+  const [sheetDragY,    setSheetDragY]    = useState(0);
   const [isKeyboardOpen,setIsKeyboardOpen]= useState(false);
   const [visualViewportHeight, setVisualViewportHeight] = useState(null);
 
   const chatLogRef = useRef(null);
   const inputRef   = useRef(null);
   const recognitionRef = useRef(null);
+  const sheetDragRef = useRef({ startY: 0, lastY: 0, dragging: false });
 
   const cardiologyReports = [
     { id: 'ecg-interpretation', title: 'ECG — 12 Lead Interpretation', image: '/reports/ecg-interpretation.png', type: 'ECG', keywords: ['acute coronary syndrome', 'myocardial infarction', 'heart attack', 'stemi', 'chest pain', 'crushing', 'pressure'] },
@@ -327,6 +330,54 @@ export default function Simulator() {
     const aiCases = differentCases.filter(c => c.id?.startsWith('ai-'));
     const pool = aiCases.length > 0 ? aiCases : differentCases;
     return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function openMobileSheet(tab) {
+    setSheetExpanded(false);
+    setSheetDragY(0);
+    setActiveTab(tab);
+  }
+
+  function closeMobileSheet() {
+    setSheetDragY(0);
+    setSheetExpanded(false);
+    setActiveTab('chat');
+  }
+
+  function handleSheetPointerDown(e) {
+    if (!isMobileViewport()) return;
+    sheetDragRef.current = { startY: e.clientY, lastY: e.clientY, dragging: true };
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    setSheetDragY(0);
+  }
+
+  function handleSheetPointerMove(e) {
+    if (!sheetDragRef.current.dragging || !isMobileViewport()) return;
+    const delta = e.clientY - sheetDragRef.current.startY;
+    sheetDragRef.current.lastY = e.clientY;
+    setSheetDragY(delta < 0 ? delta * 0.32 : delta);
+  }
+
+  function handleSheetPointerUp(e) {
+    if (!sheetDragRef.current.dragging || !isMobileViewport()) return;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+    const delta = sheetDragRef.current.lastY - sheetDragRef.current.startY;
+    sheetDragRef.current.dragging = false;
+    setSheetDragY(0);
+
+    if (delta < -54) {
+      setSheetExpanded(true);
+      return;
+    }
+
+    if (sheetExpanded && delta > 88) {
+      setSheetExpanded(false);
+      return;
+    }
+
+    if (delta > 132) {
+      closeMobileSheet();
+    }
   }
 
   async function loadCase(caseId, caseList = cases, caseData = null) {
@@ -630,19 +681,19 @@ export default function Simulator() {
       <div className="sim-mobile-tabs">
         <button 
           className={`sim-mobile-tab ${activeTab === 'tests' ? 'active' : ''}`}
-          onClick={() => setActiveTab('tests')}
+          onClick={() => openMobileSheet('tests')}
         >
           Investigations
         </button>
         <button 
           className={`sim-mobile-tab ${activeTab === 'chat' ? 'active' : ''}`}
-          onClick={() => setActiveTab('chat')}
+          onClick={closeMobileSheet}
         >
           Consultation
         </button>
         <button 
           className={`sim-mobile-tab ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
+          onClick={() => openMobileSheet('profile')}
         >
           Patient Profile
         </button>
@@ -659,8 +710,17 @@ export default function Simulator() {
 
       <div className="sim-workspace">
 
-        <div className={`sim-panel sim-panel-left ${activeTab === 'tests' ? 'mobile-active' : ''}`}>
-          <div className="sim-panel-header sim-sheet-header"><span>Recommended Tests</span><button type="button" className="sim-sheet-close" onClick={() => setActiveTab('chat')} aria-label="Close investigations"><XIcon /></button></div>
+        <div
+          className={`sim-panel sim-panel-left ${activeTab === 'tests' ? 'mobile-active' : ''} ${sheetExpanded ? 'sheet-expanded' : ''} ${sheetDragY ? 'sheet-dragging' : ''}`}
+          style={{ '--sheet-drag-y': `${sheetDragY}px` }}
+        >
+          <div
+            className="sim-panel-header sim-sheet-header"
+            onPointerDown={handleSheetPointerDown}
+            onPointerMove={handleSheetPointerMove}
+            onPointerUp={handleSheetPointerUp}
+            onPointerCancel={handleSheetPointerUp}
+          ><span>Recommended Tests</span><button type="button" className="sim-sheet-close" onClick={closeMobileSheet} aria-label="Close investigations"><XIcon /></button></div>
 
           <div className="sim-panel-body">
             {/* New Patient button */}
@@ -901,8 +961,17 @@ export default function Simulator() {
           )}
         </div>
 
-        <div className={`sim-panel sim-panel-right ${activeTab === 'profile' ? 'mobile-active' : ''}`}>
-          <div className="sim-panel-header sim-sheet-header"><span>Patient Profile</span><button type="button" className="sim-sheet-close" onClick={() => setActiveTab('chat')} aria-label="Close patient profile"><XIcon /></button></div>
+        <div
+          className={`sim-panel sim-panel-right ${activeTab === 'profile' ? 'mobile-active' : ''} ${sheetExpanded ? 'sheet-expanded' : ''} ${sheetDragY ? 'sheet-dragging' : ''}`}
+          style={{ '--sheet-drag-y': `${sheetDragY}px` }}
+        >
+          <div
+            className="sim-panel-header sim-sheet-header"
+            onPointerDown={handleSheetPointerDown}
+            onPointerMove={handleSheetPointerMove}
+            onPointerUp={handleSheetPointerUp}
+            onPointerCancel={handleSheetPointerUp}
+          ><span>Patient Profile</span><button type="button" className="sim-sheet-close" onClick={closeMobileSheet} aria-label="Close patient profile"><XIcon /></button></div>
 
           <div className="sim-panel-body">
             {/* Patient card */}

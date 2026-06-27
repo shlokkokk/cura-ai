@@ -58,7 +58,6 @@ export default function Sidebar() {
   const { user, saveUser } = useAuth();
   const { isDark, toggle } = useTheme();
   const navigate = useNavigate();
-
   const handleLogout = () => {
     saveUser(null);
     navigate('/');
@@ -85,6 +84,12 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="sidebar-rail-fill" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
 
       <div className="sidebar-footer">
         {/* User card */}

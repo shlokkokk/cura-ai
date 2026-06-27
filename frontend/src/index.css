@@ -6129,3 +6129,302 @@ select:autofill:active {
     white-space: nowrap !important;
   }
 }
+
+/* Draggable mobile sheet states */
+@media (max-width: 768px) {
+  .sim-panel-left,
+  .sim-panel-right {
+    max-height: min(58dvh, calc(var(--sim-vvh, 100dvh) - 210px)) !important;
+    transform: translateY(108%) scale(0.98) !important;
+    will-change: transform, max-height;
+  }
+
+  .sim-panel-left.mobile-active,
+  .sim-panel-right.mobile-active {
+    transform: translateY(var(--sheet-drag-y, 0px)) scale(1) !important;
+  }
+
+  .sim-panel-left.sheet-expanded,
+  .sim-panel-right.sheet-expanded {
+    max-height: min(92dvh, calc(var(--sim-vvh, 100dvh) - 42px)) !important;
+  }
+
+  .sim-panel-left.sheet-dragging,
+  .sim-panel-right.sheet-dragging {
+    transition: none !important;
+  }
+
+  .sim-sheet-header {
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+  }
+
+  .sim-panel-left.sheet-dragging .sim-sheet-header,
+  .sim-panel-right.sheet-dragging .sim-sheet-header {
+    cursor: grabbing;
+  }
+
+  .sim-sheet-close {
+    border-color: rgba(248, 113, 113, 0.22) !important;
+    background: rgba(248, 113, 113, 0.075) !important;
+    color: rgba(255, 180, 180, 0.86) !important;
+  }
+
+  .sim-sheet-close:hover,
+  .sim-sheet-close:focus-visible {
+    border-color: rgba(248, 113, 113, 0.34) !important;
+    background: rgba(248, 113, 113, 0.12) !important;
+    color: #ffd1d1 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .sim-panel-left,
+  .sim-panel-right {
+    max-height: min(57dvh, calc(var(--sim-vvh, 100dvh) - 202px)) !important;
+  }
+
+  .sim-panel-left.sheet-expanded,
+  .sim-panel-right.sheet-expanded {
+    max-height: min(91dvh, calc(var(--sim-vvh, 100dvh) - 38px)) !important;
+  }
+}
+
+/* Resting sheet sits above half, expands on upward drag */
+@media (max-width: 768px) {
+  .sim-panel-left,
+  .sim-panel-right {
+    max-height: min(66dvh, calc(var(--sim-vvh, 100dvh) - 150px)) !important;
+  }
+
+  .sim-panel-left.sheet-expanded,
+  .sim-panel-right.sheet-expanded {
+    max-height: min(92dvh, calc(var(--sim-vvh, 100dvh) - 42px)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .sim-panel-left,
+  .sim-panel-right {
+    max-height: min(65dvh, calc(var(--sim-vvh, 100dvh) - 142px)) !important;
+  }
+
+  .sim-panel-left.sheet-expanded,
+  .sim-panel-right.sheet-expanded {
+    max-height: min(91dvh, calc(var(--sim-vvh, 100dvh) - 38px)) !important;
+  }
+}
+
+/* Keyboard-open composer pins to the visual viewport on mobile */
+@media (max-width: 768px) {
+  .sim-shell.keyboard-open .sim-panel-center {
+    min-height: var(--sim-vvh, 100dvh) !important;
+  }
+
+  .sim-shell.keyboard-open .chat-area {
+    height: var(--sim-vvh, 100dvh) !important;
+    padding-bottom: 86px !important;
+    scroll-padding-bottom: 92px;
+  }
+
+  .sim-shell.keyboard-open .chat-input-dock {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 62 !important;
+    padding: 6px 10px 8px !important;
+    background: linear-gradient(180deg, rgba(7, 5, 22, 0.72), rgba(7, 5, 22, 0.96)) !important;
+    border-top: 1px solid rgba(138, 124, 255, 0.28) !important;
+    box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .sim-shell.keyboard-open .chat-input-form {
+    min-height: 48px !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* Desktop simulator rail alignment guard */
+@media (min-width: 769px) {
+  .sim-workspace {
+    grid-template-columns: 260px minmax(0, 1fr) 260px !important;
+    align-items: stretch !important;
+  }
+
+  .sim-panel-left,
+  .sim-panel-right,
+  .sim-panel-center {
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .sim-panel-left {
+    border: 0 !important;
+    border-right: 1px solid var(--border-md) !important;
+  }
+
+  .sim-panel-right {
+    border: 0 !important;
+    border-left: 1px solid var(--border-md) !important;
+  }
+
+  .sim-panel-center {
+    border: 0 !important;
+  }
+}
+
+
+/* Desktop sidebar full-height rail guard */
+@media (min-width: 769px) {
+  .sidebar {
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, var(--purple) 2%), var(--surface) 42%, color-mix(in srgb, var(--surface) 94%, var(--purple) 6%)) !important;
+  }
+
+  .sidebar-brand,
+  .sidebar-section-label,
+  .sidebar-nav,
+  .sidebar-footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sidebar-nav {
+    flex: 0 0 auto !important;
+  }
+
+  .sidebar-rail-fill {
+    flex: 1 1 auto;
+    min-height: 140px;
+    position: relative;
+    margin: 10px 0 14px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-rail-fill::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    bottom: 18px;
+    left: 22px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(138, 124, 255, 0.28), rgba(0, 201, 177, 0.18), transparent);
+  }
+
+  .sidebar-rail-fill span {
+    position: absolute;
+    left: 18px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid rgba(138, 124, 255, 0.28);
+    box-shadow: 0 0 0 5px rgba(138, 124, 255, 0.06);
+  }
+
+  .sidebar-rail-fill span:nth-child(1) { top: 18%; }
+  .sidebar-rail-fill span:nth-child(2) { top: 50%; border-color: rgba(0, 201, 177, 0.32); box-shadow: 0 0 0 5px rgba(0, 201, 177, 0.055); }
+  .sidebar-rail-fill span:nth-child(3) { bottom: 18%; }
+
+  .sidebar-footer {
+    flex: 0 0 auto;
+    margin-top: 0 !important;
+    padding-top: 16px !important;
+    padding-bottom: 2px !important;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--surface) 96%, var(--purple) 4%));
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-rail-fill {
+    display: none !important;
+  }
+}
+
+/* Dashboard shell sidebar stretches with long page content */
+@media (min-width: 769px) {
+  .dash-page {
+    position: relative;
+    align-items: stretch;
+    min-height: 100dvh;
+  }
+
+  .dash-page::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 240px;
+    min-height: 100%;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, var(--purple) 2%), var(--surface) 42%, color-mix(in srgb, var(--surface) 94%, var(--purple) 6%));
+    border-right: 1px solid var(--border-md);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app-main-with-sidebar {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sidebar {
+    z-index: calc(var(--z-raised) + 1) !important;
+  }
+
+  .sidebar-rail-fill {
+    min-height: 0 !important;
+    margin: 10px 0 0 !important;
+    border-top: 1px solid var(--border) !important;
+    border-bottom: 0 !important;
+    overflow: visible;
+  }
+
+  .sidebar-rail-fill::before {
+    top: 0 !important;
+    bottom: -92px !important;
+  }
+
+  .sidebar-rail-fill span:nth-child(1) { top: 14% !important; }
+  .sidebar-rail-fill span:nth-child(2) { top: 56% !important; }
+  .sidebar-rail-fill span:nth-child(3) { bottom: -4px !important; }
+
+  .sidebar-footer {
+    border-top: 1px solid var(--border) !important;
+  }
+}
+
+/* Real desktop dashboard sidebar stretches to page content height */
+@media (min-width: 769px) {
+  .dash-page > .sidebar {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    border-right: 1px solid var(--border-md) !important;
+  }
+
+  .dash-page::before {
+    display: none !important;
+  }
+
+  .dash-page > .sidebar .sidebar-rail-fill {
+    flex: 1 1 auto !important;
+  }
+
+  .dash-page > .sidebar .sidebar-rail-fill::before {
+    bottom: -110px !important;
+  }
+}
