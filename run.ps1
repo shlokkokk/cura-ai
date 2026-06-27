@@ -25,9 +25,10 @@ function Clear-Port ($port) {
     Write-Host "[i] Scanning for active processes on port $port..." -ForegroundColor Gray
     $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
     if ($connections) {
-        $pids = $connections.OwningProcess | Select-Object -Unique
+        $pids = $connections.OwningProcess | Where-Object { $_ -gt 4 } | Select-Object -Unique
         foreach ($p in $pids) {
             try {
+
                 $proc = Get-Process -Id $p -ErrorAction SilentlyContinue
                 if ($proc) {
                     Write-Host "[!] Found process '$($proc.Name)' (PID: $p) on port $port. Terminating..." -ForegroundColor Yellow

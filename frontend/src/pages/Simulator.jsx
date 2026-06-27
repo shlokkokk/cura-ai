@@ -391,16 +391,21 @@ export default function Simulator() {
 
     if (!cleanedText) return;
 
+    const resolvedGender = activeCase?.gender?.toLowerCase();
     const utterance = new SpeechSynthesisUtterance(cleanedText);
-    const voice = getBestVoice(activeCase?.gender);
+    const voice = getBestVoice(resolvedGender);
     if (voice) {
       utterance.voice = voice;
     }
 
-    
-    utterance.rate = 1.05;
 
-    utterance.pitch = 1.0;
+    // Startup-grade voice mapping: deeper male pitch & age-appropriate rate
+    const isMale = resolvedGender === 'male';
+    const isElderly = activeCase?.age && activeCase.age >= 60;
+
+    utterance.pitch = isMale ? 0.88 : 1.0;
+    utterance.rate = isElderly ? 0.94 : 1.05;
+
 
     utterance.onstart = () => {
       setSpeakingIdx(idx);
