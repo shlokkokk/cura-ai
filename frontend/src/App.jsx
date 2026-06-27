@@ -79,10 +79,12 @@ function SmoothedApp() {
           effects: true,         // enable data-speed / data-lag parallax attrs
           ignoreMobileResize: true,
         });
+        document.documentElement.classList.add('has-smooth-scroll');
         setReady(true);
 
         return () => {
           smoother.kill();
+          document.documentElement.classList.remove('has-smooth-scroll');
           setReady(false);
         };
       }

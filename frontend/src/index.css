@@ -3795,8 +3795,8 @@ select:autofill:active {
     margin-bottom: 16px !important;
   }
 }
-/* ScrollSmoother required layout */
-#smooth-wrapper {
+/* ScrollSmoother required layout - Active state only */
+.has-smooth-scroll #smooth-wrapper {
   overflow: hidden;
   position: fixed;
   height: 100%;
@@ -3804,7 +3804,7 @@ select:autofill:active {
   top: 0;
   left: 0;
 }
-#smooth-content {
+.has-smooth-scroll #smooth-content {
   overflow: visible;
   width: 100%;
 }
