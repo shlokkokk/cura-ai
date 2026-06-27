@@ -11,7 +11,7 @@ const SendIcon = () => (
   </svg>
 );
 const MicIcon = ({ active }) => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? 'var(--teal)' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={active ? '#EF4444' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
     <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
     <line x1="8" y1="23" x2="16" y2="23"/>
@@ -403,15 +403,25 @@ export default function Simulator() {
       setListening(false);
       return;
     }
+    const initialText = question;
     const recognition = new SR();
     recognition.lang = 'en-US';
-    recognition.interimResults = false;
+    recognition.interimResults = true;
+    recognition.continuous = true;
     recognition.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      setQuestion(q => (q ? q + ' ' + transcript : transcript));
+      let finalTranscript = '';
+      for (let i = 0; i < e.results.length; ++i) {
+        finalTranscript += e.results[i][0].transcript;
+      }
+      setQuestion(initialText ? initialText + ' ' + finalTranscript : finalTranscript);
     };
     recognition.onend = () => setListening(false);
-    recognition.onerror = () => { setListening(false); showToast('Voice input failed.', 'error'); };
+    recognition.onerror = (err) => {
+      setListening(false);
+      if (err.error !== 'no-speech' && err.error !== 'aborted') {
+        showToast('Voice input failed: ' + err.error, 'error');
+      }
+    };
     recognitionRef.current = recognition;
     recognition.start();
     setListening(true);
@@ -707,7 +717,7 @@ export default function Simulator() {
           {/* Chat input */}
           {!evaluation && (
             <div className="chat-input-dock">
-              <form onSubmit={sendMessage} className="chat-input-form">
+              <form onSubmit={sendMessage} className={`chat-input-form ${listening ? 'recording-active' : ''}`}>
                 <button
                   type="button"
                   onClick={handleHint}
@@ -737,10 +747,17 @@ export default function Simulator() {
                   title="Voice input (Chrome/Edge)"
                   style={{
                     padding: '6px', flexShrink: 0,
-                    color: listening ? 'var(--teal)' : 'var(--text-muted)',
-                    animation: listening ? 'pulse 1s infinite' : 'none',
+                    color: listening ? '#EF4444' : 'var(--text-muted)',
+                    display: 'flex', alignItems: 'center', gap: 4,
                   }}
                 >
+                  {listening && (
+                    <div className="recording-dot" style={{
+                      width: 8, height: 8, borderRadius: '50%',
+                      background: '#EF4444',
+                      animation: 'pulseRed 1.2s infinite'
+                    }} />
+                  )}
                   <MicIcon active={listening} />
                 </button>
 
@@ -825,15 +842,22 @@ export default function Simulator() {
                       Vitals
                     </div>
                     <div className="vitals-grid">
-                      {vitals.map(({ key, val, unit }) => {
+                      {vitals.map(({ key, val, unit }, index) => {
                         const isCritical = (key === 'HR' && (parseInt(val) > 120 || parseInt(val) < 50)) ||
                           (key === 'SpO₂' && parseInt(val) < 94) ||
                           (key === 'Temp' && parseFloat(val) > 39);
+                        const isLastAndOdd = index === vitals.length - 1 && vitals.length % 2 !== 0;
                         return (
-                          <div key={key} className={`vital-item${isCritical ? ' vital-critical' : ''}`}>
-                            <div className="vital-value">{val}</div>
-                            <div className="vital-unit">{unit}</div>
-                            <div className="vital-label">{key}</div>
+                          <div
+                            key={key}
+                            className={`vital-item${isCritical ? ' vital-critical' : ''}`}
+                            style={isLastAndOdd ? { gridColumn: 'span 2' } : {}}
+                          >
+                            <div className="vital-value" style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3 }}>
+                              <span>{val}</span>
+                              <span className="vital-unit" style={{ fontSize: '10px', color: 'var(--text-2)', opacity: 0.85, fontFamily: 'var(--mono)', fontWeight: 500 }}>{unit}</span>
+                            </div>
+                            <div className="vital-label" style={{ marginTop: 4 }}>{key}</div>
                           </div>
                         );
                       })}
