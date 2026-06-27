@@ -140,6 +140,8 @@ export default function Simulator() {
   const [listening,     setListening]     = useState(false);
   const [toastType,     setToastType]     = useState('info'); // 'info' | 'error' | 'success'
   const [activeTab,     setActiveTab]     = useState('chat'); // 'chat' | 'tests' | 'profile'
+  const [isKeyboardOpen,setIsKeyboardOpen]= useState(false);
+  const [visualViewportHeight, setVisualViewportHeight] = useState(null);
 
   const chatLogRef = useRef(null);
   const inputRef   = useRef(null);
@@ -284,10 +286,47 @@ export default function Simulator() {
     }
   }, [messages, evaluation]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return undefined;
+
+    const updateViewport = () => {
+      if (!isMobileViewport()) {
+        setVisualViewportHeight(null);
+        setIsKeyboardOpen(false);
+        return;
+      }
+
+      const viewportHeight = window.visualViewport.height;
+      setVisualViewportHeight(viewportHeight);
+      setIsKeyboardOpen(window.innerHeight - viewportHeight > 120);
+    };
+
+    updateViewport();
+    window.visualViewport.addEventListener('resize', updateViewport);
+    window.visualViewport.addEventListener('scroll', updateViewport);
+    window.addEventListener('orientationchange', updateViewport);
+
+    return () => {
+      window.visualViewport.removeEventListener('resize', updateViewport);
+      window.visualViewport.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('orientationchange', updateViewport);
+    };
+  }, []);
+
   function showToast(msg, type = 'info') {
     setToastMessage(msg);
     setToastType(type);
     setTimeout(() => setToastMessage(null), 4000);
+  }
+
+  function pickNextCase(caseList, currentCaseId = activeCase?.id) {
+    if (!Array.isArray(caseList) || caseList.length === 0) return null;
+    const differentCases = caseList.filter(c => c.id !== currentCaseId);
+    if (differentCases.length === 0) return caseList[0];
+
+    const aiCases = differentCases.filter(c => c.id?.startsWith('ai-'));
+    const pool = aiCases.length > 0 ? aiCases : differentCases;
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   async function loadCase(caseId, caseList = cases, caseData = null) {
@@ -370,9 +409,13 @@ export default function Simulator() {
       return;
     }
     const asked = messages.filter(m => m.role === 'user').length;
+    const cameFromMobileDrawer = isMobileViewport() && activeTab !== 'chat';
     setQuestion(activeCase.hints[asked % activeCase.hints.length]);
     if (isMobileViewport()) setActiveTab('chat');
-    window.setTimeout(() => inputRef.current?.focus(), 180);
+    if (!cameFromMobileDrawer) {
+      window.setTimeout(() => inputRef.current?.focus(), 140);
+    }
+
   };
 
   const handleKeyDown = (e) => {
@@ -383,17 +426,34 @@ export default function Simulator() {
   };
 
   const handleNewPatient = async () => {
+    const mobile = isMobileViewport();
+    if (mobile) {
+      document.activeElement?.blur();
+      setIsKeyboardOpen(false);
+      setActiveTab('chat');
+      await new Promise(resolve => window.setTimeout(resolve, 180));
+    }
+
     setGeneratingAI(true);
     try {
       const specialtyToUse = demoSpecialty
         ? demoSpecialty.charAt(0).toUpperCase() + demoSpecialty.slice(1)
         : effectiveUser.specialization;
-      const specialtyParam = specialtyToUse ? `?specialty=${encodeURIComponent(specialtyToUse)}` : '';
-      const data = await api(`/api/cases${specialtyParam}`);
-      setCases(data.cases);
-      if (data.cases.length > 0) {
-        await loadCase(data.cases[0].id, data.cases, data.cases[0]);
+      const params = new URLSearchParams();
+      if (specialtyToUse) params.set('specialty', specialtyToUse);
+      params.set('fresh', 'true');
+      if (activeCase?.id) params.set('exclude', activeCase.id);
+
+      const query = params.toString() ? `?${params.toString()}` : '';
+      const data = await api(`/api/cases${query}`);
+      const nextCases = data.cases || [];
+      setCases(nextCases);
+      const nextCase = pickNextCase(nextCases);
+      if (nextCase) {
+        await loadCase(nextCase.id, nextCases, nextCase);
         if (isMobileViewport()) setActiveTab('chat');
+      } else {
+        showToast('No patient cases available for this specialty yet.', 'info');
       }
     } catch (err) {
       showToast('Failed to generate new patient: ' + err.message, 'error');
@@ -451,16 +511,20 @@ export default function Simulator() {
   if (!effectiveUser) return null;
 
   return (
-    <div className="sim-shell">
+    <div
+      className={`sim-shell ${isKeyboardOpen ? 'keyboard-open' : ''} ${generatingAI ? 'is-generating' : ''}`}
+      style={visualViewportHeight ? { '--sim-vvh': `${visualViewportHeight}px` } : undefined}
+    >
 
       {generatingAI && (
-        <div className="page-loading">
-          <div style={{
-            width: 52, height: 52, borderRadius: 'var(--r-lg)',
-            background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            marginBottom: 16,
-          }}>
+        <div className="page-loading sim-loading-overlay">
+          <div className="sim-loading-card">
+            <div style={{
+              width: 52, height: 52, borderRadius: 'var(--r-lg)',
+              background: 'var(--teal-dim)', border: '1px solid rgba(0,201,177,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 16,
+            }}>
             <div className="spinner-lg" />
           </div>
           <div style={{ fontWeight: 700, fontSize: 'var(--fs-lg)', color: 'var(--text)' }}>
@@ -468,6 +532,7 @@ export default function Simulator() {
           </div>
           <div className="page-loading-label">
             Creating a unique case for {effectiveUser.specialization || 'your specialty'}...
+          </div>
           </div>
         </div>
       )}
@@ -534,14 +599,14 @@ export default function Simulator() {
           {!evaluation && (
             <button
               onClick={() => setIsAssessmentModalOpen(true)}
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-sm sim-diagnosis-btn"
               disabled={!sessionId || messages.length < 2}
             >
               Make Diagnosis
             </button>
           )}
           {evaluation && (
-            <button onClick={() => setIsAssessmentModalOpen(true)} className="btn btn-primary btn-sm">
+            <button onClick={() => setIsAssessmentModalOpen(true)} className="btn btn-primary btn-sm sim-diagnosis-btn">
               View Feedback
             </button>
           )}
@@ -665,17 +730,30 @@ export default function Simulator() {
           {/* Patient selector bar */}
           <div className="chat-patient-bar">
             {cases.length > 1 ? (
-              <select
-                className="chat-patient-selector"
-                value={activeCase?.id || ''}
-                onChange={e => loadCase(e.target.value)}
-              >
-                {cases.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} — {isEmergencyMode ? 'EMERGENCY' : c.specialty}
-                  </option>
-                ))}
-              </select>
+              <label className="chat-patient-switcher" aria-label="Switch patient case">
+                <select
+                  className="chat-patient-selector"
+                  value={activeCase?.id || ''}
+                  onChange={e => loadCase(e.target.value)}
+                >
+                  {cases.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} - {isEmergencyMode ? 'EMERGENCY' : c.specialty}
+                    </option>
+                  ))}
+                </select>
+                <span className="chat-patient-switcher-main">
+                  <span className="chat-patient-switcher-title">
+                    {activeCase?.name || 'Waiting for patient'} - {isEmergencyMode ? 'Emergency' : activeCase?.specialty}
+                  </span>
+                  <span className="chat-patient-switcher-hint">Switch patient</span>
+                </span>
+                <span className="chat-patient-switcher-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </span>
+              </label>
             ) : (
               <span style={{ fontWeight: 700, fontSize: 'var(--fs-base)', color: 'var(--text)' }}>
                 {activeCase?.name || 'Waiting for patient...'}
@@ -754,10 +832,16 @@ export default function Simulator() {
                 <input
                   ref={inputRef}
                   type="text"
+                  name="patient-question"
+                  autoComplete="off"
+                  autoCorrect="on"
+                  enterKeyHint="send"
                   className="chat-input"
                   value={question}
                   onChange={e => setQuestion(e.target.value)}
                   onKeyDown={handleKeyDown}
+                  onFocus={() => { if (isMobileViewport()) setIsKeyboardOpen(true); }}
+                  onBlur={() => window.setTimeout(() => setIsKeyboardOpen(false), 120)}
                   disabled={loading || !sessionId}
                   placeholder={listening ? 'Listening...' : 'Ask the patient a question...'}
                 />

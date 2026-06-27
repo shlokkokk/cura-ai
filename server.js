@@ -413,6 +413,8 @@ const server = http.createServer(async (request, response) => {
 
     if (request.method === "GET" && pathname === "/api/cases") {
       const specialtyFilter = url.searchParams.get("specialty");
+      const freshRequested = ["true", "1", "yes"].includes((url.searchParams.get("fresh") || "").toLowerCase());
+      const excludedCaseId = url.searchParams.get("exclude");
       
       let filteredCases = caseStudies;
       
@@ -479,6 +481,27 @@ Make cases medically accurate and diverse. Return ONLY valid JSON array, no mark
           }
           return generated;
         };
+
+        if (freshRequested) {
+          console.log(`[AI Case Gen] Fresh case requested for "${specialtyFilter}"`);
+          try {
+            const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 45000));
+            const generated = await Promise.race([generateSpecialtyCases(1, specialtyFilter), timeout]);
+            if (generated && generated.length > 0) {
+              filteredCases = [
+                ...generated,
+                ...filteredCases.filter(c => c.id !== excludedCaseId && !generated.find(g => g.id === c.id))
+              ];
+            }
+          } catch (err) {
+            console.error(`[AI Case Gen] Fresh generation failed/timed out for ${specialtyFilter}:`, err.message);
+          }
+        }
+
+        if (excludedCaseId && filteredCases.length > 1) {
+          const withoutExcluded = filteredCases.filter(c => c.id !== excludedCaseId);
+          if (withoutExcluded.length > 0) filteredCases = withoutExcluded;
+        }
 
         if (filteredCases.length === 0) {
           // NO matching cases at all — we MUST wait for AI to generate at least one
